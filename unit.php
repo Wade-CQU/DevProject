@@ -7,7 +7,7 @@
   <link href="css/style.css" rel="stylesheet" />
 </head>
 <body>
-    <header>
+    <header> 
         <img class="menu-icon" src="https://cdn-icons-png.flaticon.com/512/2516/2516745.png">
         <img class="nav-logo" src="https://moodle.cqu.edu.au/pluginfile.php/1/core_admin/logocompact/300x300/1688017676/cqu-logo.png"  alt="Moodle">
         <nav >
@@ -15,7 +15,7 @@
                 <li><a class="nav-element" href="">COURSES</a></li>
                 <li><a class="nav-element" href="">ASSESSMENT</a></li>
                 <li><a class="nav-element" href="">SUPPORT</a>  </li>
-            </ul>
+            </ul>      
         </nav>
         <img class="profile-icon" src="https://cdn-icons-png.flaticon.com/512/64/64572.png">
     </header>
@@ -25,13 +25,13 @@
         <div class="unit-title">
             <p1>
                 COIT120398 MORE JAVA
-            </p1>
+            </p1>  
         </div>
         <div class="unit-description">
             <p2>
                 On behalf of the CQUniversity's School of Engineering and Technology, we welcome you to this unit and wish you the very best with your study. I trust that you find it to be a rewarding experience.
                 <br><br>
-                Please work your way through the introductory resources below to get an overview of the unit and requirements before proceeding.
+                Please work your way through the introductory resources below to get an overview of the unit and requirements before proceeding. 
                 <br><br>
                 Unit Coordinator and Teaching Teams
             </p2>
@@ -43,22 +43,24 @@
           </div>
           <div class="quest-description">
             <p>
-              This is the details of the weekly quest. Aye woah look, lookkyy here this is a whole lotta week 1 content. Wow week 1, looky here week 1 content header.
+              This is the details of the weekly quest. Aye woah look, lookkyy here this is a whole lotta week 1 content. Wow week 1, looky here week 1 content header.  
             </p>
           </div>
         </div>
         <div class="weekly-content-container">
-            <button type="button" class="test-button">WEEK 1</button>
-              <div class="weekly-content"><p><br>This unit is the capstone project for the application development major of the Bachelor of Information Technology (BIT) course. You are required to synthesise and apply your skills developed across the units studied previously.
-                This unit will help you to consolidate your competence with a relevant set of software engineering concepts, practices, and tools. To achieve this, you will work in small teams with a designated customer to identify a problem
-                and develop a software application adhering to software engineering principles and standards. You will document and present the requirement analysis, design artifacts, and the results from software testing.
-                In addition to the documented application, your team will also identify and produce the project management and quality assurance components required to ensure that the project is delivered within specified project outcome parameters.
+            <button type="button" class="test-button">WEEK 1
+              <p class="week-subtitle">SAMPLE UNIT SUBTITLE</p>
+            </button>
+              <div class="weekly-content"><p><br>This unit is the capstone project for the application development major of the Bachelor of Information Technology (BIT) course. You are required to synthesise and apply your skills developed across the units studied previously. 
+                This unit will help you to consolidate your competence with a relevant set of software engineering concepts, practices, and tools. To achieve this, you will work in small teams with a designated customer to identify a problem 
+                and develop a software application adhering to software engineering principles and standards. You will document and present the requirement analysis, design artifacts, and the results from software testing. 
+                In addition to the documented application, your team will also identify and produce the project management and quality assurance components required to ensure that the project is delivered within specified project outcome parameters. 
                 You will also evaluate and discuss your contribution to the project team and the overall team performance.
                   <br><br>
-                  This unit is the capstone project for the application development major of the Bachelor of Information Technology (BIT) course. You are required to synthesise and apply your skills developed across the units studied previously.
-                  This unit will help you to consolidate your competence with a relevant set of software engineering concepts, practices, and tools. To achieve this, you will work in small teams with a designated customer to identify a problem
-                  and develop a software application adhering to software engineering principles and standards. You will document and present the requirement analysis, design artifacts, and the results from software testing.
-                  In addition to the documented application, your team will also identify and produce the project management and quality assurance components required to ensure that the project is delivered within specified project outcome parameters.
+                  This unit is the capstone project for the application development major of the Bachelor of Information Technology (BIT) course. You are required to synthesise and apply your skills developed across the units studied previously. 
+                  This unit will help you to consolidate your competence with a relevant set of software engineering concepts, practices, and tools. To achieve this, you will work in small teams with a designated customer to identify a problem 
+                  and develop a software application adhering to software engineering principles and standards. You will document and present the requirement analysis, design artifacts, and the results from software testing. 
+                  In addition to the documented application, your team will also identify and produce the project management and quality assurance components required to ensure that the project is delivered within specified project outcome parameters. 
                   You will also evaluate and discuss your contribution to the project team and the overall team performance.<br><br>
                 </p>
                 <ul>
@@ -68,19 +70,21 @@
                   <li>Develop your professionalism by following standards and good practices.<br><br></li>
                   <li>Manage your time efficiently and complete tasks on time.<br><br></li>
                   <li>If you have problems with any of the topics/concepts learnt in previous units do not hesitate to discuss with your tutor and get assistance to learn and apply.<br><br></li>
-                </ul>
+                </ul>  
               </div>
-            <button type="button" class="test-button">WEEK 2</button>
-            <div class="weekly-content"><p><br>This unit is the capstone project for the application development major of the Bachelor of Information Technology (BIT) course. You are required to synthesise and apply your skills developed across the units studied previously.
-              This unit will help you to consolidate your competence with a relevant set of software engineering concepts, practices, and tools. To achieve this, you will work in small teams with a designated customer to identify a problem
-              and develop a software application adhering to software engineering principles and standards. You will document and present the requirement analysis, design artifacts, and the results from software testing.
-              In addition to the documented application, your team will also identify and produce the project management and quality assurance components required to ensure that the project is delivered within specified project outcome parameters.
+            <button type="button" class="test-button">WEEK 2
+              <p class="week-subtitle">SAMPLE UNIT SUBTITLE</p>
+            </button>
+            <div class="weekly-content"><p><br>This unit is the capstone project for the application development major of the Bachelor of Information Technology (BIT) course. You are required to synthesise and apply your skills developed across the units studied previously. 
+              This unit will help you to consolidate your competence with a relevant set of software engineering concepts, practices, and tools. To achieve this, you will work in small teams with a designated customer to identify a problem 
+              and develop a software application adhering to software engineering principles and standards. You will document and present the requirement analysis, design artifacts, and the results from software testing. 
+              In addition to the documented application, your team will also identify and produce the project management and quality assurance components required to ensure that the project is delivered within specified project outcome parameters. 
               You will also evaluate and discuss your contribution to the project team and the overall team performance.
                 <br><br>
-                This unit is the capstone project for the application development major of the Bachelor of Information Technology (BIT) course. You are required to synthesise and apply your skills developed across the units studied previously.
-                This unit will help you to consolidate your competence with a relevant set of software engineering concepts, practices, and tools. To achieve this, you will work in small teams with a designated customer to identify a problem
-                and develop a software application adhering to software engineering principles and standards. You will document and present the requirement analysis, design artifacts, and the results from software testing.
-                In addition to the documented application, your team will also identify and produce the project management and quality assurance components required to ensure that the project is delivered within specified project outcome parameters.
+                This unit is the capstone project for the application development major of the Bachelor of Information Technology (BIT) course. You are required to synthesise and apply your skills developed across the units studied previously. 
+                This unit will help you to consolidate your competence with a relevant set of software engineering concepts, practices, and tools. To achieve this, you will work in small teams with a designated customer to identify a problem 
+                and develop a software application adhering to software engineering principles and standards. You will document and present the requirement analysis, design artifacts, and the results from software testing. 
+                In addition to the documented application, your team will also identify and produce the project management and quality assurance components required to ensure that the project is delivered within specified project outcome parameters. 
                 You will also evaluate and discuss your contribution to the project team and the overall team performance.<br><br>
               </p>
               <ul>
@@ -90,19 +94,21 @@
                 <li>Develop your professionalism by following standards and good practices.<br><br></li>
                 <li>Manage your time efficiently and complete tasks on time.<br><br></li>
                 <li>If you have problems with any of the topics/concepts learnt in previous units do not hesitate to discuss with your tutor and get assistance to learn and apply.<br><br></li>
-              </ul>
+              </ul>  
             </div>
-            <button type="button" class="test-button">WEEK 3</button>
-            <div class="weekly-content"><p><br>This unit is the capstone project for the application development major of the Bachelor of Information Technology (BIT) course. You are required to synthesise and apply your skills developed across the units studied previously.
-              This unit will help you to consolidate your competence with a relevant set of software engineering concepts, practices, and tools. To achieve this, you will work in small teams with a designated customer to identify a problem
-              and develop a software application adhering to software engineering principles and standards. You will document and present the requirement analysis, design artifacts, and the results from software testing.
-              In addition to the documented application, your team will also identify and produce the project management and quality assurance components required to ensure that the project is delivered within specified project outcome parameters.
+            <button type="button" class="test-button">WEEK 3
+              <p class="week-subtitle">SAMPLE UNIT SUBTITLE</p>
+            </button>
+            <div class="weekly-content"><p><br>This unit is the capstone project for the application development major of the Bachelor of Information Technology (BIT) course. You are required to synthesise and apply your skills developed across the units studied previously. 
+              This unit will help you to consolidate your competence with a relevant set of software engineering concepts, practices, and tools. To achieve this, you will work in small teams with a designated customer to identify a problem 
+              and develop a software application adhering to software engineering principles and standards. You will document and present the requirement analysis, design artifacts, and the results from software testing. 
+              In addition to the documented application, your team will also identify and produce the project management and quality assurance components required to ensure that the project is delivered within specified project outcome parameters. 
               You will also evaluate and discuss your contribution to the project team and the overall team performance.
                 <br><br>
-                This unit is the capstone project for the application development major of the Bachelor of Information Technology (BIT) course. You are required to synthesise and apply your skills developed across the units studied previously.
-                This unit will help you to consolidate your competence with a relevant set of software engineering concepts, practices, and tools. To achieve this, you will work in small teams with a designated customer to identify a problem
-                and develop a software application adhering to software engineering principles and standards. You will document and present the requirement analysis, design artifacts, and the results from software testing.
-                In addition to the documented application, your team will also identify and produce the project management and quality assurance components required to ensure that the project is delivered within specified project outcome parameters.
+                This unit is the capstone project for the application development major of the Bachelor of Information Technology (BIT) course. You are required to synthesise and apply your skills developed across the units studied previously. 
+                This unit will help you to consolidate your competence with a relevant set of software engineering concepts, practices, and tools. To achieve this, you will work in small teams with a designated customer to identify a problem 
+                and develop a software application adhering to software engineering principles and standards. You will document and present the requirement analysis, design artifacts, and the results from software testing. 
+                In addition to the documented application, your team will also identify and produce the project management and quality assurance components required to ensure that the project is delivered within specified project outcome parameters. 
                 You will also evaluate and discuss your contribution to the project team and the overall team performance.<br><br>
               </p>
               <ul>
@@ -112,19 +118,21 @@
                 <li>Develop your professionalism by following standards and good practices.<br><br></li>
                 <li>Manage your time efficiently and complete tasks on time.<br><br></li>
                 <li>If you have problems with any of the topics/concepts learnt in previous units do not hesitate to discuss with your tutor and get assistance to learn and apply.<br><br></li>
-              </ul>
+              </ul>  
             </div>
-            <button type="button" class="test-button">WEEK 4</button>
-            <div class="weekly-content"><p><br>AThis unit is the capstone project for the application development major of the Bachelor of Information Technology (BIT) course. You are required to synthesise and apply your skills developed across the units studied previously.
-              This unit will help you to consolidate your competence with a relevant set of software engineering concepts, practices, and tools. To achieve this, you will work in small teams with a designated customer to identify a problem
-              and develop a software application adhering to software engineering principles and standards. You will document and present the requirement analysis, design artifacts, and the results from software testing.
-              In addition to the documented application, your team will also identify and produce the project management and quality assurance components required to ensure that the project is delivered within specified project outcome parameters.
+            <button type="button" class="test-button">WEEK 4
+              <p class="week-subtitle">SAMPLE UNIT SUBTITLE</p>
+            </button>
+            <div class="weekly-content"><p><br>AThis unit is the capstone project for the application development major of the Bachelor of Information Technology (BIT) course. You are required to synthesise and apply your skills developed across the units studied previously. 
+              This unit will help you to consolidate your competence with a relevant set of software engineering concepts, practices, and tools. To achieve this, you will work in small teams with a designated customer to identify a problem 
+              and develop a software application adhering to software engineering principles and standards. You will document and present the requirement analysis, design artifacts, and the results from software testing. 
+              In addition to the documented application, your team will also identify and produce the project management and quality assurance components required to ensure that the project is delivered within specified project outcome parameters. 
               You will also evaluate and discuss your contribution to the project team and the overall team performance.
                 <br><br>
-                This unit is the capstone project for the application development major of the Bachelor of Information Technology (BIT) course. You are required to synthesise and apply your skills developed across the units studied previously.
-                This unit will help you to consolidate your competence with a relevant set of software engineering concepts, practices, and tools. To achieve this, you will work in small teams with a designated customer to identify a problem
-                and develop a software application adhering to software engineering principles and standards. You will document and present the requirement analysis, design artifacts, and the results from software testing.
-                In addition to the documented application, your team will also identify and produce the project management and quality assurance components required to ensure that the project is delivered within specified project outcome parameters.
+                This unit is the capstone project for the application development major of the Bachelor of Information Technology (BIT) course. You are required to synthesise and apply your skills developed across the units studied previously. 
+                This unit will help you to consolidate your competence with a relevant set of software engineering concepts, practices, and tools. To achieve this, you will work in small teams with a designated customer to identify a problem 
+                and develop a software application adhering to software engineering principles and standards. You will document and present the requirement analysis, design artifacts, and the results from software testing. 
+                In addition to the documented application, your team will also identify and produce the project management and quality assurance components required to ensure that the project is delivered within specified project outcome parameters. 
                 You will also evaluate and discuss your contribution to the project team and the overall team performance.<br><br>
               </p>
               <ul>
@@ -134,23 +142,39 @@
                 <li>Develop your professionalism by following standards and good practices.<br><br></li>
                 <li>Manage your time efficiently and complete tasks on time.<br><br></li>
                 <li>If you have problems with any of the topics/concepts learnt in previous units do not hesitate to discuss with your tutor and get assistance to learn and apply.<br><br></li>
-              </ul>
+              </ul>  
             </div>
-            <button type="button" class="test-button">WEEK 5</button>
+            <button type="button" class="test-button">WEEK 5
+              <p class="week-subtitle">SAMPLE UNIT SUBTITLE</p>
+            </button>
               <div class="weekly-content"></div>
-            <button type="button" class="test-button">WEEK 6</button>
+            <button type="button" class="test-button">WEEK 6
+              <p class="week-subtitle">SAMPLE UNIT SUBTITLE</p>
+            </button>
               <div class="weekly-content"></div>
-            <button type="button" class="test-button">WEEK 7</button>
+            <button type="button" class="test-button">WEEK 7
+              <p class="week-subtitle">SAMPLE UNIT SUBTITLE</p>
+            </button>
               <div class="weekly-content"></div>
-            <button type="button" class="test-button">WEEK 8</button>
+            <button type="button" class="test-button">WEEK 8
+              <p class="week-subtitle">SAMPLE UNIT SUBTITLE</p>
+            </button>
               <div class="weekly-content"></div>
-            <button type="button" class="test-button">WEEK 9</button>
+            <button type="button" class="test-button">WEEK 9
+              <p class="week-subtitle">SAMPLE UNIT SUBTITLE</p>
+            </button>
               <div class="weekly-content"></div>
-            <button type="button" class="test-button">WEEK 10</button>
+            <button type="button" class="test-button">WEEK 10
+              <p class="week-subtitle">SAMPLE UNIT SUBTITLE</p>
+            </button>
               <div class="weekly-content"></div>
-            <button type="button" class="test-button">WEEK 11</button>
+            <button type="button" class="test-button">WEEK 11
+              <p class="week-subtitle">SAMPLE UNIT SUBTITLE</p>
+            </button>
               <div class="weekly-content"></div>
-            <button type="button" class="test-button">WEEK 12</button>
+            <button type="button" class="test-button">WEEK 12
+              <p class="week-subtitle">SAMPLE UNIT SUBTITLE</p>
+            </button>
               <div class="weekly-content"></div>
             <button type="button" class="test-button">REVIEW WEEK</button>
               <div class="weekly-content"></div>
@@ -160,7 +184,7 @@
     </div>
   <script>
     // const weeklyContentButton = document.querySelector(".test-button");
-
+    
     // weeklyContentButton.addEventListener("click", () => {
     //   weeklyContentButton.classList.toggle("button-openned");
     // });
