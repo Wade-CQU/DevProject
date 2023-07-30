@@ -202,3 +202,10 @@ p2{
   transition-timing-function:cubic-bezier(1, 0, 0, 1);
   transition-duration: .6s;
 }
+
+.flexbox{
+  display: flex;
+  justify-content: right;
+  color: white;
+  text-shadow: -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000;
+}

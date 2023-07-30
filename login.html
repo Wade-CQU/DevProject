@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <title>NU | Pluto Login</title>
+  <link rel="stylesheet" href="/devproject/css/style.css">
+</head>
+
+<body style="background-image: url('/devproject/assets/NeptuneBackground.png');">
+
+  <form action="/devproject/php/login.php" method="post">
+
+    <div class="flexbox">
+      <table>
+        <td><h1>Neptune Universirty</h1><h2>Pluto Login</h2><br /></td>
+        <tr>
+          <td><label for="username"><b>Username:</b></label></td>
+          <td><input type="text" placeholder="Enter Username" name="username" required></td>
+        </tr>
+        <tr>
+          <td><label for="password"><b>Password:</b></label></td>
+          <td><input type="password" placeholder="Enter Password" name="password" required></td>
+        </tr>
+        <tr>
+          <td><button type="submit">Login</button></td>
+          <td><label><input type="checkbox" checked="checked" name="remember"> Remember me</label></td>
+        </tr>
+      </table>
+
+    </div>
+
+    <!--
+    <div class="container" style="background-color:#f1f1f1">
+      <button type="button" class="cancelbtn">Cancel</button>
+      <span class="password">Forgot <a href="#">password?</a></span>
+    </div>
+    -->
+
+  </form>
+
+</body>
+
+</html>
