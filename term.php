@@ -4,15 +4,15 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link href="css/header.css" rel="stylesheet" />
+    <link href="css/default.css" rel="stylesheet" />
     <link href="css/term.css" rel="stylesheet" />
-    <title>Document</title>
+    <title></title>
 </head>
 <body>
     <?php require("php/header.php"); ?>
     <h1>WELCOME TO TERM 1, WEEK 1</h1>
 
-    
+
     <div class="side-scroll-container">
 
         <!-- example unit tile -->

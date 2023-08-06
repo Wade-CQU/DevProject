@@ -1,4 +1,4 @@
-/* 
+/*
     Outline for debug
         outline: 1px solid red;
 */
@@ -143,7 +143,7 @@ p2{
 }
 
 /* .test-button{
-  display: block; 
+  display: block;
   width: 250px;
   margin-top: 50px;
   padding: 20px 0px;
@@ -154,15 +154,15 @@ p2{
   transition: box-shadow .4s, width .2s ease-in-out, border-radius .2s ease-in-out;
   outline: inherit;
   border: none;
-  
+
 } */
 
 .test-button{
-  display: block; 
+  display: block;
   width: 250px;
   height: 80px;
   margin-top: 50px;
-  padding: 20px 0px;  
+  padding: 20px 0px;
   text-align: center;
   background-color: #2b2b52;
   background-image:  linear-gradient(43deg, #b6c2ff 0%, #ffaffa 46%, #ffe0a7 100%);
@@ -208,4 +208,83 @@ p2{
   justify-content: right;
   color: white;
   text-shadow: -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000;
+}
+
+/* The Unit Page's Tile Components: */
+.unitTileDiv {
+
+}
+
+.unitTileHolder {
+  background-color: #1e1f22;
+  border-radius: 16px;
+  padding: 6px;
+  margin-top: 50px;
+  max-width: 300px;
+}
+.unitTile {
+  background-color: #303339;
+  border-radius: 16px;
+  grid-auto-flow: column;
+  display: grid;
+  grid-column: 2;
+}
+.unitTileIconHolder {
+  background-color: white;
+  border-radius: 16px;
+  padding: 12px;
+  display: inline-block;
+  min-height: 60px;
+  min-width: 80px;
+  vertical-align: middle;
+}
+.unitTileContents {
+  padding: 8px;
+  text-align: center;
+  display: inline-block;
+  vertical-align: middle;
+}
+.unitTileTitle {
+  color: white;
+  margin-top: 4px;
+  font-size 16px;
+  font-weight: bold;
+}
+.unitTileLabel {
+  color: #02d7f2;
+  font-size: 14px;
+  overflow: hidden;
+  max-width: 100%;
+  max-height: 36px;
+  min-height: 36px;
+}
+.unitTileXpHolder {
+  margin-top: 6px;
+  vertical-align: middle;
+  text-align: center;
+}
+.unitTileXpLabel {
+  font-size: 13px;
+  color: #f2e900;
+  display: inline-block;
+  vertical-align: middle;
+}
+.unitTileXpBar {
+  background-color: white;
+  min-width: 180px;
+  min-height: 12px;
+  border-radius: 6px;
+  display: inline-block;
+  vertical-align: middle;
+}
+.unitTileXpProgress {
+  background-color: green;
+  height: 12px;
+  border-radius: 6px;
+  float: left;
+  width: 12%; /* THIS WILL BE INLINE FOR EACH EXP BAR */
+}
+
+.unitTileDescription {
+  display: none;
 }
