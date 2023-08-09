@@ -1,9 +1,29 @@
-<?php include("php/session.php");  ?>
+<?php // Page responsible for displaying an individual unit and it's content //
+include("php/session.php");
+include("php/dbConnect.php");
+
+// Get unit record:
+$sql = "SELECT * FROM unit WHERE ID = ? LIMIT 1;";
+$stmt = $dbh->prepare($sql);
+
+$stmt->bind_param("i", $_GET['id']);
+$stmt->execute();
+$result = $stmt->get_result();
+
+if (!$result || $result->num_rows == 0) { // if query or database connection fails, or unit not found:
+  echo "404 Unit Not Found";
+  $stmt->close();
+  $dbh->close();
+  exit;
+}
+
+$unit = $result->fetch_assoc();
+?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="utf-8">
-  <title>UNIT PAGE</title>
+  <title><?php echo $unit['code'] . ": " . $unit['name']; ?></title>
   <link href="css/unit.css" rel="stylesheet" />
   <link href="css/default.css" rel="stylesheet" />
 </head>
@@ -13,16 +33,12 @@
       <div class="unit-heading">
         <div class="unit-title">
             <p1>
-                COIT120398 MORE JAVA
+                <?php echo $unit['code'] . ": " . $unit['name']; ?>
             </p1>
         </div>
         <div class="unit-description">
             <p2>
-                On behalf of the CQUniversity's School of Engineering and Technology, we welcome you to this unit and wish you the very best with your study. I trust that you find it to be a rewarding experience.
-                <br><br>
-                Please work your way through the introductory resources below to get an overview of the unit and requirements before proceeding.
-                <br><br>
-                Unit Coordinator and Teaching Teams
+                <?php echo $unit['description']; ?>
             </p2>
         </div>
       </div>
@@ -37,7 +53,23 @@
           </div>
         </div>
         <div class="weekly-content-container">
-              <!-- New Week Tiles -->
+          <?php
+            // Get unit's tiles (!!! if not cached):
+            $sql = "SELECT * FROM tile WHERE unitId = ?;";
+            $stmt = $dbh->prepare($sql);
+
+            $stmt->bind_param("i", $_GET['id']);
+            $stmt->execute();
+            $result = $stmt->get_result();
+
+            if (!$result) { // if query or database connection fails:
+              echo "404 Unit Not Found"; // !!! review?
+              $stmt->close();
+              $dbh->close();
+              exit;
+            }
+
+            while ($tile = $result->fetch_assoc()) { ?>
               <div class="unitTileDiv">
                 <div class="unitTileHolder">
                   <div class="unitTile">
@@ -45,12 +77,8 @@
                       <img src="" alt="">
                     </div>
                     <div class="unitTileContents">
-                      <p class="unitTileTitle">
-                        WEEK 1
-                      </p>
-                      <p class="unitTileLabel">
-                        Introduction to breadmaking.
-                      </p>
+                      <p class="unitTileTitle"><?php echo $tile['name']; ?></p>
+                      <p class="unitTileLabel"><?php echo $tile['label']; ?></p>
                     </div>
                   </div>
                   <div class="unitTileXpHolder">
@@ -63,233 +91,13 @@
                   </div>
                 </div>
                 <div class="unitTileDescription">
-                  In this unit we are going to be commiting bread making.
+                  <?php echo $tile['description']; ?>
                 </div>
               </div>
-              <div class="unitTileDiv">
-                <div class="unitTileHolder">
-                  <div class="unitTile">
-                    <div class="unitTileIconHolder">
-                      <img src="" alt="">
-                    </div>
-                    <div class="unitTileContents">
-                      <p class="unitTileTitle">
-                        WEEK 1
-                      </p>
-                      <p class="unitTileLabel">
-                        Introduction to breadmaking.
-                      </p>
-                    </div>
-                  </div>
-                  <div class="unitTileXpHolder">
-                    <p class="unitTileXpLabel">EXP:</p>
-                    <div class="unitTileXpBar">
-                      <div class="unitTileXpProgress">
-
-                      </div>
-                    </div>
-                  </div>
-                </div>
-                <div class="unitTileDescription">
-                  In this unit we are going to be commiting bread making.
-                </div>
-              </div>
-              <div class="unitTileDiv">
-                <div class="unitTileHolder">
-                  <div class="unitTile">
-                    <div class="unitTileIconHolder">
-                      <img src="" alt="">
-                    </div>
-                    <div class="unitTileContents">
-                      <p class="unitTileTitle">
-                        WEEK 1
-                      </p>
-                      <p class="unitTileLabel">
-                        Introduction to breadmaking.
-                      </p>
-                    </div>
-                  </div>
-                  <div class="unitTileXpHolder">
-                    <p class="unitTileXpLabel">EXP:</p>
-                    <div class="unitTileXpBar">
-                      <div class="unitTileXpProgress">
-
-                      </div>
-                    </div>
-                  </div>
-                </div>
-                <div class="unitTileDescription">
-                  In this unit we are going to be commiting bread making.
-                </div>
-              </div>
-              <div class="unitTileDiv">
-                <div class="unitTileHolder">
-                  <div class="unitTile">
-                    <div class="unitTileIconHolder">
-                      <img src="" alt="">
-                    </div>
-                    <div class="unitTileContents">
-                      <p class="unitTileTitle">
-                        WEEK 1
-                      </p>
-                      <p class="unitTileLabel">
-                        Introduction to breadmaking.
-                      </p>
-                    </div>
-                  </div>
-                  <div class="unitTileXpHolder">
-                    <p class="unitTileXpLabel">EXP:</p>
-                    <div class="unitTileXpBar">
-                      <div class="unitTileXpProgress">
-
-                      </div>
-                    </div>
-                  </div>
-                </div>
-                <div class="unitTileDescription">
-                  In this unit we are going to be commiting bread making.
-                </div>
-              </div>
-              <div class="unitTileDiv">
-                <div class="unitTileHolder">
-                  <div class="unitTile">
-                    <div class="unitTileIconHolder">
-                      <img src="" alt="">
-                    </div>
-                    <div class="unitTileContents">
-                      <p class="unitTileTitle">
-                        WEEK 1
-                      </p>
-                      <p class="unitTileLabel">
-                        Introduction to breadmaking.
-                      </p>
-                    </div>
-                  </div>
-                  <div class="unitTileXpHolder">
-                    <p class="unitTileXpLabel">EXP:</p>
-                    <div class="unitTileXpBar">
-                      <div class="unitTileXpProgress">
-
-                      </div>
-                    </div>
-                  </div>
-                </div>
-                <div class="unitTileDescription">
-                  In this unit we are going to be commiting bread making.
-                </div>
-              </div>
-              <div class="unitTileDiv">
-                <div class="unitTileHolder">
-                  <div class="unitTile">
-                    <div class="unitTileIconHolder">
-                      <img src="" alt="">
-                    </div>
-                    <div class="unitTileContents">
-                      <p class="unitTileTitle">
-                        WEEK 1
-                      </p>
-                      <p class="unitTileLabel">
-                        Introduction to breadmaking.
-                      </p>
-                    </div>
-                  </div>
-                  <div class="unitTileXpHolder">
-                    <p class="unitTileXpLabel">EXP:</p>
-                    <div class="unitTileXpBar">
-                      <div class="unitTileXpProgress">
-
-                      </div>
-                    </div>
-                  </div>
-                </div>
-                <div class="unitTileDescription">
-                  In this unit we are going to be commiting bread making.
-                </div>
-              </div>
-              <div class="unitTileDiv">
-                <div class="unitTileHolder">
-                  <div class="unitTile">
-                    <div class="unitTileIconHolder">
-                      <img src="" alt="">
-                    </div>
-                    <div class="unitTileContents">
-                      <p class="unitTileTitle">
-                        WEEK 1
-                      </p>
-                      <p class="unitTileLabel">
-                        Introduction to breadmaking.
-                      </p>
-                    </div>
-                  </div>
-                  <div class="unitTileXpHolder">
-                    <p class="unitTileXpLabel">EXP:</p>
-                    <div class="unitTileXpBar">
-                      <div class="unitTileXpProgress">
-
-                      </div>
-                    </div>
-                  </div>
-                </div>
-                <div class="unitTileDescription">
-                  In this unit we are going to be commiting bread making.
-                </div>
-              </div>
-              <div class="unitTileDiv">
-                <div class="unitTileHolder">
-                  <div class="unitTile">
-                    <div class="unitTileIconHolder">
-                      <img src="" alt="">
-                    </div>
-                    <div class="unitTileContents">
-                      <p class="unitTileTitle">
-                        WEEK 1
-                      </p>
-                      <p class="unitTileLabel">
-                        Introduction to breadmaking.
-                      </p>
-                    </div>
-                  </div>
-                  <div class="unitTileXpHolder">
-                    <p class="unitTileXpLabel">EXP:</p>
-                    <div class="unitTileXpBar">
-                      <div class="unitTileXpProgress">
-
-                      </div>
-                    </div>
-                  </div>
-                </div>
-                <div class="unitTileDescription">
-                  In this unit we are going to be commiting bread making.
-                </div>
-              </div>
-              <div class="unitTileDiv">
-                <div class="unitTileHolder">
-                  <div class="unitTile">
-                    <div class="unitTileIconHolder">
-                      <img src="" alt="">
-                    </div>
-                    <div class="unitTileContents">
-                      <p class="unitTileTitle">
-                        WEEK 1
-                      </p>
-                      <p class="unitTileLabel">
-                        Introduction to breadmaking.
-                      </p>
-                    </div>
-                  </div>
-                  <div class="unitTileXpHolder">
-                    <p class="unitTileXpLabel">EXP:</p>
-                    <div class="unitTileXpBar">
-                      <div class="unitTileXpProgress">
-
-                      </div>
-                    </div>
-                  </div>
-                </div>
-                <div class="unitTileDescription">
-                  In this unit we are going to be commiting bread making.
-                </div>
-              </div>
+          <?php }
+            $stmt->close();
+            $dbh->close();
+           ?>
         </div>
     </div>
   <script>
