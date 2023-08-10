@@ -26,6 +26,7 @@ $unit = $result->fetch_assoc();
   <title><?php echo $unit['code'] . ": " . $unit['name']; ?></title>
   <link href="css/unit.css" rel="stylesheet" />
   <link href="css/default.css" rel="stylesheet" />
+  <script src="https://code.jquery.com/jquery-3.7.0.min.js" integrity="sha256-2Pmvv0kuTBOenSvLm6bvfBSSHrUJ+3A7x6P5Ebd07/g=" crossorigin="anonymous"></script>
 </head>
 <body>
     <?php require("php/header.php"); ?>
@@ -71,7 +72,7 @@ $unit = $result->fetch_assoc();
 
             while ($tile = $result->fetch_assoc()) { ?>
               <div class="unitTileDiv">
-                <div class="unitTileHolder">
+                <div class="unitTileHolder" id="<?php echo $tile['id']; ?>">
                   <div class="unitTile">
                     <div class="unitTileIconHolder">
                       <img src="" alt="">
@@ -101,30 +102,62 @@ $unit = $result->fetch_assoc();
         </div>
     </div>
   <script>
-    // const weeklyContentButton = document.querySelector(".test-button");
+    //select all the tiles
+    const tiles = document.querySelectorAll(".unitTileHolder");
 
-    // weeklyContentButton.addEventListener("click", () => {
-    //   weeklyContentButton.classList.toggle("button-openned");
-    // });
+    //move all the id values into the idValues array
+    tiles.forEach(tile => {
+      //store boolean to show if the modal has been created already to avoid loading more than once if tile is clicked more than once
+      var contentLoaded = false;
+      //create listener for each tile on the page
+      tile.addEventListener("click", function(){
+        //if modal has already been loaded -> change visiblity
+        if(contentLoaded){
+          const thisModalContainer = document.querySelector("#modalContainer" + tile.id + ".modal");
+          thisModalContainer.style.display = "block";
 
-    // !!! Old tile opening code (wade would be very upset if you removed it):
+          window.onclick = function(event) {
+            if (event.target == thisModalContainer) {
+              thisModalContainer.style.display = "none";
+            }
+          }
+        //if modal is not yet created -> create and make visible
+        } else {
+          var modalContainer = document.createElement('div');
+            modalContainer.className = "modal";
+            modalContainer.id = "modalContainer" + tile.id;
+          var modalContent = document.createElement('div');
+            modalContent.className = "modal-content";
+          var closeButton = document.createElement('span');
+            closeButton.className = "close";
+            closeButton.textContent = "x";
 
-    // const weeklyContentButton = document.querySelectorAll(".test-button");
-    // var i;
-    //
-    // for (i = 0; i < weeklyContentButton.length; i++) {
-    //   weeklyContentButton[i].addEventListener("click", function() {
-    //     this.classList.toggle("button-openned");
-    //     var content = this.nextElementSibling;
-    //     if (content.style.maxHeight) {
-    //       content.style.maxHeight = null;
-    //       content.style.display = "none";
-    //     } else {
-    //       content.style.display = "block";
-    //       content.style.maxHeight = content.scrollHeight + "px";
-    //     }
-    //   });
-    // }
+          document.body.appendChild(modalContainer);
+          modalContainer.appendChild(modalContent);
+          modalContent.appendChild(closeButton);
+
+          //!!! logic for modal content goes here
+          var contentHeading = document.createElement('div');
+          contentHeading.className = "modal-unit-heading";
+          contentHeading.textContent = "You selected the tile with id: " + tile.id;
+          modalContent.appendChild(contentHeading);
+          modalContainer.style.display = "block";
+
+          //close modal functions
+          closeButton.onclick = function() {
+            modalContainer.style.display = "none";
+          }
+          window.onclick = function(event) {
+            if (event.target == modalContainer) {
+              modalContainer.style.display = "none";
+            }
+          }
+          //set loaded to true so it doesnt reload modal each time user clicks on it
+          contentLoaded = true;
+        }
+        console.log(tile.id);
+      })
+    });
   </script>
 </body>
 </html>
