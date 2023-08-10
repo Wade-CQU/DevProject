@@ -208,29 +208,35 @@ p2{
 
 /* The Modal (background) */
 .modal {
-  display: none; 
-  position: fixed; 
-  z-index: 1; 
+  display: none;
+  position: fixed;
+  z-index: 1;
   left: 0;
   top: 0;
-  width: 100%; 
-  height: 100%; 
-  overflow: auto; 
+  width: 100%;
+  height: 100%;
+  overflow: auto;
 }
 
 /* Modal Content/Box */
 .modal-content {
   background-color: #1e1f22;
-  margin: 15% auto; 
+  margin: 5% auto;
   padding: 20px;
   border: 1px solid #888;
-  width: 80%; 
+  width: 80%;
   min-height: 1000px;
 }
 
 .modal-unit-heading{
   color: #02d7f2;
   font-size: 3em;
+  text-align: center;
+}
+.modal-unit-description {
+  color: white;
+  margin: 20px 100px;
+  text-align: center;
 }
 
 /* The Close Button */

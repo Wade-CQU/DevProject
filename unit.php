@@ -72,7 +72,7 @@ $unit = $result->fetch_assoc();
 
             while ($tile = $result->fetch_assoc()) { ?>
               <div class="unitTileDiv">
-                <div class="unitTileHolder" id="<?php echo $tile['id']; ?>">
+                <div class="unitTileHolder" id="<?php echo $tile['id']; ?>" data-tile-name="<?php echo $tile['name']; ?>" data-tile-label="<?php echo $tile['label']; ?>" data-tile-description="<?php echo $tile['description']; ?>">
                   <div class="unitTile">
                     <div class="unitTileIconHolder">
                       <img src="" alt="">
@@ -139,9 +139,15 @@ $unit = $result->fetch_assoc();
           //!!! logic for modal content goes here
           var contentHeading = document.createElement('div');
           contentHeading.className = "modal-unit-heading";
-          contentHeading.textContent = "You selected the tile with id: " + tile.id;
+          contentHeading.textContent = tile.dataset.tileName + ": " + tile.dataset.tileLabel;
           modalContent.appendChild(contentHeading);
           modalContainer.style.display = "block";
+
+          var contentDescription = document.createElement('div');
+          contentDescription.className = "modal-unit-description";
+          contentDescription.textContent = tile.dataset.tileDescription;
+          modalContent.appendChild(contentDescription);
+          contentDescription.style.display = "block";
 
           //close modal functions
           closeButton.onclick = function() {
