@@ -136,19 +136,44 @@ $unit = $result->fetch_assoc();
           modalContainer.appendChild(modalContent);
           modalContent.appendChild(closeButton);
 
-          //!!! logic for modal content goes here
+          //Title section
           var contentHeading = document.createElement('div');
           contentHeading.className = "modal-unit-heading";
           contentHeading.textContent = tile.dataset.tileName + ": " + tile.dataset.tileLabel;
           modalContent.appendChild(contentHeading);
-          modalContainer.style.display = "block";
-
+          
           var contentDescription = document.createElement('div');
           contentDescription.className = "modal-unit-description";
           contentDescription.textContent = tile.dataset.tileDescription;
           modalContent.appendChild(contentDescription);
-          contentDescription.style.display = "block";
 
+          //Weekly Quest section
+          var weeklyQuestContainer = document.createElement('div');
+          weeklyQuestContainer.className = "modal-weekly-quest-container";
+          modalContent.appendChild(weeklyQuestContainer);
+
+          var weeklyQuestTitle = document.createElement('div');
+          weeklyQuestTitle.className = "modal-weekly-quest-title";
+          weeklyQuestTitle.textContent = "Weekly Quest!";
+          weeklyQuestContainer.appendChild(weeklyQuestTitle);
+
+          var weeklyQuest = document.createElement('div');
+          weeklyQuest.className = "modal-weekly-quest";
+          weeklyQuest.textContent = "Do some stuff and learn some thing.";
+          weeklyQuestContainer.appendChild(weeklyQuest);
+
+          //Content and tasks section
+          var contentTitle = document.createElement('div');
+          contentTitle.className = "modal-content-title";
+          contentTitle.textContent = "Learning Material";
+          modalContent.appendChild(contentTitle);
+
+          var content = document.createElement('div');
+          content.className = "modal-inner-content";
+          content.textContent = "Complete this week's learning material below.";
+          modalContent.appendChild(content);
+
+          modalContainer.style.display = "block";
           //close modal functions
           closeButton.onclick = function() {
             modalContainer.style.display = "none";

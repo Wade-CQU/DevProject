@@ -220,7 +220,7 @@ p2{
 
 /* Modal Content/Box */
 .modal-content {
-  background-color: #1e1f22;
+  background-color: #1E1F22;
   margin: 5% auto;
   padding: 20px;
   border: 1px solid #888;
@@ -233,10 +233,40 @@ p2{
   font-size: 3em;
   text-align: center;
 }
+
 .modal-unit-description {
   color: white;
   margin: 20px 100px;
   text-align: center;
+}
+
+.modal-weekly-quest-container{
+  background-color: #35393E;
+  height: fit-content;
+  width: 100%;
+  margin-top: 20px;
+  margin-bottom: 30px;
+  border-radius: 10px;
+}
+
+.modal-weekly-quest-title{
+  font-size: 2em;
+  letter-spacing: 8px;
+}
+
+.modal-weekly-quest, .modal-weekly-quest-title{
+  color: #FF7700;
+  padding: 10px 15px;
+}
+
+.modal-content-title{
+  color: #02d7f2;
+  padding: 10px 15px
+}
+
+.modal-inner-content{
+  color: white;
+  padding: 10px 15px
 }
 
 /* The Close Button */
