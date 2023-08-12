@@ -1,5 +1,5 @@
 <header>
-    <img class="nav-logo" src="assets/Logo.svg"  alt="Moodle">
+    <img class="nav-logo" src="assets/Logo.svg"  alt="Pluto logo">
     <div class="term-xp-label">Term XP:</div>
     <div class="term-xp-bar">
         <div class="term-xp-progress"></div>

@@ -1,3 +1,8 @@
+/* 
+    Outline for debug
+        outline: 1px solid red;
+*/
+
 .body-content{
   display: block;
   padding: 20px 15%;
@@ -7,14 +12,11 @@ p1{
   display: block;
   margin-top: 20px;
   font-size: 3rem;
-  color: #2b2b52;
-  font-weight: 500;
-}
-
-p2{
-  display: block;
-  margin-top: 30px;
-
+  font-family: 'Blender Pro';
+  color: #02d7f2;
+  font-weight: 400;
+  text-align: center;
+  padding: 20px;
 }
 
 .divider{
@@ -26,39 +28,44 @@ p2{
   margin-top: 15px;
 }
 
-.unit-heading, .weekly-quest{
-  /* background-image: linear-gradient(43deg, #b6c2ff 0%, #ffaffa 46%, #ffe0a7 100%); */
+.unit-heading{
+  background-color: #35393E;
   padding: 0px 15px;
   border-radius: 15px;
 }
 
-.unit-heading{
-  background-color: #dae5ff;
-}
-
-.weekly-quest{
-  background-color: #ffc0fb;
-}
-
-
-.quest-title{
-  color: #2b2b52;
-  font-weight: BOLD;
-  padding: 5px;
-}
-
-.quest-description{
-  line-height: 30px;
-  padding: 5px;
-}
-
 .unit-title{
   letter-spacing: -2px;
+  
 }
 
-.unit-description{
-  margin-bottom: 30px;
-  line-height: 30px;
+.class-xp-container{
+  display: flex;
+  gap: 10px;
+}
+
+.class-xp-label{
+  font-family: 'Blender Pro';
+  color: #f2e900;
+  width: 100px;
+  padding: 5px;
+}
+
+.class-xp-bar{
+  width: 100%;
+  height: fit-content;
+  background-color: white;
+  align-items: center;
+  align-self: center;
+  margin-right: 10px;
+  overflow: hidden;
+  border-radius: 5px;
+}
+
+.class-xp-progress{
+  width: 40%;
+  height: 10px;
+  background-color: #54FF00;
 }
 
 .weekly-content-container{
@@ -66,52 +73,6 @@ p2{
   flex-wrap: wrap;
   column-gap: 20px;
   justify-content:space-evenly;
-}
-
-.test-button{
-  display: block;
-  width: 250px;
-  height: 80px;
-  margin-top: 50px;
-  padding: 20px 0px;
-  text-align: center;
-  background-color: #2b2b52;
-  background-image:  linear-gradient(43deg, #b6c2ff 0%, #ffaffa 46%, #ffe0a7 100%);
-  color: #4b4b77;
-  font-weight: bold;
-  font-size: 20px;
-  border-radius: 18px 5px;
-  transition: box-shadow .4s, width .2s ease-in-out, border-radius .2s ease-in-out;
-  outline: inherit;
-  border: none;
-}
-
-.week-subtitle{
-  font-size: 13px;
-  color: #ff6c27;
-}
-
-.test-button:hover{
-  box-shadow: #2b2b52 1px 1px 10px 1px;
-  color: #ccccf8;
-}
-
-.button-openned{
-  width: 100%;
-  border-radius: 5px;
-}
-
-.weekly-content{
-
-  padding: 0px 20px;
-  background-image: linear-gradient(#f1daff, white 20%);
-  max-height: 0;
-  overflow: hidden;
-  display: none;
-  transition-delay: .3s;
-  transition-property: max-height;
-  transition-timing-function:cubic-bezier(1, 0, 0, 1);
-  transition-duration: .6s;
 }
 
 .flexbox{
@@ -162,7 +123,7 @@ p2{
 .unitTileTitle {
   color: white;
   margin-top: 4px;
-  font-size 16px;
+  font-size: 16px;
   font-weight: bold;
 }
 .unitTileLabel {

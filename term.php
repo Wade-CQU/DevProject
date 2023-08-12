@@ -1,4 +1,8 @@
-<?php include("php/session.php");  ?>
+<?php 
+    include("php/session.php");  
+    include("php/dbConnect.php");
+?>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -15,38 +19,46 @@
 
     <div class="side-scroll-container">
 
-        <!-- example unit tile -->
-        <div class="unit-card">
-            <div class="icon unit-icon-container"></div>
-            <div class="xp-container"></div>
-            <div class="rank-icon-container"></div>
-            <div class="unit-title"></div>
-        </div>
+    <?php
+            // Get unit's (!!! if not cached):
+            $sql = "SELECT * FROM unit";
+            $stmt = $dbh->prepare($sql);
 
-        <!-- example unit tile -->
-        <div class="unit-card">
-            <div class="unit-icon-container"></div>
-            <div class="xp-container"></div>
-            <div class="rank-icon-container"></div>
-            <div class="unit-title"></div>
-        </div>
+            $stmt->execute();
+            $result = $stmt->get_result();
 
-        <!-- example unit tile -->
-        <div class="unit-card">
-            <div class="unit-icon-container"></div>
-            <div class="xp-container"></div>
-            <div class="rank-icon-container"></div>
-            <div class="unit-title"></div>
-        </div>
+            if (!$result) { // if query or database connection fails:
+              echo "404 Unit Not Found"; // !!! review?
+              $stmt->close();
+              $dbh->close();
+              exit;
+            }
 
-        <!-- example unit tile -->
-        <div class="unit-card">
-            <div class="unit-icon-container"></div>
-            <div class="xp-container"></div>
-            <div class="rank-icon-container"></div>
-            <div class="unit-title"></div>
-        </div>
-
+            while ($unit = $result->fetch_assoc()) { 
+                $fakeRank = rand(1, 4); ?>
+              <div class="unit-card" id="<?php echo $unit['id']; ?>">
+                <div class="icon unit-icon-container"></div>
+                <div class="xp-container"></div>
+                <img class="rank-icon-container" src="assets/<?php echo $fakeRank; ?>.svg"/>
+                <div class="unit-title"><?php echo $unit['name']; ?></div>
+                <div class="rank-highlight rank-<?php echo $fakeRank; ?>"></div>
+            </div>
+          <?php }
+            $stmt->close();
+            $dbh->close();
+           ?>
+        
     </div>
+
+    <script>
+        //select all the tiles
+        const cards = document.querySelectorAll(".unit-card");
+        //!!! change this later        
+        cards.forEach(card => {
+            card.addEventListener("click", function(){
+                window.location.href = "unit.php?id=" + card.id;
+            });
+        });
+    </script>
 </body>
 </html>

@@ -37,22 +37,14 @@ $unit = $result->fetch_assoc();
                 <?php echo $unit['code'] . ": " . $unit['name']; ?>
             </p1>
         </div>
-        <div class="unit-description">
-            <p2>
-                <?php echo $unit['description']; ?>
-            </p2>
+        <div class="class-xp-container">
+          <div class="class-xp-label">CLASS XP:</div>
+          <div class="class-xp-bar">
+            <div class="class-xp-progress"></div>
+          </div>
         </div>
       </div>
-        <div class="weekly-quest">
-          <div class="quest-title">
-            WEEKLY QUEST
-          </div>
-          <div class="quest-description">
-            <p>
-              This is the details of the weekly quest. Aye woah look, lookkyy here this is a whole lotta week 1 content. Wow week 1, looky here week 1 content header.
-            </p>
-          </div>
-        </div>
+        
         <div class="weekly-content-container">
           <?php
             // Get unit's tiles (!!! if not cached):
