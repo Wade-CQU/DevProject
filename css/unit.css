@@ -1,4 +1,4 @@
-/* 
+/*
     Outline for debug
         outline: 1px solid red;
 */
@@ -36,7 +36,7 @@ p1{
 
 .unit-title{
   letter-spacing: -2px;
-  
+
 }
 
 .class-xp-container{
@@ -220,11 +220,17 @@ p1{
   padding: 10px 15px;
 }
 
-.modal-content-title{
+.modal-component { /*!!! this is for the divs that hold the component and its contents (feel free to style) */
+
+}
+.modal-component-title{
   color: #02d7f2;
   padding: 10px 15px
 }
-
+.modal-component-description{
+  color: white;
+  padding: 10px 15px
+}
 .modal-inner-content{
   color: white;
   padding: 10px 15px

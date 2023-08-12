@@ -27,6 +27,7 @@ $unit = $result->fetch_assoc();
   <link href="css/unit.css" rel="stylesheet" />
   <link href="css/default.css" rel="stylesheet" />
   <script src="https://code.jquery.com/jquery-3.7.0.min.js" integrity="sha256-2Pmvv0kuTBOenSvLm6bvfBSSHrUJ+3A7x6P5Ebd07/g=" crossorigin="anonymous"></script>
+  <script src="js/ajax.js"></script> <!-- !!! perhaps in header ? -->
 </head>
 <body>
     <?php require("php/header.php"); ?>
@@ -44,7 +45,7 @@ $unit = $result->fetch_assoc();
           </div>
         </div>
       </div>
-        
+
         <div class="weekly-content-container">
           <?php
             // Get unit's tiles (!!! if not cached):
@@ -119,6 +120,7 @@ $unit = $result->fetch_assoc();
             modalContainer.className = "modal";
             modalContainer.id = "modalContainer" + tile.id;
           var modalContent = document.createElement('div');
+            modalContent.id = "modalCont" + tile.id;
             modalContent.className = "modal-content";
           var closeButton = document.createElement('span');
             closeButton.className = "close";
@@ -133,7 +135,7 @@ $unit = $result->fetch_assoc();
           contentHeading.className = "modal-unit-heading";
           contentHeading.textContent = tile.dataset.tileName + ": " + tile.dataset.tileLabel;
           modalContent.appendChild(contentHeading);
-          
+
           var contentDescription = document.createElement('div');
           contentDescription.className = "modal-unit-description";
           contentDescription.textContent = tile.dataset.tileDescription;
@@ -154,17 +156,6 @@ $unit = $result->fetch_assoc();
           weeklyQuest.textContent = "Do some stuff and learn some thing.";
           weeklyQuestContainer.appendChild(weeklyQuest);
 
-          //Content and tasks section
-          var contentTitle = document.createElement('div');
-          contentTitle.className = "modal-content-title";
-          contentTitle.textContent = "Learning Material";
-          modalContent.appendChild(contentTitle);
-
-          var content = document.createElement('div');
-          content.className = "modal-inner-content";
-          content.textContent = "Complete this week's learning material below.";
-          modalContent.appendChild(content);
-
           modalContainer.style.display = "block";
           //close modal functions
           closeButton.onclick = function() {
@@ -179,8 +170,53 @@ $unit = $result->fetch_assoc();
           contentLoaded = true;
         }
         console.log(tile.id);
+        getTileContents(tile.id, "#modalCont" + tile.id);
       })
     });
+
+    // fetch tile component & contents:
+    function getTileContents(id, parent) {
+      var formData = new FormData();
+      formData.append("tileId", id);
+      var promise = postAJAX("php/tiles/loadTileContent.php", formData);
+      promise.then(function(data) {
+        console.log(data);
+        unpackTileJSON(data, parent);
+      }).catch(function(error) {
+        console.error('Error:', error);
+      });
+    }
+
+    // constructs the tile's components & content from JSON objects:
+    function unpackTileJSON(data, parent) {
+      var holder = $(parent);
+      var componentsArray = JSON.parse(data.components);
+      componentsArray.forEach(function(ele) {
+        $("#comp" + ele.id + ".modal-component").remove();
+        let component = $("<div>").addClass("modal-component").attr("id", "comp" + ele.id);
+        holder.append(component);
+        component.append($("<div>").addClass("modal-component-title").html(ele.name));
+        component.append($("<div>").addClass("modal-component-description").html(ele.description));
+        component.append($("<div>").addClass("modal-inner-content").attr("id", "compContent" + ele.id));
+      });
+
+      var contentArray = JSON.parse(data.content);
+      contentArray.forEach(function(ele) {
+        let contentType = "<li>"; // !!! insert type logic
+        if (ele.type == 2 || ele.type == 3) { // download server file or navigate to url:
+          contentType = "<a>";
+        }
+        let content = $(contentType).addClass("modal-inner-content").attr("id", "content" + ele.id).html(ele.name);
+        if (ele.type == 2) {
+          content.attr('href', 'files/<?php echo $unit['id']; ?>/content/' + ele.url);
+          content.attr('download', ele.url);
+        } else if (ele.type == 3) {
+          content.attr('href', "https://" + ele.url); // !!! this should be more adaptable
+          content.attr('target', '_blank');
+        }
+        $("#compContent" + ele.componentId).append(content);
+      });
+    }
   </script>
 </body>
 </html>

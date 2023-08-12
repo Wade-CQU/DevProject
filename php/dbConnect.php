@@ -1,7 +1,7 @@
 <?php // Responsible for all database connections:
 $dbAddress = 'localhost';
 $dbUser = 'root'; // !!! (these are my database credentials)
-$dbPass = 'root'; 
+$dbPass = 'coit13230';
 $dbName = 'plutodb';
 
 $dbh = new mysqli($dbAddress, $dbUser, $dbPass, $dbName);
