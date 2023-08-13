@@ -30,11 +30,12 @@ header{
     justify-content:space-evenly;
     align-items: center;
   }
-  
+
 .nav-logo{
   height: 60px;
   align-self: flex-start;
   margin-left: 15px;
+  cursor: pointer;
 }
 
 .profile-icon{
@@ -43,7 +44,7 @@ header{
   float: right;
   margin-right: 20px;
 }
-  
+
 .term-xp-label{
   color: #F2E900;
   font-family: 'Blender Pro';

@@ -3,10 +3,10 @@ include("php/session.php");
 include("php/dbConnect.php");
 
 // Get unit record:
-$sql = "SELECT * FROM unit WHERE ID = ? LIMIT 1;";
+$sql = "SELECT id, code, name, description FROM unit WHERE EXISTS (SELECT 1 FROM unitUser WHERE unitId = ? AND userId = $userId) AND ID = ? LIMIT 1;";
 $stmt = $dbh->prepare($sql);
 
-$stmt->bind_param("i", $_GET['id']);
+$stmt->bind_param("ii", $_GET['id'], $_GET['id']);
 $stmt->execute();
 $result = $stmt->get_result();
 
@@ -26,7 +26,7 @@ $unit = $result->fetch_assoc();
   <title><?php echo $unit['code'] . ": " . $unit['name']; ?></title>
   <link href="css/unit.css" rel="stylesheet" />
   <link href="css/default.css" rel="stylesheet" />
-  <script src="https://code.jquery.com/jquery-3.7.0.min.js" integrity="sha256-2Pmvv0kuTBOenSvLm6bvfBSSHrUJ+3A7x6P5Ebd07/g=" crossorigin="anonymous"></script>
+  <script src="frameworks/jquery-3.7.0.min.js"></script>
   <script src="js/ajax.js"></script> <!-- !!! perhaps in header ? -->
 </head>
 <body>
@@ -49,7 +49,7 @@ $unit = $result->fetch_assoc();
         <div class="weekly-content-container">
           <?php
             // Get unit's tiles (!!! if not cached):
-            $sql = "SELECT * FROM tile WHERE unitId = ?;";
+            $sql = "SELECT id, icon, name, label, description FROM tile WHERE unitId = ? ORDER BY `order` ASC;";
             $stmt = $dbh->prepare($sql);
 
             $stmt->bind_param("i", $_GET['id']);
@@ -169,7 +169,6 @@ $unit = $result->fetch_assoc();
           //set loaded to true so it doesnt reload modal each time user clicks on it
           contentLoaded = true;
         }
-        console.log(tile.id);
         getTileContents(tile.id, "#modalCont" + tile.id);
       })
     });
@@ -180,10 +179,9 @@ $unit = $result->fetch_assoc();
       formData.append("tileId", id);
       var promise = postAJAX("php/tiles/loadTileContent.php", formData);
       promise.then(function(data) {
-        console.log(data);
         unpackTileJSON(data, parent);
       }).catch(function(error) {
-        console.error('Error:', error);
+        console.error('Error:', error); // !!! better solution
       });
     }
 
@@ -191,6 +189,9 @@ $unit = $result->fetch_assoc();
     function unpackTileJSON(data, parent) {
       var holder = $(parent);
       var componentsArray = JSON.parse(data.components);
+      if (!componentsArray) {
+        return;
+      }
       componentsArray.forEach(function(ele) {
         $("#comp" + ele.id + ".modal-component").remove();
         let component = $("<div>").addClass("modal-component").attr("id", "comp" + ele.id);
@@ -201,6 +202,9 @@ $unit = $result->fetch_assoc();
       });
 
       var contentArray = JSON.parse(data.content);
+      if (!contentArray) {
+        return;
+      }
       contentArray.forEach(function(ele) {
         let contentType = "<li>"; // !!! insert type logic
         if (ele.type == 2 || ele.type == 3) { // download server file or navigate to url:

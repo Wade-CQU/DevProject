@@ -1,5 +1,7 @@
 <header>
-    <img class="nav-logo" src="assets/Logo.svg"  alt="Pluto logo">
+  <a href="term.php">
+    <img class="nav-logo" src="assets/Logo.svg" alt="Pluto logo" onclick="document.location = '';">
+  </a>
     <div class="term-xp-label">Term XP:</div>
     <div class="term-xp-bar">
         <div class="term-xp-progress"></div>
