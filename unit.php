@@ -5,7 +5,6 @@ include("php/dbConnect.php");
 // Get unit record:
 $sql = "SELECT id, code, name, description FROM unit WHERE EXISTS (SELECT 1 FROM unitUser WHERE unitId = ? AND userId = $userId) AND ID = ? LIMIT 1;";
 $stmt = $dbh->prepare($sql);
-
 $stmt->bind_param("ii", $_GET['id'], $_GET['id']);
 $stmt->execute();
 $result = $stmt->get_result();
@@ -16,7 +15,6 @@ if (!$result || $result->num_rows == 0) { // if query or database connection fai
   $dbh->close();
   exit;
 }
-
 $unit = $result->fetch_assoc();
 ?>
 <!DOCTYPE html>
@@ -27,7 +25,7 @@ $unit = $result->fetch_assoc();
   <link href="css/unit.css" rel="stylesheet" />
   <link href="css/default.css" rel="stylesheet" />
   <script src="frameworks/jquery-3.7.0.min.js"></script>
-  <script src="js/ajax.js"></script> <!-- !!! perhaps in header ? -->
+  <script src="js/ajax.js"></script> <!-- !!! perhaps in header ^^? -->
 </head>
 <body>
     <?php require("php/header.php"); ?>
@@ -200,17 +198,34 @@ $unit = $result->fetch_assoc();
         component.append($("<div>").addClass("modal-component-description").html(ele.description));
         component.append($("<div>").addClass("modal-inner-content").attr("id", "compContent" + ele.id));
       });
-
       var contentArray = JSON.parse(data.content);
       if (!contentArray) {
         return;
       }
       contentArray.forEach(function(ele) {
-        let contentType = "<li>"; // !!! insert type logic
-        if (ele.type == 2 || ele.type == 3) { // download server file or navigate to url:
+        let contentType = "<p>"; // !!! insert type logic
+        let contentClass = "unordered";
+        if (ele.type == 1) {
+          contentClass = "ordered";
+        } else if (ele.type == 2) {
           contentType = "<a>";
+        } else if (ele.type == 3) { // download server file or navigate to url:
+          contentType = "<a>";
+          contentClass = "external";
         }
-        let content = $(contentType).addClass("modal-inner-content").attr("id", "content" + ele.id).html(ele.name);
+        let contentHolder = $("<li>").addClass("modal-content-item " + contentClass).attr("id", "content" + ele.id);
+        let content = $(contentType).html(ele.name);
+        contentHolder.append(content);
+        if (ele.isTask) {
+          let taskBtn = $("<button>").addClass("modal-content-task").attr("id", "task" + ele.id);
+          taskBtn.attr("onclick", "requestTaskToggle(" + ele.id + ");");
+          if (ele.isComplete) {
+            taskBtn.html("✓");
+            taskBtn.addClass("completed");
+          }
+          contentHolder.append(taskBtn);
+        }
+
         if (ele.type == 2) {
           content.attr('href', 'files/<?php echo $unit['id']; ?>/content/' + ele.url);
           content.attr('download', ele.url);
@@ -218,7 +233,38 @@ $unit = $result->fetch_assoc();
           content.attr('href', "https://" + ele.url); // !!! this should be more adaptable
           content.attr('target', '_blank');
         }
-        $("#compContent" + ele.componentId).append(content);
+        $("#compContent" + ele.componentId).append(contentHolder);
+      });
+    }
+
+    // Task ticking & unticking:
+    function toggleTask(id) {
+      let task = $("#task" + id);
+      task.prop("disabled", true);
+      if (task.html() == "") {
+        task.html("✓");
+        task.addClass("completed");
+        return true;
+      } else if (task.html() == "✓"){
+        task.html("");
+        task.removeClass("completed");
+        return false;
+      }
+    }
+    function requestTaskToggle(id) {
+      let state = toggleTask(id);
+      var formData = new FormData();
+      formData.append("contentId", id);
+      if (state) {
+        formData.append("taskState", true);
+      }
+      var promise = postAJAX("php/tiles/taskToggle.php", formData);
+      promise.then(function(data) {
+        $("#task" + id).prop("disabled", false);
+      }).catch(function(error) {
+        toggleTask();
+        $("#task" + id).prop("disabled", false);
+        console.error('Error:', error); // !!! better solution
       });
     }
   </script>

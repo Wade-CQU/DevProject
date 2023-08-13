@@ -36,7 +36,6 @@ p1{
 
 .unit-title{
   letter-spacing: -2px;
-
 }
 
 .class-xp-container{
@@ -160,12 +159,9 @@ p1{
   float: left;
   width: 12%; /* THIS WILL BE INLINE FOR EACH EXP BAR */
 }
-
 .unitTileDescription {
   display: none;
 }
-
-
 
 /* The Modal (background) */
 .modal {
@@ -220,6 +216,7 @@ p1{
   padding: 10px 15px;
 }
 
+/* Tile Components & Content Items: */
 .modal-component { /*!!! this is for the divs that hold the component and its contents (feel free to style) */
 
 }
@@ -234,6 +231,51 @@ p1{
 .modal-inner-content{
   color: white;
   padding: 10px 15px
+}
+.modal-content-item {
+  padding: 10px 15px;
+  width: 100%;
+  display: list-item;
+  list-style-type: square;
+}
+.modal-content-item.unordered {
+
+}
+.modal-content-item.ordered {
+  list-style-type: decimal;
+  padding-left: 11px;
+}
+.modal-content-item.ordered * {
+  margin-left: 12px;
+}
+.modal-content-item.external {
+  padding-left: 9px;
+}
+.modal-content-item.external * {
+  margin-left: 12px;
+}
+.modal-content-item.external::marker {
+  content: "🌏︎";
+}
+.modal-content-item * {
+  color: white;
+  display: inline;
+  text-decoration: none;
+}
+
+/* The Task Checkbox Button: */
+.modal-content-task {
+  float: right;
+  width: 20px;
+  height: 20px;
+  user-select: none;
+}
+.modal-content-task.completed {
+  font-size: 32px;
+  color: green;
+  font-weight: bold;
+  line-height: 0;
+  padding-bottom: 10px;
 }
 
 /* The Close Button */

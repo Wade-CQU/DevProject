@@ -4,7 +4,7 @@ function postAJAX(url, data) {
     xhr.open("POST", url, true);
     xhr.onload = function() {
       if (xhr.status >= 200 && xhr.status < 300) {
-        var responseData = JSON.parse(xhr.responseText); 
+        var responseData = JSON.parse(xhr.responseText);
         resolve(responseData);
       } else {
         reject(new Error('Request failed with status: ' + xhr.status));

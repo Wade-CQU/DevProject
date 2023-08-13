@@ -1,7 +1,8 @@
 <?php
+require("../session.php");
 require("../dbConnect.php");
 header('Content-Type: application/json');
-if (!isset($_POST['tileId'])) {
+if (!isset($_POST['tileId'])) { // !!! more & sessions
   exit;
 }
 
@@ -42,9 +43,10 @@ $sql = "SELECT JSON_ARRAYAGG(
             'name', `name`,
             'url', `url`,
             'order', `order`,
-            'isTask', `isTask`
+            'isTask', `isTask`,
+            'isComplete', `isComplete`
           )
-        ) AS json_data FROM content WHERE componentId IN ($compIds) ORDER BY `order` ASC;";
+        ) AS json_data FROM content c LEFT JOIN (SELECT isComplete, contentId FROM taskCompletion WHERE userId = $userId) t ON c.id = t.contentId WHERE componentId IN ($compIds) ORDER BY `order` ASC;";
 $stmt = $dbh->prepare($sql);
 $stmt->execute();
 $result = $stmt->get_result();
