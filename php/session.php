@@ -14,6 +14,7 @@
 //
 //     }
 // }
-$userId = 2; // !!! hard-coded until jack finishes session control.
+$userId = 5; // !!! hard-coded until jack finishes session control.
 $termCode = 22023; // !!! hard-coded until jack finishes session control.
+
 ?>

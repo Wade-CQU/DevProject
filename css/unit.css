@@ -292,3 +292,17 @@ p1{
   text-decoration: none;
   cursor: pointer;
 }
+
+.modal-edit-button{
+  padding: 10px 15px;
+  background-color: #FF7700;
+  border-radius: 5px;
+  width: fit-content;
+  cursor: pointer;
+  font-weight: bold;
+  letter-spacing: 3px;
+}
+
+.modal-edit-button:hover{
+  background-color: #02d7f2;
+}

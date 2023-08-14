@@ -2,12 +2,21 @@
 include("php/session.php");
 include("php/dbConnect.php");
 
+// Get user's role:
+$sql = "SELECT role FROM user WHERE id = ?";
+$stmt = $dbh->prepare($sql);
+$stmt->bind_param("i", $userId);
+$stmt->execute();
+$result = $stmt->get_result();
+$userRole = $result->fetch_assoc();
+
 // Get unit record:
 $sql = "SELECT id, code, name, description FROM unit WHERE EXISTS (SELECT 1 FROM unitUser WHERE unitId = ? AND userId = $userId) AND ID = ? LIMIT 1;";
 $stmt = $dbh->prepare($sql);
 $stmt->bind_param("ii", $_GET['id'], $_GET['id']);
 $stmt->execute();
 $result = $stmt->get_result();
+
 
 if (!$result || $result->num_rows == 0) { // if query or database connection fails, or unit not found:
   echo "404 Unit Not Found";
@@ -137,7 +146,7 @@ $unit = $result->fetch_assoc();
           var contentDescription = document.createElement('div');
           contentDescription.className = "modal-unit-description";
           contentDescription.textContent = tile.dataset.tileDescription;
-          modalContent.appendChild(contentDescription);
+          modalContent.appendChild(contentDescription);          
 
           //Weekly Quest section
           var weeklyQuestContainer = document.createElement('div');
@@ -168,6 +177,14 @@ $unit = $result->fetch_assoc();
           contentLoaded = true;
         }
         getTileContents(tile.id, "#modalCont" + tile.id);
+
+        //Add edit button for lecturer
+        if(<?php echo $userRole['role']; ?> == 2 ){
+            var editButton = document.createElement('div');
+            editButton.className = "modal-edit-button";
+            editButton.textContent = "✎ EDIT";
+            modalContent.appendChild(editButton);
+          }         
       })
     });
 
