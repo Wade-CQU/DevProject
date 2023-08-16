@@ -306,3 +306,107 @@ p1{
 .modal-edit-button:hover{
   background-color: #02d7f2;
 }
+
+.save-cancel-btn{
+  display: inline-block;
+  padding: 10px;
+  border-radius: 5px;
+  border: solid #FF7700  2px;
+  background-color: white;
+  color: #FF7700;
+  margin: 5px 15px;
+  cursor: pointer;
+}
+
+.save-cancel-btn:hover{
+  background-color: #FF7700;
+  color: #1E1F22;
+}
+
+.edit-field{
+  border: dashed #dfdff3 2px;
+  margin-top: 15px;
+}
+
+.component-head{
+  width:100%
+}
+
+.modal-component-title, .edit-modal-delete-component{
+  display: inline-block;
+}
+
+.edit-modal-delete-component{
+  float: right;
+  text-align: center;
+  background-color: #dfdff3;
+  color: #FF7700;
+  width: 80px;
+  padding: 2px;
+  margin: 5px;
+  border-radius: 5px ;
+  cursor: pointer;
+}
+
+.add-content-btn{
+  background-color: white;
+  padding: 2px 8px;
+  margin: 0px 15px;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.add-content-btn, .add-content-btn-label{
+  display: inline-block;
+  color: #FF7700;
+}
+
+.edit-content-holder{
+  padding: 10px;
+  border: dashed #dfdff3 1px;
+  margin-top: 2px;
+}
+
+.edit-content-label{
+  color: #FF7700;
+}
+
+.edit-content-row-type, .edit-content-row, .edit-content-row-url{
+  display: grid;
+  grid-auto-flow: column;
+  gap: 10px;
+  margin-top: 5px;
+}
+
+.edit-content-row-type{
+  grid-template-columns: 120px 150px;
+}
+
+.edit-content-row{
+  grid-template-columns: 120px auto;
+}
+
+.edit-content-row-url{
+  grid-template-columns: 120px auto 1fr;
+}
+
+.edit-content-url{
+  text-align: left;
+  background-color: #ffffff;
+  color:#1E1F22;
+  padding: 0px 5px;
+}
+
+.edit-content-delete-icon{
+  padding: 5px;
+  width: 25px;
+  margin-left: auto;
+  cursor: pointer;
+}
+
+.edit-content-delete-icon:hover{
+  background-color: #FF7700;
+  border-radius: 5px;
+}
+
+

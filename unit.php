@@ -123,11 +123,39 @@ $unit = $result->fetch_assoc();
           }
         //if modal is not yet created -> create and make visible
         } else {
-          var modalContainer = document.createElement('div');
+          loadModalFrame(tile, false);
+
+          //Add edit button for lecturer
+          if(<?php echo $userRole['role']; ?> == 2 ){
+            const thisModalContainer = document.querySelector("#modalContainer" + tile.id + ".modal");
+            const thisModalContent = thisModalContainer.childNodes[0];
+            var editButton = document.createElement('div');
+            editButton.className = "modal-edit-button";
+            editButton.textContent = "✎ EDIT";
+            thisModalContent.appendChild(editButton);
+
+            editButton.addEventListener("click", function() {
+              thisModalContainer.style.display = "none";
+              loadModalFrame(tile, true)
+              getTileContents(tile.id, "#editModalCont" + tile.id, true);  
+            })
+          }
+          contentLoaded = true;
+        }
+        getTileContents(tile.id, "#modalCont" + tile.id, false);         
+      })
+    });
+
+    function loadModalFrame(tile, isEdit) {
+      var modalContainer = document.createElement('div');
             modalContainer.className = "modal";
             modalContainer.id = "modalContainer" + tile.id;
           var modalContent = document.createElement('div');
-            modalContent.id = "modalCont" + tile.id;
+            if(isEdit){
+              modalContent.id = "editModalCont" + tile.id;
+            } else {
+              modalContent.id = "modalCont" + tile.id;
+            }  
             modalContent.className = "modal-content";
           var closeButton = document.createElement('span');
             closeButton.className = "close";
@@ -165,36 +193,35 @@ $unit = $result->fetch_assoc();
 
           modalContainer.style.display = "block";
           //close modal functions
-          closeButton.onclick = function() {
+          if(isEdit){
+            closeButton.onclick = function() {
+            modalContainer.innerHTML = '';
+            modalContainer.remove();
+            }
+          } else {
+            closeButton.onclick = function() {
             modalContainer.style.display = "none";
-          }
-          window.onclick = function(event) {
-            if (event.target == modalContainer) {
-              modalContainer.style.display = "none";
+            }
+            window.onclick = function(event) {
+              if (event.target == modalContainer) {
+                modalContainer.style.display = "none";
+              }
             }
           }
-          //set loaded to true so it doesnt reload modal each time user clicks on it
-          contentLoaded = true;
-        }
-        getTileContents(tile.id, "#modalCont" + tile.id);
-
-        //Add edit button for lecturer
-        if(<?php echo $userRole['role']; ?> == 2 ){
-            var editButton = document.createElement('div');
-            editButton.className = "modal-edit-button";
-            editButton.textContent = "✎ EDIT";
-            modalContent.appendChild(editButton);
-          }         
-      })
-    });
+          
+    }
 
     // fetch tile component & contents:
-    function getTileContents(id, parent) {
+    function getTileContents(id, parent, isEdit) {
       var formData = new FormData();
       formData.append("tileId", id);
       var promise = postAJAX("php/tiles/loadTileContent.php", formData);
       promise.then(function(data) {
-        unpackTileJSON(data, parent);
+        if(isEdit){
+          unpackTileJSONEdit(data, parent);
+        } else {
+          unpackTileJSON(data, parent);
+        }
       }).catch(function(error) {
         console.error('Error:', error); // !!! better solution
       });
@@ -252,7 +279,7 @@ $unit = $result->fetch_assoc();
         }
         $("#compContent" + ele.componentId).append(contentHolder);
       });
-    }
+    
 
     // Task ticking & unticking:
     function toggleTask(id) {
@@ -284,6 +311,80 @@ $unit = $result->fetch_assoc();
         console.error('Error:', error); // !!! better solution
       });
     }
+    }
+
+    //Load modal content and components in edit mode
+    function unpackTileJSONEdit(data, parent) {
+      var holder = $(parent);
+      let buttonHolder = $("<div>").addClass("save-cancel-btn-container");
+      buttonHolder.append($("<div>").addClass("save-cancel-btn").html("Save"));
+      buttonHolder.append($("<div>").addClass("save-cancel-btn").html("Cancel"));
+      holder.append(buttonHolder);
+      var componentsArray = JSON.parse(data.components);
+      if (!componentsArray) {
+        return;
+      }
+      componentsArray.forEach(function(ele) {
+        let component = $("<div>").addClass("modal-component edit-field").attr("id", "comp" + ele.id).attr("contenteditable", true);
+        holder.append(component);
+        let componentHead = $("<div>").addClass("component-head");
+        componentHead.append($("<div>").addClass("modal-component-title").html(ele.name));
+        componentHead.append($("<div>").addClass("edit-modal-delete-component").html("Delete").attr("contenteditable", false));
+        component.append(componentHead);
+        component.append($("<div>").addClass("modal-component-description").html(ele.description));
+        component.append($("<div>").addClass("modal-inner-content").attr("id", "editCompContent" + ele.id));
+        component.append($("<div>").addClass("add-content-btn").attr("id", "add-content-btn" + ele.id).html("+"));
+        component.append($("<div>").addClass("add-content-btn-label").html("Add Content"));
+      });
+
+      var contentArray = JSON.parse(data.content);
+      if (!contentArray) {
+        return;
+      }
+      contentArray.forEach(function(ele) {
+        let contentHolder = $("<div>").attr("id", "content" + ele.id).addClass("edit-content-holder");
+
+        let typeRow = $("<div>").addClass("edit-content-row-type");
+        typeRow.append($("<div>").addClass("edit-content-label").html("Type:"))
+        var typeSelect = $("<select id=\"componentTypeId\" name=\"componentType\" />").addClass("edit-content-field");
+          $("<option />", {value: "1", text: "Ordered list"}).appendTo(typeSelect);
+          $("<option />", {value: "2", text: "Unordered list"}).appendTo(typeSelect);
+          $("<option />", {value: "3", text: "Link"}).appendTo(typeSelect);
+        typeSelect.val(ele.type);
+        typeRow.append(typeSelect);
+        typeRow.append($("<img>").attr("src", "assets/deleteIcon.svg").attr("alt", "Delete").addClass("edit-content-delete-icon"));
+        contentHolder.append(typeRow);
+
+        let textRow = $("<div>").addClass("edit-content-row");
+        textRow.append($("<div>").addClass("edit-content-label").html("Text:"));
+        textRow.append($("<div>").addClass("edit-content-text").html(ele.name));
+        contentHolder.append(textRow);
+
+        let urlRow = $("<div>").addClass("edit-content-row-url");
+        urlRow.append($("<div>").addClass("edit-content-label").html("url:"));
+        let urlCheckbox = $("<button>").addClass("modal-content-task");
+        urlRow.append(urlCheckbox);
+        urlRow.append($("<div>").addClass("edit-content-url").html(ele.url));
+        if(!ele.url == ""){
+          urlCheckbox.html("✓");
+          urlCheckbox.addClass("completed");
+        }
+        contentHolder.append(urlRow);
+
+        let taskRow = $("<div>").addClass("edit-content-row");
+        taskRow.append($("<div>").addClass("edit-content-label").html("Assign as task:"));
+        let taskCheckbox = $("<button>").addClass("modal-content-task")
+        taskRow.append(taskCheckbox);
+        if(ele.isTask == 1){
+          taskCheckbox.html("✓");
+          taskCheckbox.addClass("completed");
+        }
+        contentHolder.append(taskRow);
+
+        $("#editCompContent" + ele.componentId).append(contentHolder);
+      });
+
+      }
   </script>
 </body>
 </html>
