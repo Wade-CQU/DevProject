@@ -6,6 +6,6 @@
     <div class="term-xp-bar">
         <div class="term-xp-progress"></div>
     </div>
-    <img class="profile-icon" src="https://cdn-icons-png.flaticon.com/512/64/64572.png">
+    <a href="profilePage.php"><img class="profile-icon" src="https://cdn-icons-png.flaticon.com/512/64/64572.png"></a>
 </header>
 <div class="divider"></div>
