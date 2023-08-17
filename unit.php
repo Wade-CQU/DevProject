@@ -136,13 +136,8 @@ $unit = $result->fetch_assoc();
 
             editButton.addEventListener("click", function() {
               thisModalContainer.style.display = "none";
-<<<<<<< Updated upstream
-              loadModalFrame(tile, true)
-              getTileContents(tile.id, "#editModalCont" + tile.id, true);
-=======
               loadModalFrame(tile, true);
               getTileContents(tile.id, "#editModalCont" + tile.id, true);  
->>>>>>> Stashed changes
             })
           }
           contentLoaded = true;
