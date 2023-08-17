@@ -137,12 +137,12 @@ $unit = $result->fetch_assoc();
             editButton.addEventListener("click", function() {
               thisModalContainer.style.display = "none";
               loadModalFrame(tile, true)
-              getTileContents(tile.id, "#editModalCont" + tile.id, true);  
+              getTileContents(tile.id, "#editModalCont" + tile.id, true);
             })
           }
           contentLoaded = true;
         }
-        getTileContents(tile.id, "#modalCont" + tile.id, false);         
+        getTileContents(tile.id, "#modalCont" + tile.id, false);
       })
     });
 
@@ -155,7 +155,7 @@ $unit = $result->fetch_assoc();
               modalContent.id = "editModalCont" + tile.id;
             } else {
               modalContent.id = "modalCont" + tile.id;
-            }  
+            }
             modalContent.className = "modal-content";
           var closeButton = document.createElement('span');
             closeButton.className = "close";
@@ -174,7 +174,7 @@ $unit = $result->fetch_assoc();
           var contentDescription = document.createElement('div');
           contentDescription.className = "modal-unit-description";
           contentDescription.textContent = tile.dataset.tileDescription;
-          modalContent.appendChild(contentDescription);          
+          modalContent.appendChild(contentDescription);
 
           //Weekly Quest section
           var weeklyQuestContainer = document.createElement('div');
@@ -208,7 +208,7 @@ $unit = $result->fetch_assoc();
               }
             }
           }
-          
+
     }
 
     // fetch tile component & contents:
@@ -279,7 +279,7 @@ $unit = $result->fetch_assoc();
         }
         $("#compContent" + ele.componentId).append(contentHolder);
       });
-    
+    }
 
     // Task ticking & unticking:
     function toggleTask(id) {
@@ -310,7 +310,6 @@ $unit = $result->fetch_assoc();
         $("#task" + id).prop("disabled", false);
         console.error('Error:', error); // !!! better solution
       });
-    }
     }
 
     //Load modal content and components in edit mode
