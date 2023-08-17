@@ -136,8 +136,13 @@ $unit = $result->fetch_assoc();
 
             editButton.addEventListener("click", function() {
               thisModalContainer.style.display = "none";
+<<<<<<< Updated upstream
               loadModalFrame(tile, true)
               getTileContents(tile.id, "#editModalCont" + tile.id, true);
+=======
+              loadModalFrame(tile, true);
+              getTileContents(tile.id, "#editModalCont" + tile.id, true);  
+>>>>>>> Stashed changes
             })
           }
           contentLoaded = true;
@@ -197,6 +202,8 @@ $unit = $result->fetch_assoc();
             closeButton.onclick = function() {
             modalContainer.innerHTML = '';
             modalContainer.remove();
+            var originalModal = document.querySelector("#modalContainer" + tile.id);
+            originalModal.style.display = "block";
             }
           } else {
             closeButton.onclick = function() {
