@@ -18,8 +18,13 @@ p1{
   text-align: center;
   padding: 20px;
 }
+textarea {
+  padding: 4px;
+  font-size: 14px;
+  resize: vertical;
+}
 
-.divider{
+.divider {
   position: absolute;
   margin-left: 2%;
   width: 96%;
@@ -28,29 +33,29 @@ p1{
   margin-top: 15px;
 }
 
-.unit-heading{
+.unit-heading {
   background-color: #35393E;
   padding: 0px 15px;
   border-radius: 15px;
 }
 
-.unit-title{
+.unit-title {
   letter-spacing: -2px;
 }
 
-.class-xp-container{
+.class-xp-container {
   display: flex;
   gap: 10px;
 }
 
-.class-xp-label{
+.class-xp-label {
   font-family: 'Blender Pro';
   color: #f2e900;
   width: 100px;
   padding: 5px;
 }
 
-.class-xp-bar{
+.class-xp-bar {
   width: 100%;
   height: fit-content;
   background-color: white;
@@ -61,20 +66,20 @@ p1{
   border-radius: 5px;
 }
 
-.class-xp-progress{
+.class-xp-progress {
   width: 40%;
   height: 10px;
   background-color: #54FF00;
 }
 
-.weekly-content-container{
+.weekly-content-container {
   display: flex;
   flex-wrap: wrap;
   column-gap: 20px;
   justify-content:space-evenly;
 }
 
-.flexbox{
+.flexbox {
   display: flex;
   justify-content: right;
   color: white;
@@ -173,6 +178,7 @@ p1{
   width: 100%;
   height: 100%;
   overflow: auto;
+  background-color: #0000008c;
 }
 
 /* Modal Content/Box */
@@ -224,9 +230,20 @@ p1{
   color: #02d7f2;
   padding: 10px 15px
 }
+input.modal-component-title {
+  width: 65%;
+  margin: 6px 12px;
+  font-weight: bold;
+  background-color: #ffffff22;
+}
 .modal-component-description{
   color: white;
   padding: 10px 15px
+}
+textarea.modal-component-description {
+  width: 75%;
+  margin: 6px 12px;
+  background-color: #ffffff22;
 }
 .modal-inner-content{
   color: white;
@@ -303,11 +320,11 @@ p1{
   letter-spacing: 3px;
 }
 
-.modal-edit-button:hover{
+.modal-edit-button:hover {
   background-color: #02d7f2;
 }
 
-.save-cancel-btn{
+.save-cancel-btn {
   display: inline-block;
   padding: 10px;
   border-radius: 5px;
@@ -318,25 +335,26 @@ p1{
   cursor: pointer;
 }
 
-.save-cancel-btn:hover{
+.save-cancel-btn:hover {
   background-color: #FF7700;
   color: #1E1F22;
 }
 
-.edit-field{
+.edit-field {
   border: dashed #dfdff3 2px;
   margin-top: 15px;
+  padding-bottom: 8px;
 }
 
-.component-head{
+.component-head {
   width:100%
 }
 
-.modal-component-title, .edit-modal-delete-component{
+.modal-component-title, .edit-modal-delete-component {
   display: inline-block;
 }
 
-.edit-modal-delete-component{
+.edit-modal-delete-component {
   float: right;
   text-align: center;
   background-color: #dfdff3;
@@ -395,6 +413,9 @@ p1{
   background-color: #ffffff;
   color:#1E1F22;
   padding: 0px 5px;
+  width: 100%;
+  font-size: 14px;
+  padding: 4px;
 }
 
 .edit-content-delete-icon{
@@ -408,5 +429,3 @@ p1{
   background-color: #FF7700;
   border-radius: 5px;
 }
-
-

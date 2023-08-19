@@ -126,7 +126,7 @@ $unit = $result->fetch_assoc();
           loadModalFrame(tile, false);
 
           //Add edit button for lecturer
-          if(<?php echo $userRole['role']; ?> == 2 ){
+          if(<?php echo $userRole['role']; ?> == 2 ){ // perform role management in session.php and never send these functions to the students !!!
             const thisModalContainer = document.querySelector("#modalContainer" + tile.id + ".modal");
             const thisModalContent = thisModalContainer.childNodes[0];
             var editButton = document.createElement('div');
@@ -137,8 +137,8 @@ $unit = $result->fetch_assoc();
             editButton.addEventListener("click", function() {
               thisModalContainer.style.display = "none";
               loadModalFrame(tile, true);
-              getTileContents(tile.id, "#editModalCont" + tile.id, true);  
-            })
+              getTileContents(tile.id, "#editModalCont" + tile.id, true);
+            });
           }
           contentLoaded = true;
         }
@@ -149,13 +149,9 @@ $unit = $result->fetch_assoc();
     function loadModalFrame(tile, isEdit) {
       var modalContainer = document.createElement('div');
             modalContainer.className = "modal";
-            modalContainer.id = "modalContainer" + tile.id;
+            modalContainer.id = "modalContainer" + (isEdit ? "Edit" : "") + tile.id;
           var modalContent = document.createElement('div');
-            if(isEdit){
-              modalContent.id = "editModalCont" + tile.id;
-            } else {
-              modalContent.id = "modalCont" + tile.id;
-            }
+            modalContent.id = (isEdit ? "editModalCont" : "modalCont") + tile.id;
             modalContent.className = "modal-content";
           var closeButton = document.createElement('span');
             closeButton.className = "close";
@@ -195,14 +191,12 @@ $unit = $result->fetch_assoc();
           //close modal functions
           if(isEdit){
             closeButton.onclick = function() {
-            modalContainer.innerHTML = '';
-            modalContainer.remove();
-            var originalModal = document.querySelector("#modalContainer" + tile.id);
-            originalModal.style.display = "block";
+              modalContainer.innerHTML = '';
+              modalContainer.remove();
             }
           } else {
             closeButton.onclick = function() {
-            modalContainer.style.display = "none";
+              modalContainer.style.display = "none";
             }
             window.onclick = function(event) {
               if (event.target == modalContainer) {
@@ -220,7 +214,7 @@ $unit = $result->fetch_assoc();
       var promise = postAJAX("php/tiles/loadTileContent.php", formData);
       promise.then(function(data) {
         if(isEdit){
-          unpackTileJSONEdit(data, parent);
+          unpackTileJSONEdit(data, parent, id);
         } else {
           unpackTileJSON(data, parent);
         }
@@ -315,24 +309,24 @@ $unit = $result->fetch_assoc();
     }
 
     //Load modal content and components in edit mode
-    function unpackTileJSONEdit(data, parent) {
+    function unpackTileJSONEdit(data, parent, tileId) {
       var holder = $(parent);
       let buttonHolder = $("<div>").addClass("save-cancel-btn-container");
-      buttonHolder.append($("<div>").addClass("save-cancel-btn").html("Save"));
-      buttonHolder.append($("<div>").addClass("save-cancel-btn").html("Cancel"));
+      buttonHolder.append($("<div>").addClass("save-cancel-btn").html("Save").attr("onclick", "saveTile("+ tileId +");"));
+      buttonHolder.append($("<div>").addClass("save-cancel-btn").html("Cancel").attr("onclick", "$('#modalContainerEdit"+ tileId +"').remove(); document.querySelector('#modalContainer"+tileId+"').style.display = 'block';"));
       holder.append(buttonHolder);
       var componentsArray = JSON.parse(data.components);
       if (!componentsArray) {
         return;
       }
       componentsArray.forEach(function(ele) {
-        let component = $("<div>").addClass("modal-component edit-field").attr("id", "comp" + ele.id).attr("contenteditable", true);
+        let component = $("<div>").addClass("modal-component edit-field").attr("id", "editComp" + ele.id);
         holder.append(component);
         let componentHead = $("<div>").addClass("component-head");
-        componentHead.append($("<div>").addClass("modal-component-title").html(ele.name));
-        componentHead.append($("<div>").addClass("edit-modal-delete-component").html("Delete").attr("contenteditable", false));
+        componentHead.append($("<input type='text'>").addClass("modal-component-title").val(ele.name).data("initial", ele.name));
+        componentHead.append($("<div>").addClass("edit-modal-delete-component").html("Delete").attr("onclick", "deleteComponent("+ ele.id +");"));
         component.append(componentHead);
-        component.append($("<div>").addClass("modal-component-description").html(ele.description));
+        component.append($("<textarea>").addClass("modal-component-description").val(ele.description).data("initial", ele.description));
         component.append($("<div>").addClass("modal-inner-content").attr("id", "editCompContent" + ele.id));
         component.append($("<div>").addClass("add-content-btn").attr("id", "add-content-btn" + ele.id).html("+"));
         component.append($("<div>").addClass("add-content-btn-label").html("Add Content"));
@@ -343,49 +337,172 @@ $unit = $result->fetch_assoc();
         return;
       }
       contentArray.forEach(function(ele) {
-        let contentHolder = $("<div>").attr("id", "content" + ele.id).addClass("edit-content-holder");
+        let contentHolder = $("<div>").attr("id", "editContent" + ele.id).addClass("edit-content-holder");
 
         let typeRow = $("<div>").addClass("edit-content-row-type");
-        typeRow.append($("<div>").addClass("edit-content-label").html("Type:"))
-        var typeSelect = $("<select id=\"componentTypeId\" name=\"componentType\" />").addClass("edit-content-field");
-          $("<option />", {value: "1", text: "Ordered list"}).appendTo(typeSelect);
-          $("<option />", {value: "2", text: "Unordered list"}).appendTo(typeSelect);
-          $("<option />", {value: "3", text: "Link"}).appendTo(typeSelect);
-        typeSelect.val(ele.type);
+        typeRow.append($("<div>").addClass("edit-content-label").html("Type:"));
+        var typeSelect = $("<select>").addClass("edit-content-field");
+          $("<option />", {value: "0", text: "Dot Point"}).appendTo(typeSelect);
+          $("<option />", {value: "1", text: "Numbered Point"}).appendTo(typeSelect);
+          $("<option />", {value: "2", text: "Download Link"}).appendTo(typeSelect);
+          $("<option />", {value: "3", text: "Clickable Link"}).appendTo(typeSelect);
+        typeSelect.val(ele.type).data("initial", ele.type);
         typeRow.append(typeSelect);
-        typeRow.append($("<img>").attr("src", "assets/deleteIcon.svg").attr("alt", "Delete").addClass("edit-content-delete-icon"));
+        typeRow.append($("<img>").attr("src", "assets/deleteIcon.svg").attr("alt", "Delete").addClass("edit-content-delete-icon").attr("onclick", "deleteContent("+ ele.id +");"));
         contentHolder.append(typeRow);
 
         let textRow = $("<div>").addClass("edit-content-row");
         textRow.append($("<div>").addClass("edit-content-label").html("Text:"));
-        textRow.append($("<div>").addClass("edit-content-text").html(ele.name));
+        textRow.append($("<textarea>").addClass("edit-content-text").html(ele.name).data("initial", ele.name));
         contentHolder.append(textRow);
 
         let urlRow = $("<div>").addClass("edit-content-row-url");
-        urlRow.append($("<div>").addClass("edit-content-label").html("url:"));
-        let urlCheckbox = $("<button>").addClass("modal-content-task");
-        urlRow.append(urlCheckbox);
-        urlRow.append($("<div>").addClass("edit-content-url").html(ele.url));
-        if(!ele.url == ""){
-          urlCheckbox.html("✓");
-          urlCheckbox.addClass("completed");
-        }
+        urlRow.append($("<div>").addClass("edit-content-label").html("URL:"));
+        urlRow.append($("<input type='text'>").addClass("edit-content-url").val(ele.url).data("initial", ele.url));
         contentHolder.append(urlRow);
 
         let taskRow = $("<div>").addClass("edit-content-row");
         taskRow.append($("<div>").addClass("edit-content-label").html("Assign as task:"));
-        let taskCheckbox = $("<button>").addClass("modal-content-task")
+        let taskCheckbox = $("<input type='checkbox'>").addClass("modal-content-task edit-content-status").data("initial", ele.isTask);
         taskRow.append(taskCheckbox);
         if(ele.isTask == 1){
-          taskCheckbox.html("✓");
-          taskCheckbox.addClass("completed");
+          taskCheckbox.attr("checked", "true");
         }
         contentHolder.append(taskRow);
 
         $("#editCompContent" + ele.componentId).append(contentHolder);
       });
+    }
 
+    <?php if ($userRole['role'] == 2) { // lecturer only functions: ?>
+      function deleteComponent(compId) {
+        if (!confirm("Are you sure you want to delete this component? All its associated content will be deleted with it.")) {
+          return;
+        }
+
+        var formData = new FormData();
+        formData.append("componentId", compId);
+        var promise = postAJAX("php/tiles/deleteComponent.php", formData);
+        promise.then(function(data) {
+          $("#editComp" + compId).remove();
+          alert("Component and its children were successfully deleted."); // !!! convert alerts and confirmations into proper displays/modals (talk with Ky) !!!
+        }).catch(function(error) {
+          alert("There was an error deleting this component, please try again later."); // !!! ^^^
+        });
       }
+      function deleteContent(contId) {
+        if (!confirm("Are you sure you want to delete this content?")) {
+          return;
+        }
+
+        var formData = new FormData();
+        formData.append("contentId", contId);
+        var promise = postAJAX("php/tiles/deleteContent.php", formData);
+        promise.then(function(data) {
+          $("#editContent" + contId).remove();
+          alert("Content successfully deleted.");
+        }).catch(function(error) {
+          alert("There was an error deleting this content, please try again later.");
+        });
+      }
+
+      function saveTile(tileId) {
+        // get all elements required:
+        let modal = $("#editModalCont" + tileId);
+        let componentHolders = modal.find(".modal-component.edit-field");
+        let contentHolders = modal.find(".edit-content-holder");
+
+        // manage component changes:
+        var componentArray = [];
+        componentHolders.each(function() {
+          let ele = $(this);
+          let component = {};
+          let modified = false;
+          component.compId = (ele.attr("id")).match(/\d+$/)[0]; // get component's id from the element's id string.
+
+          // get other component attributes, but only if they've changed:
+          let title = $(ele.find(".modal-component-title")[0]);
+          if (title.val().trim() != ensureString(title.data("initial"))) {
+              component.name = title.val().trim();
+              modified = true;
+          }
+          let description = $(ele.find(".modal-component-description")[0]);
+          if (description.val().trim() != ensureString(description.data("initial"))) {
+              component.description = description.val().trim();
+              modified = true;
+          }
+
+          // append to data for insertion:
+          if (modified) {
+            componentArray.push(component);
+          }
+        });
+        // manage content attributes, but only if they've changed:
+        var contentArray = [];
+        contentHolders.each(function() {
+          let ele = $(this);
+          let content = {};
+          let modified = false;
+          content.contId = (ele.attr("id")).match(/\d+$/)[0]; // get component's id from the element's id string.
+
+          // get other component attributes, but only if they've changed:
+          let contentType = $(ele.find(".edit-content-field")[0]);
+          if (contentType.val() != contentType.data("initial")) {
+              content.type = contentType.val();
+              modified = true;
+          }
+          let text = $(ele.find(".edit-content-text")[0]);
+          if (text.val().trim() != ensureString(text.data("initial"))) {
+              content.name = text.val().trim();
+              modified = true;
+          }
+          let url = $(ele.find(".edit-content-url")[0]);
+          if (url.val().trim() != ensureString(url.data("initial"))) {
+              content.url = url.val().trim();
+              modified = true;
+          }
+          let status = $(ele.find(".edit-content-status")[0]);
+          if (status.prop("checked") != status.data("initial")) {
+              content.status = (status.prop("checked") ? 1 : 0);
+              modified = true;
+          }
+
+          // append to data for insertion:
+          if (modified) {
+            contentArray.push(content);
+          }
+        });
+
+        // convert to JSON and send for processing:
+        if (componentArray.length > 0 || contentArray.length > 0) {
+          if (!confirm("Are you sure you want to save these changes?")) {
+            return;
+          }
+
+          let jsonData = [];
+          jsonData.push(componentArray);
+          jsonData.push(contentArray);
+
+          var formData = new FormData();
+          formData.append("tileUpdateJSON", JSON.stringify(jsonData));
+          var promise = postAJAX("php/tiles/saveTile.php", formData);
+          promise.then(function(data) {
+            alert("Tile successfully updated.");
+            $("#modalContainerEdit" + tileId).remove(); // !!! reload tile too
+          }).catch(function(error) {
+            alert("There was an error saving this tile's components & content, please try again later.");
+          });
+        } else { // if no changes, just go back:
+          $("#modalContainerEdit" + tileId).remove();
+          document.querySelector('#modalContainer'+tileId).style.display = 'block';
+        }
+      }
+
+      // converts any null values to empty strings:
+      function ensureString(input) {
+        return input === null ? "" : String(input);
+      }
+    <?php } ?>
   </script>
 </body>
 </html>
