@@ -17,6 +17,12 @@
     <div class="split left">
         <div class="centered">
             <?php
+
+                
+                session_start();
+                $userId = $_SESSION["id"];
+
+
                 // This one I made myself. Didn't steal.
                 // Get user based on userid:
                 $sql = "SELECT id, firstName, lastName, email FROM user WHERE id = $userId";

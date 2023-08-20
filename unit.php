@@ -2,6 +2,11 @@
 include("php/session.php");
 include("php/dbConnect.php");
 
+session_start();
+
+# Get User ID from Session
+$userId = $_SESSION["id"];
+
 // Get user's role:
 $sql = "SELECT role FROM user WHERE id = ?";
 $stmt = $dbh->prepare($sql);
@@ -13,7 +18,8 @@ $userRole = $result->fetch_assoc();
 // Get unit record:
 $sql = "SELECT id, code, name, description FROM unit WHERE EXISTS (SELECT 1 FROM unitUser WHERE unitId = ? AND userId = $userId) AND ID = ? LIMIT 1;";
 $stmt = $dbh->prepare($sql);
-$stmt->bind_param("ii", $_GET['id'], $_GET['id']);
+//$stmt->bind_param("ii", $_GET['id'], $_GET['id']);
+$stmt->bind_param("ii", $userId, $userId);
 $stmt->execute();
 $result = $stmt->get_result();
 
