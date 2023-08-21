@@ -2,11 +2,6 @@
 include("php/session.php");
 include("php/dbConnect.php");
 
-session_start();
-
-# Get User ID from Session
-$userId = $_SESSION["id"];
-
 // Get user's role:
 $sql = "SELECT role FROM user WHERE id = ?";
 $stmt = $dbh->prepare($sql);
@@ -18,8 +13,7 @@ $userRole = $result->fetch_assoc();
 // Get unit record:
 $sql = "SELECT id, code, name, description FROM unit WHERE EXISTS (SELECT 1 FROM unitUser WHERE unitId = ? AND userId = $userId) AND ID = ? LIMIT 1;";
 $stmt = $dbh->prepare($sql);
-//$stmt->bind_param("ii", $_GET['id'], $_GET['id']);
-$stmt->bind_param("ii", $userId, $userId);
+$stmt->bind_param("ii", $_GET['id'], $_GET['id']);
 $stmt->execute();
 $result = $stmt->get_result();
 
@@ -222,7 +216,7 @@ $unit = $result->fetch_assoc();
         if(isEdit){
           unpackTileJSONEdit(data, parent, id);
         } else {
-          unpackTileJSON(data, parent);
+          unpackTileJSON(data, parent, id);
         }
       }).catch(function(error) {
         console.error('Error:', error); // !!! better solution
@@ -230,7 +224,7 @@ $unit = $result->fetch_assoc();
     }
 
     // constructs the tile's components & content from JSON objects:
-    function unpackTileJSON(data, parent) {
+    function unpackTileJSON(data, parent, tileId) {
       var holder = $(parent);
       var componentsArray = JSON.parse(data.components);
       if (!componentsArray) {
@@ -264,7 +258,7 @@ $unit = $result->fetch_assoc();
         contentHolder.append(content);
         if (ele.isTask) {
           let taskBtn = $("<button>").addClass("modal-content-task").attr("id", "task" + ele.id);
-          taskBtn.attr("onclick", "requestTaskToggle(" + ele.id + ");");
+          taskBtn.attr("onclick", "requestTaskToggle(" + ele.id + ","+tileId+");");
           if (ele.isComplete) {
             taskBtn.html("✓");
             taskBtn.addClass("completed");
@@ -297,9 +291,10 @@ $unit = $result->fetch_assoc();
         return false;
       }
     }
-    function requestTaskToggle(id) {
+    function requestTaskToggle(id, tileId) {
       let state = toggleTask(id);
       var formData = new FormData();
+      formData.append("tileId", tileId);
       formData.append("contentId", id);
       if (state) {
         formData.append("taskState", true);

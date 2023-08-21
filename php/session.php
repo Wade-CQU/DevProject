@@ -14,7 +14,7 @@
 //
 //     }
 // }
-#$userId = 1; // !!! hard-coded until jack finishes session control.
+session_start();
+$userId = $_SESSION["id"];
 $termCode = 22023; // !!! hard-coded until jack finishes session control.
-
 ?>

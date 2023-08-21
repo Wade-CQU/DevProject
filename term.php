@@ -16,9 +16,6 @@
     <h1>WELCOME TO TERM <?php echo strval($termCode)[0]; ?>, WEEK 1</h1>
     <div class="side-scroll-container">
     <?php
-      session_start();
-      $userId = $_SESSION["id"];
-
       // Get unit's based on user:
       $sql = "SELECT uId, name, termCode FROM unit u RIGHT JOIN (SELECT uu.unitId as uId FROM unitUser uu WHERE userId = $userId) uu ON uId = u.id ORDER BY termCode DESC";
       $stmt = $dbh->prepare($sql);

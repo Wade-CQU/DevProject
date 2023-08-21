@@ -1,14 +1,15 @@
 <?php
 require("../session.php");
 require("../dbConnect.php");
+$tileId = intval($_POST['contentId']);
 $contentId = intval($_POST['contentId']);
 $state = intval(isset($_POST['taskState']));
 
 // time cache feature !!!
 
 // Determine task togglablitity & perform toggle:
-$sql = "INSERT INTO taskCompletion (contentId, userId, isComplete)
-        VALUES ($contentId, $userId, $state)
+$sql = "INSERT INTO taskCompletion (contentId, userId, isComplete, tileId)
+        VALUES ($contentId, $userId, $state, $tileId)
         ON DUPLICATE KEY UPDATE isComplete = $state;";
 $stmt = $dbh->prepare($sql);
 $stmt->execute();
