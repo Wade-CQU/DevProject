@@ -1,7 +1,7 @@
 <?php
 require("../session.php");
 require("../dbConnect.php");
-$tileId = intval($_POST['contentId']);
+$tileId = intval($_POST['tileId']);
 $contentId = intval($_POST['contentId']);
 $state = intval(isset($_POST['taskState']));
 

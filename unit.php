@@ -62,6 +62,7 @@ $unit = $result->fetch_assoc();
             $stmt->bind_param("i", $_GET['id']);
             $stmt->execute();
             $result = $stmt->get_result();
+            $stmt->close();
 
             if (!$result) { // if query or database connection fails:
               echo "404 Unit Not Found"; // !!! review?
@@ -70,7 +71,42 @@ $unit = $result->fetch_assoc();
               exit;
             }
 
-            while ($tile = $result->fetch_assoc()) { ?>
+            while ($tile = $result->fetch_assoc()) { 
+              //get the count of total tasks for this tile
+              $sql = "SELECT COUNT(cn.id) FROM Content cn
+              RIGHT JOIN Component cm ON cn.componentId = cm.id
+              WHERE cm.tileId = ? AND cn.isTask = 1";
+              $stmt = $dbh->prepare($sql);
+              $stmt->bind_param("i", $tile['id']);
+              $stmt->execute();
+              $stmt->bind_result($taskCount); 
+              $stmt->fetch(); 
+              $stmt->close();
+
+              // Update the totalTask count for the tile being loaded
+              $sql = "UPDATE tile AS t SET t.totalTasks = ? WHERE t.id = ?;";
+              $stmt = $dbh->prepare($sql);
+              $stmt->bind_param("ii", $taskCount, $tile['id']);
+              $stmt->execute();
+              $stmt->close();
+
+              $sql = "SELECT COUNT(id) FROM taskcompletion where tileId=? and isComplete = 1;";
+              $stmt = $dbh->prepare($sql);
+              $stmt->bind_param("i", $tile['id']);
+              $stmt->execute();
+              $stmt->bind_result($completedTaskCount); // Bind the result to the $count variable
+              $stmt->fetch(); // Fetch the value
+              $stmt->close();
+
+              //get percentage of task completion
+              if($taskCount == 0) {
+                $xpPercentage = 100; 
+              } else {
+                $xpPercentage = ($completedTaskCount / $taskCount) * 100;
+                $xpPercentage = floor($xpPercentage);
+              }
+
+              ?>
               <div class="unitTileDiv">
                 <div class="unitTileHolder" id="<?php echo $tile['id']; ?>" data-tile-name="<?php echo $tile['name']; ?>" data-tile-label="<?php echo $tile['label']; ?>" data-tile-description="<?php echo $tile['description']; ?>">
                   <div class="unitTile">
@@ -85,7 +121,7 @@ $unit = $result->fetch_assoc();
                   <div class="unitTileXpHolder">
                     <p class="unitTileXpLabel">EXP:</p>
                     <div class="unitTileXpBar">
-                      <div class="unitTileXpProgress">
+                      <div class="unitTileXpProgress" style="width:<?php echo $xpPercentage; ?>%;">
 
                       </div>
                     </div>
@@ -96,7 +132,7 @@ $unit = $result->fetch_assoc();
                 </div>
               </div>
           <?php }
-            $stmt->close();
+            
             $dbh->close();
            ?>
         </div>
