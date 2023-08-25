@@ -15,6 +15,11 @@
 //     }
 // }
 session_start();
-$userId = $_SESSION["id"];
-$termCode = 22023; // !!! hard-coded until jack finishes session control.
+if (isset($_SESSION["id"])) {
+  $userId = $_SESSION["id"];
+  $termCode = 22023; // !!! hard-coded until jack finishes session control.
+} else {
+  header("Location: login.php");
+  exit;
+}
 ?>

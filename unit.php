@@ -71,7 +71,7 @@ $unit = $result->fetch_assoc();
               exit;
             }
 
-            while ($tile = $result->fetch_assoc()) { 
+            while ($tile = $result->fetch_assoc()) {
               //get the count of total tasks for this tile
               $sql = "SELECT COUNT(cn.id) FROM Content cn
               RIGHT JOIN Component cm ON cn.componentId = cm.id
@@ -79,8 +79,8 @@ $unit = $result->fetch_assoc();
               $stmt = $dbh->prepare($sql);
               $stmt->bind_param("i", $tile['id']);
               $stmt->execute();
-              $stmt->bind_result($taskCount); 
-              $stmt->fetch(); 
+              $stmt->bind_result($taskCount);
+              $stmt->fetch();
               $stmt->close();
 
               // Update the totalTask count for the tile being loaded
@@ -100,7 +100,7 @@ $unit = $result->fetch_assoc();
 
               //get percentage of task completion
               if($taskCount == 0) {
-                $xpPercentage = 100; 
+                $xpPercentage = 100;
               } else {
                 $xpPercentage = ($completedTaskCount / $taskCount) * 100;
                 $xpPercentage = floor($xpPercentage);
@@ -132,7 +132,7 @@ $unit = $result->fetch_assoc();
                 </div>
               </div>
           <?php }
-            
+
             $dbh->close();
            ?>
         </div>
@@ -344,29 +344,95 @@ $unit = $result->fetch_assoc();
         console.error('Error:', error); // !!! better solution
       });
     }
+    var currentCompId = -1; // Used for created components:
+    function createEditableComponent(holder, data = null) {
+      let di = data == null; // used to differentiate new component's values when applicable.
+      if (di) {
+        data = {
+          id: currentCompId,
+          name: "",
+          description: ""
+        };
+        currentCompId--;
+      }
+      let component = $("<div>").addClass("modal-component edit-field").attr("id", "editComp" + data.id);
+      holder.append(component);
+      let componentHead = $("<div>").addClass("component-head");
+      componentHead.append($("<input type='text'>").addClass("modal-component-title").val(data.name).data("initial", !di ? data.name : "𓁔𓃸").prop("placeholder", "Enter a heading here..."));
+      componentHead.append($("<div>").addClass("edit-modal-delete-component").html("Delete").attr("onclick", "deleteComponent("+ data.id +");"));
+      component.append(componentHead);
+      component.append($("<textarea>").addClass("modal-component-description").val(data.description).data("initial", !di ? data.description : "𓁔𓃸").prop("placeholder", "Write a description here..."));
+      component.append($("<div>").addClass("modal-inner-content").attr("id", "editCompContent" + data.id));
+      let addBtnHolder = $("<div>").on("click", function () {
+        createEditableContent(null, data.id);
+      });
+      component.append(addBtnHolder);
+      addBtnHolder.append($("<div>").addClass("add-content-btn").attr("id", "add-content-btn" + data.id).html("+"));
+      addBtnHolder.append($("<div>").addClass("add-content-btn-label").html("Add Content"));
+    }
+    var currentContId = -1; // Used for creating content:
+    function createEditableContent(ele = null, compId = null) {
+      let di = ele == null && compId != null; // used to differentiate new content's values when applicable.
+      if (di) {
+        ele = {
+          id: currentContId,
+          type: 0,
+          name: "",
+          url: "",
+          isTask: 0,
+          componentId: compId
+        };
+        currentCompId--;
+      }
 
+      let contentHolder = $("<div>").attr("id", "editContent" + ele.id).addClass("edit-content-holder");
+      let typeRow = $("<div>").addClass("edit-content-row-type");
+      typeRow.append($("<div>").addClass("edit-content-label").html("Type:"));
+      var typeSelect = $("<select>").addClass("edit-content-field");
+        $("<option />", {value: "0", text: "Dot Point"}).appendTo(typeSelect);
+        $("<option />", {value: "1", text: "Numbered Point"}).appendTo(typeSelect);
+        $("<option />", {value: "2", text: "Download Link"}).appendTo(typeSelect);
+        $("<option />", {value: "3", text: "Clickable Link"}).appendTo(typeSelect);
+      typeSelect.val(ele.type).data("initial", !di ? ele.type : "𓁔𓃸");
+      typeRow.append(typeSelect);
+      typeRow.append($("<img>").attr("src", "assets/deleteIcon.svg").attr("alt", "Delete").addClass("edit-content-delete-icon").attr("onclick", "deleteContent("+ ele.id +");"));
+      contentHolder.append(typeRow);
+
+      let textRow = $("<div>").addClass("edit-content-row");
+      textRow.append($("<div>").addClass("edit-content-label").html("Text:"));
+      textRow.append($("<textarea>").addClass("edit-content-text").html(ele.name).data("initial", !di ? ele.name : "𓁔𓃸"));
+      contentHolder.append(textRow);
+
+      let urlRow = $("<div>").addClass("edit-content-row-url");
+      urlRow.append($("<div>").addClass("edit-content-label").html("URL:"));
+      urlRow.append($("<input type='text'>").addClass("edit-content-url").val(ele.url).data("initial", !di ? ele.url : "𓁔𓃸"));
+      contentHolder.append(urlRow);
+
+      let taskRow = $("<div>").addClass("edit-content-row");
+      taskRow.append($("<div>").addClass("edit-content-label").html("Assign as task:"));
+      let taskCheckbox = $("<input type='checkbox'>").addClass("modal-content-task edit-content-status").data("initial", !di ? ele.isTask : "𓁔𓃸");
+      taskRow.append(taskCheckbox);
+      if(ele.isTask == 1){
+        taskCheckbox.attr("checked", "true");
+      }
+      contentHolder.append(taskRow);
+
+      $("#editCompContent" + ele.componentId).append(contentHolder);
+    }
     //Load modal content and components in edit mode
     function unpackTileJSONEdit(data, parent, tileId) {
       var holder = $(parent);
       let buttonHolder = $("<div>").addClass("save-cancel-btn-container");
       buttonHolder.append($("<div>").addClass("save-cancel-btn").html("Save").attr("onclick", "saveTile("+ tileId +");"));
       buttonHolder.append($("<div>").addClass("save-cancel-btn").html("Cancel").attr("onclick", "$('#modalContainerEdit"+ tileId +"').remove(); document.querySelector('#modalContainer"+tileId+"').style.display = 'block';"));
+      buttonHolder.append($("<div>").addClass("save-cancel-btn").html("Add Component").attr("onclick", "createEditableComponent($('#editModalCont"+ tileId +"'));").css("float", "right"));
       holder.append(buttonHolder);
       var componentsArray = JSON.parse(data.components);
       if (!componentsArray) {
         return;
       }
       componentsArray.forEach(function(ele) {
-        let component = $("<div>").addClass("modal-component edit-field").attr("id", "editComp" + ele.id);
-        holder.append(component);
-        let componentHead = $("<div>").addClass("component-head");
-        componentHead.append($("<input type='text'>").addClass("modal-component-title").val(ele.name).data("initial", ele.name));
-        componentHead.append($("<div>").addClass("edit-modal-delete-component").html("Delete").attr("onclick", "deleteComponent("+ ele.id +");"));
-        component.append(componentHead);
-        component.append($("<textarea>").addClass("modal-component-description").val(ele.description).data("initial", ele.description));
-        component.append($("<div>").addClass("modal-inner-content").attr("id", "editCompContent" + ele.id));
-        component.append($("<div>").addClass("add-content-btn").attr("id", "add-content-btn" + ele.id).html("+"));
-        component.append($("<div>").addClass("add-content-btn-label").html("Add Content"));
+        createEditableComponent(holder, ele);
       });
 
       var contentArray = JSON.parse(data.content);
@@ -374,40 +440,7 @@ $unit = $result->fetch_assoc();
         return;
       }
       contentArray.forEach(function(ele) {
-        let contentHolder = $("<div>").attr("id", "editContent" + ele.id).addClass("edit-content-holder");
-
-        let typeRow = $("<div>").addClass("edit-content-row-type");
-        typeRow.append($("<div>").addClass("edit-content-label").html("Type:"));
-        var typeSelect = $("<select>").addClass("edit-content-field");
-          $("<option />", {value: "0", text: "Dot Point"}).appendTo(typeSelect);
-          $("<option />", {value: "1", text: "Numbered Point"}).appendTo(typeSelect);
-          $("<option />", {value: "2", text: "Download Link"}).appendTo(typeSelect);
-          $("<option />", {value: "3", text: "Clickable Link"}).appendTo(typeSelect);
-        typeSelect.val(ele.type).data("initial", ele.type);
-        typeRow.append(typeSelect);
-        typeRow.append($("<img>").attr("src", "assets/deleteIcon.svg").attr("alt", "Delete").addClass("edit-content-delete-icon").attr("onclick", "deleteContent("+ ele.id +");"));
-        contentHolder.append(typeRow);
-
-        let textRow = $("<div>").addClass("edit-content-row");
-        textRow.append($("<div>").addClass("edit-content-label").html("Text:"));
-        textRow.append($("<textarea>").addClass("edit-content-text").html(ele.name).data("initial", ele.name));
-        contentHolder.append(textRow);
-
-        let urlRow = $("<div>").addClass("edit-content-row-url");
-        urlRow.append($("<div>").addClass("edit-content-label").html("URL:"));
-        urlRow.append($("<input type='text'>").addClass("edit-content-url").val(ele.url).data("initial", ele.url));
-        contentHolder.append(urlRow);
-
-        let taskRow = $("<div>").addClass("edit-content-row");
-        taskRow.append($("<div>").addClass("edit-content-label").html("Assign as task:"));
-        let taskCheckbox = $("<input type='checkbox'>").addClass("modal-content-task edit-content-status").data("initial", ele.isTask);
-        taskRow.append(taskCheckbox);
-        if(ele.isTask == 1){
-          taskCheckbox.attr("checked", "true");
-        }
-        contentHolder.append(taskRow);
-
-        $("#editCompContent" + ele.componentId).append(contentHolder);
+        createEditableContent(ele);
       });
     }
 
@@ -417,6 +450,10 @@ $unit = $result->fetch_assoc();
           return;
         }
 
+        if (compId < 0) { // if a newly client-created component, delete from client-side:
+            $("#editComp" + compId).remove();
+            return;
+        }
         var formData = new FormData();
         formData.append("componentId", compId);
         var promise = postAJAX("php/tiles/deleteComponent.php", formData);
@@ -432,6 +469,10 @@ $unit = $result->fetch_assoc();
           return;
         }
 
+        if (contId < 0) { // if a newly client-created content, delete from client-side:
+          $("#editContent" + contId).remove();
+          return;
+        }
         var formData = new FormData();
         formData.append("contentId", contId);
         var promise = postAJAX("php/tiles/deleteContent.php", formData);
@@ -455,7 +496,8 @@ $unit = $result->fetch_assoc();
           let ele = $(this);
           let component = {};
           let modified = false;
-          component.compId = (ele.attr("id")).match(/\d+$/)[0]; // get component's id from the element's id string.
+          component.tileId = tileId;
+          component.compId = (ele.attr("id")).match(/-?\d+$/)[0]; // get component's id from the element's id string.
 
           // get other component attributes, but only if they've changed:
           let title = $(ele.find(".modal-component-title")[0]);
@@ -480,7 +522,7 @@ $unit = $result->fetch_assoc();
           let ele = $(this);
           let content = {};
           let modified = false;
-          content.contId = (ele.attr("id")).match(/\d+$/)[0]; // get component's id from the element's id string.
+          content.contId = (ele.attr("id")).match(/-?\d+$/)[0]; // get component's id from the element's id string.
 
           // get other component attributes, but only if they've changed:
           let contentType = $(ele.find(".edit-content-field")[0]);
@@ -503,6 +545,7 @@ $unit = $result->fetch_assoc();
               content.status = (status.prop("checked") ? 1 : 0);
               modified = true;
           }
+          content.componentId = (ele.parent().attr("id")).match(/-?\d+$/)[0];
 
           // append to data for insertion:
           if (modified) {
