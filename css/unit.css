@@ -67,7 +67,6 @@ textarea {
 }
 
 .class-xp-progress {
-  width: 40%;
   height: 10px;
   background-color: #54FF00;
 }
@@ -152,14 +151,14 @@ textarea {
 .unitTileXpBar {
   background-color: white;
   min-width: 180px;
-  min-height: 12px;
+  min-height: 10px;
   border-radius: 6px;
   display: inline-block;
   vertical-align: middle;
 }
 .unitTileXpProgress {
-  background-color: green;
-  height: 12px;
+  background-color: #54FF00;
+  height: 10px;
   border-radius: 6px;
   float: left;
 }

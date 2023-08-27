@@ -10,6 +10,36 @@ $stmt->execute();
 $result = $stmt->get_result();
 $userRole = $result->fetch_assoc();
 
+//Get total nbr of tasks in unit
+$sql = "SELECT SUM(totalTasks) FROM tile where unitId=?;";
+$stmt = $dbh->prepare($sql);
+$stmt->bind_param("i", $_GET['id']);
+$stmt->execute();
+$stmt->bind_result($unitTaskCount);
+$stmt->fetch();
+$stmt->close();
+
+//get number of tasks this user has completed
+$sql = "SELECT COUNT(tc.id) FROM taskcompletion tc 
+RIGHT JOIN tile t ON tc.tileId = t.id 
+RIGHT JOIN unit u ON t.unitId = u.id 
+where u.id = ? AND tc.userId = ? AND tc.isComplete = 1;";
+$stmt = $dbh->prepare($sql);
+$stmt->bind_param("ii", $_GET['id'], $userId);
+$stmt->execute();
+$stmt->bind_result($unitTaskCompleted);
+$stmt->fetch();
+$stmt->close();
+
+//calculate total unit xp percentage for current user
+if($unitTaskCount == 0){
+  $unitXpPercentage = 0;
+} else {
+  $unitXpPercentage = ($unitTaskCompleted / $unitTaskCount) * 100;
+  $unitXpPercentage = floor($unitXpPercentage);
+}
+
+
 // Get unit record:
 $sql = "SELECT id, code, name, description FROM unit WHERE EXISTS (SELECT 1 FROM unitUser WHERE unitId = ? AND userId = $userId) AND ID = ? LIMIT 1;";
 $stmt = $dbh->prepare($sql);
@@ -48,7 +78,7 @@ $unit = $result->fetch_assoc();
         <div class="class-xp-container">
           <div class="class-xp-label">CLASS XP:</div>
           <div class="class-xp-bar">
-            <div class="class-xp-progress"></div>
+            <div class="class-xp-progress" style="width: <?php echo $unitXpPercentage; ?>%;"></div>
           </div>
         </div>
       </div>
@@ -66,7 +96,6 @@ $unit = $result->fetch_assoc();
 
             if (!$result) { // if query or database connection fails:
               echo "404 Unit Not Found"; // !!! review?
-              $stmt->close();
               $dbh->close();
               exit;
             }
@@ -90,12 +119,13 @@ $unit = $result->fetch_assoc();
               $stmt->execute();
               $stmt->close();
 
-              $sql = "SELECT COUNT(id) FROM taskcompletion where tileId=? and isComplete = 1;";
+              //get the number of tasks in this tile this user has completed
+              $sql = "SELECT COUNT(id) FROM taskcompletion WHERE tileId=? AND userId=? AND isComplete = 1;";
               $stmt = $dbh->prepare($sql);
-              $stmt->bind_param("i", $tile['id']);
+              $stmt->bind_param("ii", $tile['id'], $userId);
               $stmt->execute();
-              $stmt->bind_result($completedTaskCount); // Bind the result to the $count variable
-              $stmt->fetch(); // Fetch the value
+              $stmt->bind_result($completedTaskCount);
+              $stmt->fetch(); 
               $stmt->close();
 
               //get percentage of task completion
