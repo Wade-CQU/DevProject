@@ -82,7 +82,33 @@ $unit = $result->fetch_assoc();
           </div>
         </div>
       </div>
-
+      <div class="section-heading">RESOURCES</div>
+      <div class="section-divider"></div>
+      <div class="nav-tiles-container">
+        <!--Assignment tile-->
+        <div class="nav-tile" id="assignments">
+          <div class="nav-tile-inner">
+            <img class="nav-tile-icon" src="assets/fontAwesomeIcons/clipboard.svg"/>
+            <div class="nav-tile-label">ASSIGNMENTS</div>
+          </div>
+        </div>
+        <!--Class Info tile-->
+        <div class="nav-tile" id="classinfo">
+          <div class="nav-tile-inner">
+            <img class="nav-tile-icon" src="assets/fontAwesomeIcons/book.svg"/>
+            <div class="nav-tile-label">CLASS INFO</div>
+          </div>
+        </div>
+        <!--TimeTable tile-->
+        <div class="nav-tile" id="timetable">
+          <div class="nav-tile-inner">
+            <img class="nav-tile-icon" src="assets/fontAwesomeIcons/calender.svg"/>
+            <div class="nav-tile-label">TIMETABLE</div>
+          </div>
+        </div>          
+      </div>
+      <div class="section-heading">LEARNING</div>
+      <div class="section-divider"></div>
         <div class="weekly-content-container">
           <?php
             // Get unit's tiles (!!! if not cached):
@@ -149,7 +175,7 @@ $unit = $result->fetch_assoc();
                     </div>
                   </div>
                   <div class="unitTileXpHolder">
-                    <p class="unitTileXpLabel">EXP:</p>
+                    <p class="unitTileXpLabel">XP:</p>
                     <div class="unitTileXpBar">
                       <div class="unitTileXpProgress" style="width:<?php echo $xpPercentage; ?>%;">
 
@@ -170,8 +196,9 @@ $unit = $result->fetch_assoc();
   <script>
     //select all the tiles
     const tiles = document.querySelectorAll(".unitTileHolder");
+    const navTiles = document.querySelectorAll(".nav-tile");
 
-    //move all the id values into the idValues array
+    //loop through each tile and assign onclick function
     tiles.forEach(tile => {
       //store boolean to show if the modal has been created already to avoid loading more than once if tile is clicked more than once
       var contentLoaded = false;
@@ -212,65 +239,139 @@ $unit = $result->fetch_assoc();
       })
     });
 
+    navTiles.forEach(navTile => {
+        //store boolean to show if the modal has been created already to avoid loading more than once if tile is clicked more than once
+        var contentLoaded = false;
+      navTile.addEventListener("click", function(){
+        //only load content if it has not already been loaded on the page
+        if(contentLoaded){
+          const thisModalContainer = document.querySelector("#modalContainer" + navTile.id + ".modal");
+          thisModalContainer.style.display = "block";
+        } else{
+          loadNavTileModal(navTile);
+          contentLoaded = true;
+        }
+      })
+    });
+
     function loadModalFrame(tile, isEdit) {
       var modalContainer = document.createElement('div');
-            modalContainer.className = "modal";
-            modalContainer.id = "modalContainer" + (isEdit ? "Edit" : "") + tile.id;
-          var modalContent = document.createElement('div');
-            modalContent.id = (isEdit ? "editModalCont" : "modalCont") + tile.id;
-            modalContent.className = "modal-content";
-          var closeButton = document.createElement('span');
-            closeButton.className = "close";
-            closeButton.textContent = "x";
+        modalContainer.className = "modal";
+        modalContainer.id = "modalContainer" + (isEdit ? "Edit" : "") + tile.id;
+      var modalContent = document.createElement('div');
+        modalContent.id = (isEdit ? "editModalCont" : "modalCont") + tile.id;
+        modalContent.className = "modal-content";
+      var closeButton = document.createElement('span');
+        closeButton.className = "close";
+        closeButton.textContent = "x";
 
-          document.body.appendChild(modalContainer);
-          modalContainer.appendChild(modalContent);
-          modalContent.appendChild(closeButton);
+      document.body.appendChild(modalContainer);
+      modalContainer.appendChild(modalContent);
+      modalContent.appendChild(closeButton);
 
-          //Title section
-          var contentHeading = document.createElement('div');
-          contentHeading.className = "modal-unit-heading";
-          contentHeading.textContent = tile.dataset.tileName + ": " + tile.dataset.tileLabel;
-          modalContent.appendChild(contentHeading);
+      //Title section
+      var contentHeading = document.createElement('div');
+      contentHeading.className = "modal-unit-heading";
+      contentHeading.textContent = tile.dataset.tileName + ": " + tile.dataset.tileLabel;
+      modalContent.appendChild(contentHeading);
 
-          var contentDescription = document.createElement('div');
-          contentDescription.className = "modal-unit-description";
-          contentDescription.textContent = tile.dataset.tileDescription;
-          modalContent.appendChild(contentDescription);
+      var contentDescription = document.createElement('div');
+      contentDescription.className = "modal-unit-description";
+      contentDescription.textContent = tile.dataset.tileDescription;
+      modalContent.appendChild(contentDescription);
 
-          //Weekly Quest section
-          var weeklyQuestContainer = document.createElement('div');
-          weeklyQuestContainer.className = "modal-weekly-quest-container";
-          modalContent.appendChild(weeklyQuestContainer);
+      //Weekly Quest section
+      var weeklyQuestContainer = document.createElement('div');
+      weeklyQuestContainer.className = "modal-weekly-quest-container";
+      modalContent.appendChild(weeklyQuestContainer);
 
-          var weeklyQuestTitle = document.createElement('div');
-          weeklyQuestTitle.className = "modal-weekly-quest-title";
-          weeklyQuestTitle.textContent = "Weekly Quest!";
-          weeklyQuestContainer.appendChild(weeklyQuestTitle);
+      var weeklyQuestTitle = document.createElement('div');
+      weeklyQuestTitle.className = "modal-weekly-quest-title";
+      weeklyQuestTitle.textContent = "Weekly Quest!";
+      weeklyQuestContainer.appendChild(weeklyQuestTitle);
 
-          var weeklyQuest = document.createElement('div');
-          weeklyQuest.className = "modal-weekly-quest";
-          weeklyQuest.textContent = "Do some stuff and learn some thing.";
-          weeklyQuestContainer.appendChild(weeklyQuest);
+      var weeklyQuest = document.createElement('div');
+      weeklyQuest.className = "modal-weekly-quest";
+      weeklyQuest.textContent = "Do some stuff and learn some thing.";
+      weeklyQuestContainer.appendChild(weeklyQuest);
 
-          modalContainer.style.display = "block";
-          //close modal functions
-          if(isEdit){
-            closeButton.onclick = function() {
-              modalContainer.innerHTML = '';
-              modalContainer.remove();
-            }
-          } else {
-            closeButton.onclick = function() {
-              modalContainer.style.display = "none";
-            }
-            window.onclick = function(event) {
-              if (event.target == modalContainer) {
-                modalContainer.style.display = "none";
-              }
-            }
+      modalContainer.style.display = "block";
+      //close modal functions
+      if(isEdit){
+        closeButton.onclick = function() {
+          modalContainer.innerHTML = '';
+          modalContainer.remove();
+        }
+      } else {
+        closeButton.onclick = function() {
+          modalContainer.style.display = "none";
+        }
+        window.onclick = function(event) {
+          if (event.target == modalContainer) {
+            modalContainer.style.display = "none";
           }
+        }
+      }
 
+    }
+
+    //load modal for each nav tile
+    function loadNavTileModal(navTile){
+      //load empty modal
+      var modalContainer = document.createElement('div');
+        modalContainer.className = "modal";
+        modalContainer.id = "modalContainer" + navTile.id;
+      var modalContent = document.createElement('div');
+        modalContent.id ="modalCont"+ navTile.id;
+        modalContent.className = "modal-content";
+      var closeButton = document.createElement('span');
+        closeButton.className = "close";
+        closeButton.textContent = "x";
+      
+      document.body.appendChild(modalContainer);
+      modalContainer.appendChild(modalContent);
+      modalContent.appendChild(closeButton);
+      modalContainer.style.display = "block";
+
+      /*
+
+      JACK AND CONNOR
+      USE SECTION BELOW TO CREATE YOUR MODALS
+
+        ||  
+        ||
+        ||
+      \ || /
+        \/
+
+      */
+
+
+      //fill modal with content based on the nav tile id
+      if(navTile.id == "assignments"){
+        console.log("loadNavTile assignments");
+        //!!! fill out with appropriate content
+      }
+
+      if(navTile.id == "classinfo"){
+        console.log("loadNavTile classinfo");
+        //!!! fill out with appropriate content
+      }
+      
+      if(navTile.id == "timetable"){
+        console.log("loadNavTile timetable");
+        //!!! fill out with appropriate content
+      }
+
+      //make modal closeable
+      closeButton.onclick = function() {
+        modalContainer.style.display = "none";
+      }
+      window.onclick = function(event) {
+        if (event.target == modalContainer) {
+          modalContainer.style.display = "none";
+        }
+      }
     }
 
     // fetch tile component & contents:

@@ -42,4 +42,3 @@ if($termTaskCount == 0){
     <a href="profilePage.php"><img class="profile-icon" src="https://cdn-icons-png.flaticon.com/512/64/64572.png"></a>
     <a href="/devproject/php/logout.php">Logout</a>
 </header>
-<div class="divider"></div>
