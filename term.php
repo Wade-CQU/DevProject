@@ -28,16 +28,22 @@
         $dbh->close();
         exit;
       }
+      
       while ($unit = $result->fetch_assoc()) {
         $fakeRank = rand(1, 4);
+        
         ?>
         <div class="unit-card" id="<?php echo $unit['uId']; ?>"<?php echo $unit['termCode'] != $termCode ? "style='display: none;'" : ""; ?>>
-          <div class="icon unit-icon-container"></div>
-          <div class="xp-container"></div>
-          <img class="rank-icon-container" src="assets/<?php echo $fakeRank; ?>.svg"/>
+          <div class="term-code-label">Term Code: <?php echo $unit['termCode'];?></div>
+          <div class="xp-container">
+            <div class="xp-label">XP:</div>
+            <div class="xp-bar"><div class="xp-progress"></div></div>
+          </div>
+          <img class="rank-icon-<?php echo $fakeRank; ?>" src="assets/<?php echo $fakeRank; ?>.svg"/>
           <div class="unit-title"><?php echo $unit['name']; ?></div>
           <div class="rank-highlight rank-<?php echo $fakeRank; ?>"></div>
         </div>
+        
       <?php }
         $stmt->close();
         $dbh->close();

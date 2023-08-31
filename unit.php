@@ -247,6 +247,12 @@ $unit = $result->fetch_assoc();
         if(contentLoaded){
           const thisModalContainer = document.querySelector("#modalContainer" + navTile.id + ".modal");
           thisModalContainer.style.display = "block";
+
+          window.onclick = function(event) {
+            if (event.target == thisModalContainer) {
+              thisModalContainer.style.display = "none";
+            }
+          }
         } else{
           loadNavTileModal(navTile);
           contentLoaded = true;
