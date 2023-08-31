@@ -10,6 +10,36 @@ $stmt->execute();
 $result = $stmt->get_result();
 $userRole = $result->fetch_assoc();
 
+//Get total nbr of tasks in unit
+$sql = "SELECT SUM(totalTasks) FROM tile where unitId=?;";
+$stmt = $dbh->prepare($sql);
+$stmt->bind_param("i", $_GET['id']);
+$stmt->execute();
+$stmt->bind_result($unitTaskCount);
+$stmt->fetch();
+$stmt->close();
+
+//get number of tasks this user has completed
+$sql = "SELECT COUNT(tc.id) FROM taskcompletion tc 
+RIGHT JOIN tile t ON tc.tileId = t.id 
+RIGHT JOIN unit u ON t.unitId = u.id 
+where u.id = ? AND tc.userId = ? AND tc.isComplete = 1;";
+$stmt = $dbh->prepare($sql);
+$stmt->bind_param("ii", $_GET['id'], $userId);
+$stmt->execute();
+$stmt->bind_result($unitTaskCompleted);
+$stmt->fetch();
+$stmt->close();
+
+//calculate total unit xp percentage for current user
+if($unitTaskCount == 0){
+  $unitXpPercentage = 0;
+} else {
+  $unitXpPercentage = ($unitTaskCompleted / $unitTaskCount) * 100;
+  $unitXpPercentage = floor($unitXpPercentage);
+}
+
+
 // Get unit record:
 $sql = "SELECT id, code, name, description FROM unit WHERE EXISTS (SELECT 1 FROM unitUser WHERE unitId = ? AND userId = $userId) AND ID = ? LIMIT 1;";
 $stmt = $dbh->prepare($sql);
@@ -47,32 +77,37 @@ $unit = $result->fetch_assoc();
         <div class="class-xp-container">
           <div class="class-xp-label">CLASS XP:</div>
           <div class="class-xp-bar">
-            <div class="class-xp-progress"></div>
+            <div class="class-xp-progress" style="width: <?php echo $unitXpPercentage; ?>%;"></div>
           </div>
         </div>
       </div>
-
-      <div class="assignment-container">
-          <div class="unitTileDiv">
-            <div class="unitTileHolder" id="ass" data-tile-name="Assignments" data-tile-label="<?php echo $unit['name']; ?>" data-tile-description="Your assignments for the term are located in here">
-              <div class="unitTile">
-                <div class="unitTileIconHolder">
-                  <img src="" alt="">
-                </div>
-                <div class="unitTileContents">
-                  <p class="unitTileTitle">Assignments</p>
-                  <p class="unitTileLabel">Details and submission</p>
-                </div>
-              </div>
-            </div>
-            <div class="unitTileDescription">
-              "Some form of thing"
-            </div>
-            <a href="/devproject/php/assigment.php?unitId=<?php echo $_GET['id']; ?>" >Assgnment Submission</a>
+      <div class="section-heading">RESOURCES</div>
+      <div class="section-divider"></div>
+      <div class="nav-tiles-container">
+        <!--Assignment tile-->
+        <div class="nav-tile" id="assignments">
+          <div class="nav-tile-inner">
+            <img class="nav-tile-icon" src="assets/fontAwesomeIcons/clipboard.svg"/>
+            <div class="nav-tile-label">ASSIGNMENTS</div>
           </div>
         </div>
+        <!--Class Info tile-->
+        <div class="nav-tile" id="classinfo">
+          <div class="nav-tile-inner">
+            <img class="nav-tile-icon" src="assets/fontAwesomeIcons/book.svg"/>
+            <div class="nav-tile-label">CLASS INFO</div>
+          </div>
+        </div>
+        <!--TimeTable tile-->
+        <div class="nav-tile" id="timetable">
+          <div class="nav-tile-inner">
+            <img class="nav-tile-icon" src="assets/fontAwesomeIcons/calender.svg"/>
+            <div class="nav-tile-label">TIMETABLE</div>
+          </div>
+        </div>          
       </div>
-
+      <div class="section-heading">LEARNING</div>
+      <div class="section-divider"></div>
         <div class="weekly-content-container">
           <?php
             // Get unit's tiles (!!! if not cached):
@@ -86,7 +121,6 @@ $unit = $result->fetch_assoc();
 
             if (!$result) { // if query or database connection fails:
               echo "404 Unit Not Found"; // !!! review?
-              $stmt->close();
               $dbh->close();
               exit;
             }
@@ -110,12 +144,13 @@ $unit = $result->fetch_assoc();
               $stmt->execute();
               $stmt->close();
 
-              $sql = "SELECT COUNT(id) FROM taskcompletion where tileId=? and isComplete = 1;";
+              //get the number of tasks in this tile this user has completed
+              $sql = "SELECT COUNT(id) FROM taskcompletion WHERE tileId=? AND userId=? AND isComplete = 1;";
               $stmt = $dbh->prepare($sql);
-              $stmt->bind_param("i", $tile['id']);
+              $stmt->bind_param("ii", $tile['id'], $userId);
               $stmt->execute();
-              $stmt->bind_result($completedTaskCount); // Bind the result to the $count variable
-              $stmt->fetch(); // Fetch the value
+              $stmt->bind_result($completedTaskCount);
+              $stmt->fetch(); 
               $stmt->close();
 
               //get percentage of task completion
@@ -139,7 +174,7 @@ $unit = $result->fetch_assoc();
                     </div>
                   </div>
                   <div class="unitTileXpHolder">
-                    <p class="unitTileXpLabel">EXP:</p>
+                    <p class="unitTileXpLabel">XP:</p>
                     <div class="unitTileXpBar">
                       <div class="unitTileXpProgress" style="width:<?php echo $xpPercentage; ?>%;">
 
@@ -160,8 +195,9 @@ $unit = $result->fetch_assoc();
   <script>
     //select all the tiles
     const tiles = document.querySelectorAll(".unitTileHolder");
+    const navTiles = document.querySelectorAll(".nav-tile");
 
-    //move all the id values into the idValues array
+    //loop through each tile and assign onclick function
     tiles.forEach(tile => {
       //store boolean to show if the modal has been created already to avoid loading more than once if tile is clicked more than once
       var contentLoaded = false;
@@ -202,65 +238,145 @@ $unit = $result->fetch_assoc();
       })
     });
 
-    function loadModalFrame(tile, isEdit) {
-      var modalContainer = document.createElement('div');
-            modalContainer.className = "modal";
-            modalContainer.id = "modalContainer" + (isEdit ? "Edit" : "") + tile.id;
-          var modalContent = document.createElement('div');
-            modalContent.id = (isEdit ? "editModalCont" : "modalCont") + tile.id;
-            modalContent.className = "modal-content";
-          var closeButton = document.createElement('span');
-            closeButton.className = "close";
-            closeButton.textContent = "x";
+    navTiles.forEach(navTile => {
+        //store boolean to show if the modal has been created already to avoid loading more than once if tile is clicked more than once
+        var contentLoaded = false;
+      navTile.addEventListener("click", function(){
+        //only load content if it has not already been loaded on the page
+        if(contentLoaded){
+          const thisModalContainer = document.querySelector("#modalContainer" + navTile.id + ".modal");
+          thisModalContainer.style.display = "block";
 
-          document.body.appendChild(modalContainer);
-          modalContainer.appendChild(modalContent);
-          modalContent.appendChild(closeButton);
-
-          //Title section
-          var contentHeading = document.createElement('div');
-          contentHeading.className = "modal-unit-heading";
-          contentHeading.textContent = tile.dataset.tileName + ": " + tile.dataset.tileLabel;
-          modalContent.appendChild(contentHeading);
-
-          var contentDescription = document.createElement('div');
-          contentDescription.className = "modal-unit-description";
-          contentDescription.textContent = tile.dataset.tileDescription;
-          modalContent.appendChild(contentDescription);
-
-          //Weekly Quest section
-          var weeklyQuestContainer = document.createElement('div');
-          weeklyQuestContainer.className = "modal-weekly-quest-container";
-          modalContent.appendChild(weeklyQuestContainer);
-
-          var weeklyQuestTitle = document.createElement('div');
-          weeklyQuestTitle.className = "modal-weekly-quest-title";
-          weeklyQuestTitle.textContent = "Weekly Quest!";
-          weeklyQuestContainer.appendChild(weeklyQuestTitle);
-
-          var weeklyQuest = document.createElement('div');
-          weeklyQuest.className = "modal-weekly-quest";
-          weeklyQuest.textContent = "Do some stuff and learn some thing.";
-          weeklyQuestContainer.appendChild(weeklyQuest);
-
-          modalContainer.style.display = "block";
-          //close modal functions
-          if(isEdit){
-            closeButton.onclick = function() {
-              modalContainer.innerHTML = '';
-              modalContainer.remove();
-            }
-          } else {
-            closeButton.onclick = function() {
-              modalContainer.style.display = "none";
-            }
-            window.onclick = function(event) {
-              if (event.target == modalContainer) {
-                modalContainer.style.display = "none";
-              }
+          window.onclick = function(event) {
+            if (event.target == thisModalContainer) {
+              thisModalContainer.style.display = "none";
             }
           }
+        } else{
+          loadNavTileModal(navTile);
+          contentLoaded = true;
+        }
+      })
+    });
 
+    function loadModalFrame(tile, isEdit) {
+      var modalContainer = document.createElement('div');
+        modalContainer.className = "modal";
+        modalContainer.id = "modalContainer" + (isEdit ? "Edit" : "") + tile.id;
+      var modalContent = document.createElement('div');
+        modalContent.id = (isEdit ? "editModalCont" : "modalCont") + tile.id;
+        modalContent.className = "modal-content";
+      var closeButton = document.createElement('span');
+        closeButton.className = "close";
+        closeButton.textContent = "x";
+
+      document.body.appendChild(modalContainer);
+      modalContainer.appendChild(modalContent);
+      modalContent.appendChild(closeButton);
+
+      //Title section
+      var contentHeading = document.createElement('div');
+      contentHeading.className = "modal-unit-heading";
+      contentHeading.textContent = tile.dataset.tileName + ": " + tile.dataset.tileLabel;
+      modalContent.appendChild(contentHeading);
+
+      var contentDescription = document.createElement('div');
+      contentDescription.className = "modal-unit-description";
+      contentDescription.textContent = tile.dataset.tileDescription;
+      modalContent.appendChild(contentDescription);
+
+      //Weekly Quest section
+      var weeklyQuestContainer = document.createElement('div');
+      weeklyQuestContainer.className = "modal-weekly-quest-container";
+      modalContent.appendChild(weeklyQuestContainer);
+
+      var weeklyQuestTitle = document.createElement('div');
+      weeklyQuestTitle.className = "modal-weekly-quest-title";
+      weeklyQuestTitle.textContent = "Weekly Quest!";
+      weeklyQuestContainer.appendChild(weeklyQuestTitle);
+
+      var weeklyQuest = document.createElement('div');
+      weeklyQuest.className = "modal-weekly-quest";
+      weeklyQuest.textContent = "Do some stuff and learn some thing.";
+      weeklyQuestContainer.appendChild(weeklyQuest);
+
+      modalContainer.style.display = "block";
+      //close modal functions
+      if(isEdit){
+        closeButton.onclick = function() {
+          modalContainer.innerHTML = '';
+          modalContainer.remove();
+        }
+      } else {
+        closeButton.onclick = function() {
+          modalContainer.style.display = "none";
+        }
+        window.onclick = function(event) {
+          if (event.target == modalContainer) {
+            modalContainer.style.display = "none";
+          }
+        }
+      }
+
+    }
+
+    //load modal for each nav tile
+    function loadNavTileModal(navTile){
+      //load empty modal
+      var modalContainer = document.createElement('div');
+        modalContainer.className = "modal";
+        modalContainer.id = "modalContainer" + navTile.id;
+      var modalContent = document.createElement('div');
+        modalContent.id ="modalCont"+ navTile.id;
+        modalContent.className = "modal-content";
+      var closeButton = document.createElement('span');
+        closeButton.className = "close";
+        closeButton.textContent = "x";
+      
+      document.body.appendChild(modalContainer);
+      modalContainer.appendChild(modalContent);
+      modalContent.appendChild(closeButton);
+      modalContainer.style.display = "block";
+
+      /*
+
+      JACK AND CONNOR
+      USE SECTION BELOW TO CREATE YOUR MODALS
+
+        ||  
+        ||
+        ||
+      \ || /
+        \/
+
+      */
+
+
+      //fill modal with content based on the nav tile id
+      if(navTile.id == "assignments"){
+        console.log("loadNavTile assignments");
+        //!!! fill out with appropriate content
+      }
+
+      if(navTile.id == "classinfo"){
+        console.log("loadNavTile classinfo");
+        //!!! fill out with appropriate content
+      }
+      
+      if(navTile.id == "timetable"){
+        console.log("loadNavTile timetable");
+        //!!! fill out with appropriate content
+      }
+
+      //make modal closeable
+      closeButton.onclick = function() {
+        modalContainer.style.display = "none";
+      }
+      window.onclick = function(event) {
+        if (event.target == modalContainer) {
+          modalContainer.style.display = "none";
+        }
+      }
     }
 
     // fetch tile component & contents:
