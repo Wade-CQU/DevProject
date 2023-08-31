@@ -132,7 +132,7 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
             <div class="centre-button">
                 <input type="submit" class="btn btn-primary" value="Login">
             </div>
-        </div>
+    </div>
         <p>DEV USE ONLY - <a href="php/register.php">register account</a>.</p>
   </form>
 

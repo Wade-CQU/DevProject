@@ -17,7 +17,6 @@ $stmt->bind_param("ii", $_GET['id'], $_GET['id']);
 $stmt->execute();
 $result = $stmt->get_result();
 
-
 if (!$result || $result->num_rows == 0) { // if query or database connection fails, or unit not found:
   echo "404 Unit Not Found";
   $stmt->close();
@@ -49,6 +48,27 @@ $unit = $result->fetch_assoc();
           <div class="class-xp-label">CLASS XP:</div>
           <div class="class-xp-bar">
             <div class="class-xp-progress"></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="assignment-container">
+          <div class="unitTileDiv">
+            <div class="unitTileHolder" id="ass" data-tile-name="Assignments" data-tile-label="<?php echo $unit['name']; ?>" data-tile-description="Your assignments for the term are located in here">
+              <div class="unitTile">
+                <div class="unitTileIconHolder">
+                  <img src="" alt="">
+                </div>
+                <div class="unitTileContents">
+                  <p class="unitTileTitle">Assignments</p>
+                  <p class="unitTileLabel">Details and submission</p>
+                </div>
+              </div>
+            </div>
+            <div class="unitTileDescription">
+              "Some form of thing"
+            </div>
+            <a href="/devproject/php/assigment.php?unitId=<?php echo $_GET['id']; ?>" >Assgnment Submission</a>
           </div>
         </div>
       </div>
@@ -105,7 +125,7 @@ $unit = $result->fetch_assoc();
                 $xpPercentage = ($completedTaskCount / $taskCount) * 100;
                 $xpPercentage = floor($xpPercentage);
               }
-
+              
               ?>
               <div class="unitTileDiv">
                 <div class="unitTileHolder" id="<?php echo $tile['id']; ?>" data-tile-name="<?php echo $tile['name']; ?>" data-tile-label="<?php echo $tile['label']; ?>" data-tile-description="<?php echo $tile['description']; ?>">
