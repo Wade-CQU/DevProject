@@ -485,3 +485,51 @@ textarea.modal-component-description {
   background-color: #FF7700;
   border-radius: 5px;
 }
+
+
+.commentsInput {
+  width: 100%;
+  margin-top: 12px;
+  border-radius: 8px;
+}
+.commentBtn {
+  padding: 10px 15px;
+  background-color: #FF7700;
+  border-radius: 5px;
+  width: fit-content;
+  cursor: pointer;
+  font-weight: bold;
+  letter-spacing: 2px;
+}
+.comment {
+  background: #3b3b61;
+  padding: 16px;
+  border-radius: 12px;
+  color: white;
+  margin: 12px;
+}
+.commentMessage {
+  background: #3f3461;
+  padding: 12px;
+  border-radius: 12px;
+  margin-top: 12px;
+  clear:both;
+}
+.commentUserName {
+  float: left;
+}
+.commentDate {
+  float: right;
+}
+.commentIcon {
+  height: 25px;
+  width: 25px;
+  border-radius: 16px;
+  background: #b235c1;
+  float: left;
+  margin-bottom: 12px;
+  margin-right: 12px;
+}
+.commentIcon.lecturerIcon {
+  background: darkred;
+}

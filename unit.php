@@ -20,9 +20,9 @@ $stmt->fetch();
 $stmt->close();
 
 //get number of tasks this user has completed
-$sql = "SELECT COUNT(tc.id) FROM taskcompletion tc 
-RIGHT JOIN tile t ON tc.tileId = t.id 
-RIGHT JOIN unit u ON t.unitId = u.id 
+$sql = "SELECT COUNT(tc.id) FROM taskcompletion tc
+RIGHT JOIN tile t ON tc.tileId = t.id
+RIGHT JOIN unit u ON t.unitId = u.id
 where u.id = ? AND tc.userId = ? AND tc.isComplete = 1;";
 $stmt = $dbh->prepare($sql);
 $stmt->bind_param("ii", $_GET['id'], $userId);
@@ -104,7 +104,7 @@ $unit = $result->fetch_assoc();
             <img class="nav-tile-icon" src="assets/fontAwesomeIcons/calender.svg"/>
             <div class="nav-tile-label">TIMETABLE</div>
           </div>
-        </div>          
+        </div>
       </div>
       <div class="section-heading">LEARNING</div>
       <div class="section-divider"></div>
@@ -150,7 +150,7 @@ $unit = $result->fetch_assoc();
               $stmt->bind_param("ii", $tile['id'], $userId);
               $stmt->execute();
               $stmt->bind_result($completedTaskCount);
-              $stmt->fetch(); 
+              $stmt->fetch();
               $stmt->close();
 
               //get percentage of task completion
@@ -160,7 +160,7 @@ $unit = $result->fetch_assoc();
                 $xpPercentage = ($completedTaskCount / $taskCount) * 100;
                 $xpPercentage = floor($xpPercentage);
               }
-              
+
               ?>
               <div class="unitTileDiv">
                 <div class="unitTileHolder" id="<?php echo $tile['id']; ?>" data-tile-name="<?php echo $tile['name']; ?>" data-tile-label="<?php echo $tile['label']; ?>" data-tile-description="<?php echo $tile['description']; ?>">
@@ -332,7 +332,7 @@ $unit = $result->fetch_assoc();
       var closeButton = document.createElement('span');
         closeButton.className = "close";
         closeButton.textContent = "x";
-      
+
       document.body.appendChild(modalContainer);
       modalContainer.appendChild(modalContent);
       modalContent.appendChild(closeButton);
@@ -343,7 +343,7 @@ $unit = $result->fetch_assoc();
       JACK AND CONNOR
       USE SECTION BELOW TO CREATE YOUR MODALS
 
-        ||  
+        ||
         ||
         ||
       \ || /
@@ -362,7 +362,7 @@ $unit = $result->fetch_assoc();
         console.log("loadNavTile classinfo");
         //!!! fill out with appropriate content
       }
-      
+
       if(navTile.id == "timetable"){
         console.log("loadNavTile timetable");
         //!!! fill out with appropriate content
@@ -447,6 +447,69 @@ $unit = $result->fetch_assoc();
         }
         $("#compContent" + ele.componentId).append(contentHolder);
       });
+      loadComments(parent, tileId);
+    }
+    // Loads the comments on each tile:
+    function loadComments(parent, tileId) {
+      $(".commentsDiv").remove();
+      var holder = $(parent);
+      var commentsDiv = $("<div class='commentsDiv'>");
+      holder.append(commentsDiv);
+      commentsDiv.append($("<hr>").css("margin", "16px 0"));
+      commentsDiv.append($("<div class='modal-component-title'>").html("Add a Comment"));
+      var commentInputDiv = $("<div class='commentsInputDiv'>");
+      commentsDiv.append(commentInputDiv);
+      var commentField = $("<textarea class='commentsInput' id='commentInput"+tileId+"'>");
+      var commentBtn = $("<button class='commentBtn'>").html("SUBMIT").on("click", function() {
+        createComment(parent, tileId);
+      });
+      commentInputDiv.append(commentField);
+      commentInputDiv.append(commentBtn);
+
+      var commentSection = $("<div class='commentSection' id='commentHolder"+tileId+"'>");
+      commentsDiv.append(commentSection);
+      commentSection.append($("<div class='modal-component-title'>").html("Comments"));
+
+      var formData = new FormData();
+      formData.append("tileId", tileId);
+      var promise = postAJAX("php/tiles/loadComments.php", formData);
+      promise.then(function(data) {
+        let comments = data;
+        if (!comments) {
+          return;
+        }
+        comments.forEach(function(ele) {
+          generateComment(tileId, ele);
+        });
+      });
+    }
+    function createComment(parent, tileId) {
+      comment = $("#commentInput" + tileId).val();
+
+      var formData = new FormData();
+      formData.append("tileId", tileId);
+      formData.append("comment", comment);
+      var promise = postAJAX("php/tiles/createComment.php", formData);
+      promise.then(function(data) {
+        loadComments(parent, tileId);
+      }).catch(function(){
+        alert("There was an error submitting this comment.")
+      });
+    }
+    function generateComment(tileId, data) {
+      let name = data.name;
+      let message = data.comment;
+      let date = "!!! we need a date column";
+      var comment = $("<div id='comment"+data.cid+"'>").addClass("comment");
+      var iconElement = $("<div>").addClass("commentIcon");
+      if (data.role == 2) {
+        iconElement.addClass("lecturerIcon");
+      }
+      var nameElement = $("<div>").addClass("commentUserName").text(name);
+      var dateElement = $("<div>").addClass("commentDate").text(date);
+      var messageElement = $("<div>").addClass("commentMessage").text(message);
+      comment.append(iconElement, nameElement, dateElement, messageElement);
+      $("#commentHolder"+tileId).append(comment);
     }
 
     // Task ticking & unticking:
