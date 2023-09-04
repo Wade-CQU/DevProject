@@ -67,6 +67,7 @@ $unit = $result->fetch_assoc();
 </head>
 <body>
     <?php require("php/header.php"); ?>
+   <!-- <a href="/devproject/php/assigment.php?unitId=<?php echo $_GET['id']; ?>" >Assgnment Submission</a> -->
     <div class="body-content">
       <div class="unit-heading">
         <div class="unit-title">
