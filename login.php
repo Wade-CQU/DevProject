@@ -46,20 +46,11 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
             if(mysqli_stmt_execute($stmt)){
                 //Store Result
                 mysqli_stmt_store_result($stmt);
-                echo "Stuff got " . $username . " " . $password . " ---";
                 //Check if username exists, if yes then verify password
                 if(mysqli_stmt_num_rows($stmt) == 1){
                     //BIND RESULT
-
-
-                    echo "Stuff got 2 " . $username . " " . $password . " ---";
-
-
                     mysqli_stmt_bind_result($stmt, $id, $username, $hashed_password);
                     if(mysqli_stmt_fetch($stmt)){
-
-                        echo "Stuff got 3 " . $username . " " . $password . " ---";
-
                         if(password_verify($password, $hashed_password)){
                             //password is correct, so start a new session
                             session_start();
@@ -71,15 +62,15 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
                             header("location: term.php");
                         } else{
                             //Password is net valid, display a generic error message
-                            $login_err = "Passwordo no goodo\n";
+                            $password_err = "Invalid Password";
                         }
                     } 
                 } else {
                     //Username doesn't exist, display a generic error message
-                    $login_err = "invalid username or password";
+                    $password_err = "Invalid username or password";
                 }
             } else {
-                echo "Opps! something went poo poo. Try again later, chum.";
+                echo "Opps! something went wrong. Try again later.";
             }
 
             //Close statement
