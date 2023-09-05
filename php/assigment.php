@@ -6,6 +6,7 @@
 //TODO Show mark after it's been graded
 //TODO PHP countdown for due date - date_diff()
 //TODO Upload multiple files - https://www.tutorialspoint.com/how-to-upload-multiple-files-and-store-them-in-a-folder-with-php
+//TODO Make sure the thingo gets the userID to work out the person's user levels
 
 include("session.php");
 include("dbConnect.php");
@@ -47,7 +48,7 @@ $stmt->close();
         <?php 
         while($assignment = $result->fetch_assoc()){ 
             $count++;
-
+//just pass count lmao
         
         ?>
 
@@ -72,7 +73,7 @@ $stmt->close();
                     <tr>
                         <th>Upload your assignment:</th>
                         <th>
-                            <form action="upload.php" method="post" enctype="multipart/form-data">
+                            <form action="/DevProject/upload.php" method="post" enctype="multipart/form-data">
                                 <input type="file" name="fileToUpload" id="fileToUpload">
                                 <input type="submit" value="Submit" name="submit">
                             </form> 
@@ -86,6 +87,7 @@ $stmt->close();
     </body>
 
 </html>
+
 
 <style>
 .centre{

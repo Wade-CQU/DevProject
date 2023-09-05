@@ -31,6 +31,25 @@ $stmt->bind_result($unitTaskCompleted);
 $stmt->fetch();
 $stmt->close();
 
+//Get data for the assignment tile
+$unitId = $_GET['id'];
+$count = 0;
+$sql = "SELECT id, unitId, due, total, discription, specification FROM assignments WHERE unitId = ?";
+$stmt = $dbh->prepare($sql);
+$stmt->bind_param("i", $unitId);
+$stmt->execute();
+$result = $stmt->get_result();
+$stmt->close();
+
+//Get the other thing for the assignment tile
+$sqlUnit = "SELECT id, code, name, termCode FROM unit where id = ?";
+$stmt = $dbh->prepare($sqlUnit);
+$stmt->bind_param("i", $unitId);
+$stmt->execute();
+$resultUnit = $stmt->get_result();
+$unit = $resultUnit->fetch_assoc();
+$stmt->close();
+
 //calculate total unit xp percentage for current user
 if($unitTaskCount == 0){
   $unitXpPercentage = 0;
@@ -67,7 +86,50 @@ $unit = $result->fetch_assoc();
 </head>
 <body>
     <?php require("php/header.php"); ?>
-   <!-- <a href="/devproject/php/assigment.php?unitId=<?php echo $_GET['id']; ?>" >Assgnment Submission</a> -->
+    
+    <!-- invis div for Assignment tile ------ Links to assHolder.append($("#assContent").show()); on like line 420 -->
+    <div id="assContent" style="display:none;">
+    <a href="/devproject/php/assigment.php?unitId=<?php echo $_GET['id']; ?>" >Assgnment Submission</a>
+    <h1>Assignments for <?php echo $unit['name']; ?></h1>
+        <br><br>
+
+        <?php 
+        while($assignment = $result->fetch_assoc()){ 
+            $count++;
+        //just pass count lmao
+        ?>
+            <div>
+                <table style="color:white">
+                    <tr>
+                        <th>Assignment #</th>
+                        <th><?php echo $count; ?></th>
+                    </tr>
+                    <tr>
+                        <th>Description: </th>
+                        <th><?php echo $assignment['discription']; ?></th>
+                    </tr>
+                    <tr>
+                        <th>Due Date: </th>
+                        <th><?php echo $assignment['due']; ?></th>
+                    </tr>
+                    <tr>
+                        <th>Specification: </th>
+                        <th><?php echo $assignment['specification']; ?></th>
+                    </tr>
+                    <tr>
+                        <th>Upload your assignment:</th>
+                        <th>
+                            <form action="/DevProject/upload.php" method="post" enctype="multipart/form-data">
+                                <input type="file" name="fileToUpload" id="fileToUpload">
+                                <input type="submit" value="Submit" name="submit">
+                            </form> 
+                        </th>
+                    </tr>
+                </table>
+            </div>
+        <?php } ?>
+    </div>
+    
     <div class="body-content">
       <div class="unit-heading">
         <div class="unit-title">
@@ -109,10 +171,6 @@ $unit = $result->fetch_assoc();
       </div>
       <div class="section-heading">LEARNING</div>
       <div class="section-divider"></div>
-
-        <div class="assignment-content-container">
-            <p>Did it work?</p>
-        </div>
 
         <div class="weekly-content-container">
           <?php
@@ -361,19 +419,8 @@ $unit = $result->fetch_assoc();
       //fill modal with content based on the nav tile id
       if(navTile.id == "assignments"){
         console.log("loadNavTile assignments");
-        //Make the modal
-        var modal = document.getElementById("assignment-content-container");
-        
-        //open the modal when click assignments tile?
-        var btn = document.getElementById("assignments");
-
-        //Show the modal??????
-        btn.onclick = function() {
-          modal.style.display = "block";
-        }
-        //this did nothing??????
-
-
+        var assHolder = $("#modalContassignments");
+        assHolder.append($("#assContent").show());
       }
 
       if(navTile.id == "classinfo"){
