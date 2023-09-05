@@ -109,6 +109,11 @@ $unit = $result->fetch_assoc();
       </div>
       <div class="section-heading">LEARNING</div>
       <div class="section-divider"></div>
+
+        <div class="assignment-content-container">
+            <p>Did it work?</p>
+        </div>
+
         <div class="weekly-content-container">
           <?php
             // Get unit's tiles (!!! if not cached):
@@ -356,7 +361,19 @@ $unit = $result->fetch_assoc();
       //fill modal with content based on the nav tile id
       if(navTile.id == "assignments"){
         console.log("loadNavTile assignments");
-        //!!! fill out with appropriate content
+        //Make the modal
+        var modal = document.getElementById("assignment-content-container");
+        
+        //open the modal when click assignments tile?
+        var btn = document.getElementById("assignments");
+
+        //Show the modal??????
+        btn.onclick = function() {
+          modal.style.display = "block";
+        }
+        //this did nothing??????
+
+
       }
 
       if(navTile.id == "classinfo"){
