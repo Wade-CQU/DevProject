@@ -21,11 +21,11 @@ include("php/dbConnect.php");
         //TODO's
         //$unitId = $_GET['unitId'];
         //$studentId = $_GET['userId'];
-        //$assignmetnId = $_GET['assId'];
-
+        $assignmentId = $_GET['assignmentId'];
+        echo "Assignment ID = " . $assignmentId;
         $unitId = 1;
         $userId = 1;
-        $assignmentId = 1;
+        //$assignmentId = 1;
         $target_dir = "Assignments/$unitId/$userId/$assignmentId/";
         $target_file = $target_dir . basename($_FILES["fileToUpload"]["name"]);
         $uploadOk = 1;

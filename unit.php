@@ -33,12 +33,12 @@ $stmt->close();
 
 //Get data for the assignment tile
 $unitId = $_GET['id'];
-$count = 0;
+$assCount = 0;
 $sql = "SELECT id, unitId, due, total, discription, specification FROM assignments WHERE unitId = ?";
 $stmt = $dbh->prepare($sql);
 $stmt->bind_param("i", $unitId);
 $stmt->execute();
-$result = $stmt->get_result();
+$assResult = $stmt->get_result();
 $stmt->close();
 
 //Get the other thing for the assignment tile
@@ -92,17 +92,15 @@ $unit = $result->fetch_assoc();
     <a href="/devproject/php/assigment.php?unitId=<?php echo $_GET['id']; ?>" >Assgnment Submission</a>
     <h1>Assignments for <?php echo $unit['name']; ?></h1>
         <br><br>
-
-        <?php 
-        while($assignment = $result->fetch_assoc()){ 
-            $count++;
-        //just pass count lmao
-        ?>
+            <?php 
+        while($assignment = $assResult->fetch_assoc()){ 
+            $assCount++;        
+            ?>
             <div>
                 <table style="color:white">
                     <tr>
                         <th>Assignment #</th>
-                        <th><?php echo $count; ?></th>
+                        <th><?php echo $assCount; ?></th>
                     </tr>
                     <tr>
                         <th>Description: </th>
@@ -119,7 +117,7 @@ $unit = $result->fetch_assoc();
                     <tr>
                         <th>Upload your assignment:</th>
                         <th>
-                            <form action="/DevProject/upload.php" method="post" enctype="multipart/form-data">
+                        <form action="/DevProject/upload.php?assignmentId=<?php echo $assCount; ?>" method="post" enctype="multipart/form-data">
                                 <input type="file" name="fileToUpload" id="fileToUpload">
                                 <input type="submit" value="Submit" name="submit">
                             </form> 
@@ -127,7 +125,7 @@ $unit = $result->fetch_assoc();
                     </tr>
                 </table>
             </div>
-        <?php } ?>
+            <?php } ?> 
     </div>
     
     <div class="body-content">

@@ -73,7 +73,7 @@ $stmt->close();
                     <tr>
                         <th>Upload your assignment:</th>
                         <th>
-                            <form action="/DevProject/upload.php" method="post" enctype="multipart/form-data">
+                            <form action="/DevProject/upload.php?assignmentId=<?php echo $count; ?>" method="post" enctype="multipart/form-data">
                                 <input type="file" name="fileToUpload" id="fileToUpload">
                                 <input type="submit" value="Submit" name="submit">
                             </form> 
