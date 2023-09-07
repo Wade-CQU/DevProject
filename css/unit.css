@@ -278,6 +278,15 @@ textarea {
   padding: 10px 15px;
 }
 
+.weeklyQuestListItem{
+
+}
+
+.weeklyQuestCompleted{
+  color: #54FF00;
+  text-decoration: line-through;
+}
+
 /* Tile Components & Content Items: */
 .modal-component { /*!!! this is for the divs that hold the component and its contents (feel free to style) */
 

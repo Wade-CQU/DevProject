@@ -83,21 +83,21 @@ $unit = $result->fetch_assoc();
   <link href="css/default.css" rel="stylesheet" />
   <script src="frameworks/jquery-3.7.0.min.js"></script>
   <script src="js/ajax.js"></script> <!-- !!! perhaps in header ^^? -->
-  <?php if (isset($_COOKIE['lightTheme'])) { ?>
+<?php if (isset($_COOKIE['lightTheme'])) { ?>
   <link rel="stylesheet" href="css/cringeTheme.css">
   <?php } ?>
 </head>
 <body>
     <?php require("php/header.php"); ?>
-
+    
     <!-- invis div for Assignment tile ------ Links to assHolder.append($("#assContent").show()); on like line 420 -->
     <div id="assContent" style="display:none;">
     <a href="/devproject/php/assigment.php?unitId=<?php echo $_GET['id']; ?>" >Assgnment Submission</a>
     <h1>Assignments for <?php echo $unit['name']; ?></h1>
         <br><br>
-            <?php
-        while($assignment = $assResult->fetch_assoc()){
-            $assCount++;
+            <?php 
+        while($assignment = $assResult->fetch_assoc()){ 
+            $assCount++;        
             ?>
             <div>
                 <table style="color:white">
@@ -123,14 +123,14 @@ $unit = $result->fetch_assoc();
                         <form action="/DevProject/upload.php?assignmentId=<?php echo $assCount; ?>" method="post" enctype="multipart/form-data">
                                 <input type="file" name="fileToUpload" id="fileToUpload">
                                 <input type="submit" value="Submit" name="submit">
-                            </form>
+                            </form> 
                         </th>
                     </tr>
                 </table>
             </div>
-            <?php } ?>
+            <?php } ?> 
     </div>
-
+    
     <div class="body-content">
       <div class="unit-heading">
         <div class="unit-title">
@@ -362,6 +362,7 @@ $unit = $result->fetch_assoc();
 
       var weeklyQuest = document.createElement('div');
       weeklyQuest.className = "modal-weekly-quest";
+      weeklyQuest.id = "wq" + tile.id;
       weeklyQuest.textContent = "Do some stuff and learn some thing.";
       weeklyQuestContainer.appendChild(weeklyQuest);
 
@@ -463,6 +464,9 @@ $unit = $result->fetch_assoc();
 
     // constructs the tile's components & content from JSON objects:
     function unpackTileJSON(data, parent, tileId) {
+      $("#wq"+tileId).html("");
+      var taskCount = 0;
+      var taskCompleteCount = 0;
       var holder = $(parent);
       var componentsArray = JSON.parse(data.components);
       if (!componentsArray) {
@@ -495,9 +499,14 @@ $unit = $result->fetch_assoc();
         let content = $(contentType).html(ele.name);
         contentHolder.append(content);
         if (ele.isTask) {
+          taskCount++;
+          let weeklyQuestLi = $("<li>").addClass("weeklyQuestListItem").html(ele.name);
+          $("#wq"+tileId).append(weeklyQuestLi);
           let taskBtn = $("<button>").addClass("modal-content-task").attr("id", "task" + ele.id);
           taskBtn.attr("onclick", "requestTaskToggle(" + ele.id + ","+tileId+");");
           if (ele.isComplete) {
+            taskCompleteCount++;
+            weeklyQuestLi.addClass("weeklyQuestCompleted");
             taskBtn.html("✓");
             taskBtn.addClass("completed");
           }
@@ -513,6 +522,8 @@ $unit = $result->fetch_assoc();
         }
         $("#compContent" + ele.componentId).append(contentHolder);
       });
+      let weeklyQuestTaskCount = $("<p>").html("Quest items completed for this week (" + taskCompleteCount + "/" + taskCount + ")");
+      $("#wq"+tileId).prepend(weeklyQuestTaskCount);
       loadComments(parent, tileId);
     }
     // Loads the comments on each tile:
