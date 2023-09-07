@@ -9,7 +9,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link href="css/default.css" rel="stylesheet" />
     <link href="css/profilePage.css?d=<?php echo time(); ?>" rel="stylesheet" />
-    <title></title>
+    <title>View Profile</title>
+    <?php if (isset($_COOKIE['lightTheme'])) { ?>
+      <link rel="stylesheet" href="css/cringeTheme.css">
+    <?php } ?>
 </head>
 <body>
     <?php require("php/header.php"); ?>
@@ -31,6 +34,9 @@
                   <h1><?php echo  $user["firstName"]. "   " . $user["lastName"]; ?></h1>
                   <h2><?php echo  $user["email"]; ?></h2>
           <?php } ?>
+          <form action="php/Misc/toggleTheme.php" method="post">
+            <button type="submit">Toggle Theme</button>
+          </form>
         </div>
     </div>
     <div class="split right">
@@ -52,7 +58,7 @@
                     while ($unit = $result->fetch_assoc()) {
                         $fakeRank = rand(1, 4); ?>
                 <div class="list-unit-card" id="<?php echo $unit['uId']; ?>"<?php echo $unit['termCode'] != $termCode ? "style='display: none;'" : ""; ?>>
-                    <div class="unit-title"><?php echo $unit['name']; ?></div>
+                    <div class="profile-title"><?php echo $unit['name']; ?></div>
                     <img class="rank-icon-container" src="assets/<?php echo $fakeRank; ?>.svg"/>
                     <div class="rank-highlight rank-<?php echo $fakeRank; ?>"></div>
                 </div>

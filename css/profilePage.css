@@ -36,7 +36,11 @@ h2 {
 .right {
     right: 0;
 }
-
+.profile-title {
+  z-index: 10;
+  position: absolute;
+  padding: 18px;
+}
 .centered {
     position: absolute;
     top: 40%;
@@ -49,7 +53,7 @@ h2 {
     width: 400px;
     height: 400px;
 }
-  
+
 .ranks {
     margin-top: 50px;
     margin-left: 100px;
@@ -79,7 +83,7 @@ h2 {
     width: 12%;
     margin: 10px;
     float: right;
-    
+
 }
 
 .rank-highlight{

@@ -83,18 +83,21 @@ $unit = $result->fetch_assoc();
   <link href="css/default.css" rel="stylesheet" />
   <script src="frameworks/jquery-3.7.0.min.js"></script>
   <script src="js/ajax.js"></script> <!-- !!! perhaps in header ^^? -->
+  <?php if (isset($_COOKIE['lightTheme'])) { ?>
+  <link rel="stylesheet" href="css/cringeTheme.css">
+  <?php } ?>
 </head>
 <body>
     <?php require("php/header.php"); ?>
-    
+
     <!-- invis div for Assignment tile ------ Links to assHolder.append($("#assContent").show()); on like line 420 -->
     <div id="assContent" style="display:none;">
     <a href="/devproject/php/assigment.php?unitId=<?php echo $_GET['id']; ?>" >Assgnment Submission</a>
     <h1>Assignments for <?php echo $unit['name']; ?></h1>
         <br><br>
-            <?php 
-        while($assignment = $assResult->fetch_assoc()){ 
-            $assCount++;        
+            <?php
+        while($assignment = $assResult->fetch_assoc()){
+            $assCount++;
             ?>
             <div>
                 <table style="color:white">
@@ -120,14 +123,14 @@ $unit = $result->fetch_assoc();
                         <form action="/DevProject/upload.php?assignmentId=<?php echo $assCount; ?>" method="post" enctype="multipart/form-data">
                                 <input type="file" name="fileToUpload" id="fileToUpload">
                                 <input type="submit" value="Submit" name="submit">
-                            </form> 
+                            </form>
                         </th>
                     </tr>
                 </table>
             </div>
-            <?php } ?> 
+            <?php } ?>
     </div>
-    
+
     <div class="body-content">
       <div class="unit-heading">
         <div class="unit-title">

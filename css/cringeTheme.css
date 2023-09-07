@@ -1,0 +1,65 @@
+/* Override dark theme because :( */
+h1, h2{
+    color: #000b61;
+}
+html {
+  background-color: #FFFFFF;
+}
+header {
+  background-color: #e5e5e5;
+}
+.unit-card{
+    background-color: #FFFFFF;
+    box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+}
+
+.xp-label{
+    color: #434000;
+}
+.xp-bar{
+    background-color: #084100;
+}
+.xp-progress{
+    background-color: #54FF00;
+}
+.unit-title{
+  color: blue;
+}
+.profile-title {
+    color: white;
+}
+.term-xp-bar {
+    background-color: #003b12;
+}
+.term-xp-label {
+    color: #1b00ff;
+}
+.term-code-label {
+    color: #24243d;
+}
+
+/*UNIT*/
+.section-heading {
+    color: #0027f2;
+}
+.section-divider {
+    background-color: #0400f2;
+}
+.unit-heading, .unitTileHolder, .nav-tile {
+  box-shadow: 5px 8px 8px rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+}
+.modal-content {
+  background: white;
+}
+.modal-unit-description {
+    color: #0c00af;
+}
+.modal-component-title {
+    color: #0033cb;
+}
+.modal-component-description {
+    color: #292929;
+}
+.modal-content-item * {
+  color: #8d0800;
+}

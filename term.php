@@ -9,7 +9,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link href="css/default.css" rel="stylesheet" />
     <link href="css/term.css" rel="stylesheet" />
-    <title></title>
+    <title>Your Units</title>
+    <?php if (isset($_COOKIE['lightTheme'])) { ?>
+      <link rel="stylesheet" href="css/cringeTheme.css">
+    <?php } ?>
 </head>
 <body>
     <?php require("php/header.php"); ?>
@@ -28,10 +31,10 @@
         $dbh->close();
         exit;
       }
-      
+
       while ($unit = $result->fetch_assoc()) {
         $fakeRank = rand(1, 4);
-        
+
         ?>
         <div class="unit-card" id="<?php echo $unit['uId']; ?>"<?php echo $unit['termCode'] != $termCode ? "style='display: none;'" : ""; ?>>
           <div class="term-code-label">Term Code: <?php echo $unit['termCode'];?></div>
@@ -43,7 +46,7 @@
           <div class="unit-title"><?php echo $unit['name']; ?></div>
           <div class="rank-highlight rank-<?php echo $fakeRank; ?>"></div>
         </div>
-        
+
       <?php }
         $stmt->close();
         $dbh->close();
