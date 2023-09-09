@@ -727,23 +727,32 @@ $unit = $result->fetch_assoc();
       });
     }
     var currentCompId = -1; // Used for created components:
+    var activeComp;
+    var offset;
+    var dragIndex;
+    var modalScroll;
     function createEditableComponent(holder, data = null) {
       let di = data == null; // used to differentiate new component's values when applicable.
       if (di) {
         data = {
           id: currentCompId,
           name: "",
-          description: ""
+          description: "",
+          order: -1
         };
         currentCompId--;
       }
-      let component = $("<div>").addClass("modal-component edit-field").attr("id", "editComp" + data.id);
-      holder.append(component);
+      /// Create complete component:
+      let component = $("<div>").addClass("modal-component edit-field").attr("id", "editComp" + data.id).hide();
       let componentHead = $("<div>").addClass("component-head");
-      componentHead.append($("<input type='text'>").addClass("modal-component-title").val(data.name).data("initial", !di ? data.name : "𓁔𓃸").prop("placeholder", "Enter a heading here..."));
-      componentHead.append($("<div>").addClass("edit-modal-delete-component").html("Delete").attr("onclick", "deleteComponent(" + data.id + ");"));
+      componentHead.append($("<input type='text'>").addClass("modal-component-title").val(data.name).data("initial", !di ? data.name : "𓁔𓃸").prop("placeholder", "Enter heading...").change(function() {
+        $(this).parent().parent().parent().find(".dragTitle").html(this.value);
+      }));
+      componentHead.append($("<div>").addClass("componentCondenser").html("▲").attr("onclick", "condenseComponent(" + data.id + ");"));
       component.append(componentHead);
-      component.append($("<textarea>").addClass("modal-component-description").val(data.description).data("initial", !di ? data.description : "𓁔𓃸").prop("placeholder", "Write a description here..."));
+      component.append($("<textarea>").addClass("modal-component-description").val(data.description).data("initial", !di ? data.description : "𓁔𓃸").prop("placeholder", "Write a description here...").change(function() {
+        $(this).parent().parent().find(".dragDescription").html(this.value);
+      }));
       component.append($("<div>").addClass("modal-inner-content").attr("id", "editCompContent" + data.id));
       let addBtnHolder = $("<div>").on("click", function() {
         createEditableContent(null, data.id);
@@ -751,6 +760,82 @@ $unit = $result->fetch_assoc();
       component.append(addBtnHolder);
       addBtnHolder.append($("<div>").addClass("add-content-btn").attr("id", "add-content-btn" + data.id).html("+"));
       addBtnHolder.append($("<div>").addClass("add-content-btn-label").html("Add Content"));
+      addBtnHolder.append($("<div>").addClass("edit-modal-delete-component").html("Delete").attr("onclick", "deleteComponent(" + data.id + ");"));
+
+      /// Create condensed modal:
+      let dragArea = $("#compDragArea");
+      let condensedCompHolder = $("<div>").addClass("dragCompHolder").attr("id", "dragCompHolder"+data.id).data("initial", data.order);
+      let condensedComp = $("<div>").addClass("dragComp").attr("id", "dragComp"+data.id).data("id", data.id);
+      condensedCompHolder.append(condensedComp);
+      condensedCompHolder.on("mouseenter", function(event){
+        let comp = $(this);
+        if (dragging && comp.index() != dragIndex) {
+          if (comp.index() < dragIndex) {
+            comp.before(activeComp.parent());
+            dragIndex = activeComp.parent().index();
+          } else {
+            comp.after(activeComp.parent());
+            dragIndex = activeComp.parent().index();
+          }
+        }
+      });
+      // append the editable component to its condensed holder:
+      condensedCompHolder.append(component);
+      dragArea.append(condensedCompHolder);
+
+      let dragGrip = $("<div>").addClass("modal-component-drag").html(": : :");
+      condensedComp.append(dragGrip);
+      condensedComp.append($("<div>").addClass("modal-component-title dragTitle").html(data.name));
+      condensedComp.append($("<div>").addClass("modal-component-description dragDescription").html(data.description));
+      condensedComp.append($("<div>").addClass("componentCondenser").html("▼").attr("onclick", "condenseComponent(" + data.id + ");"));
+
+      dragGrip.on('mousedown', function(event) {
+        activeComp = $(this).parent();
+        activeComp.width(activeComp.width());
+        dragIndex = activeComp.parent().index();
+        let startPos = activeComp.offset();
+        offset = {x: event.pageX - startPos.left, y: event.pageY - startPos.top};
+        modalScroll = activeComp.parent().parent().parent().parent();
+        activeComp.addClass('compDragging');
+        dragging = true;
+      });
+    }
+    var dragging = false;
+    $(document).ready(function() {
+      $(document).on('mouseup', function() {
+        if (dragging) {
+          activeComp.removeClass('compDragging');
+          activeComp.css({
+            width: "",
+            left: "",
+            top: ""
+          });
+          dragging = false;
+        }
+      });
+      $(document).on("mousemove", function(event) {
+        if (dragging) {
+          // var mouseX = event.pageX - offset.x;
+          var mouseY = event.pageY - offset.y + modalScroll.scrollTop() - $(document).scrollTop();
+          activeComp.css({
+              // left: mouseX + "px",
+              top: mouseY + "px"
+          });
+        }
+      });
+    });
+    function condenseComponent(id) {
+      $("#dragComp"+id).toggle();
+      $("#editComp"+id).toggle();
+    }
+    function condenseAll(open = false) {
+      if (open) {
+        $(".dragComp").hide();
+        $(".modal-component.edit-field").show();
+      } else {
+        $(".dragComp").show();
+        $(".modal-component.edit-field").hide();
+      }
     }
     var currentContId = -1; // Used for creating content:
     function createEditableContent(ele = null, compId = null) {
@@ -821,14 +906,20 @@ $unit = $result->fetch_assoc();
       buttonHolder.append($("<div>").addClass("save-cancel-btn").html("Cancel").attr("onclick", "$('#modalContainerEdit" + tileId + "').remove(); document.querySelector('#modalContainer" + tileId + "').style.display = 'block';"));
       buttonHolder.append($("<div>").addClass("save-cancel-btn").html("Add Component").attr("onclick", "createEditableComponent($('#editModalCont" + tileId + "'));").css("float", "right"));
       holder.append(buttonHolder);
+
+      let toggleHolder = $("<div>").addClass("collapseToggleContainer");
+      toggleHolder.append($("<div>").addClass("componentCondenserToggle").html("Collapse All ▲").attr("onclick", "condenseAll();"));
+      toggleHolder.append($("<div>").addClass("componentCondenserToggle").html("Open All ▼").attr("onclick", "condenseAll(true);"));
+      holder.append(toggleHolder);
+
       var componentsArray = JSON.parse(data.components);
       if (!componentsArray) {
         return;
       }
+      holder.append($("<div id='compDragArea'>"));
       componentsArray.forEach(function(ele) {
         createEditableComponent(holder, ele);
       });
-
       var contentArray = JSON.parse(data.content);
       if (!contentArray) {
         return;
@@ -847,14 +938,14 @@ $unit = $result->fetch_assoc();
         }
 
         if (compId < 0) { // if a newly client-created component, delete from client-side:
-          $("#editComp" + compId).remove();
+          $("#editComp" + compId).parent().remove();
           return;
         }
         var formData = new FormData();
         formData.append("componentId", compId);
         var promise = postAJAX("php/tiles/deleteComponent.php", formData);
         promise.then(function(data) {
-          $("#editComp" + compId).remove();
+          $("#editComp" + compId).parent().remove();
           alert("Component and its children were successfully deleted."); // !!! convert alerts and confirmations into proper displays/modals (talk with Ky) !!!
         }).catch(function(error) {
           alert("There was an error deleting this component, please try again later."); // !!! ^^^
@@ -905,6 +996,11 @@ $unit = $result->fetch_assoc();
           let description = $(ele.find(".modal-component-description")[0]);
           if (description.val().trim() != ensureString(description.data("initial"))) {
             component.description = description.val().trim();
+            modified = true;
+          }
+          let draggedComp = $("#dragCompHolder"+component.compId);
+          if (draggedComp.data("initial") != draggedComp.index()) {
+            component.order = draggedComp.index();
             modified = true;
           }
 

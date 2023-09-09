@@ -12,8 +12,7 @@ $dataToInsert = array(array(), array(), array()); // [0] components to insert, [
 // update all existing components:
 if (count($data[0]) > 0) {
   // prepare component data:
-  $compNameSQL = "";
-  $compDescSQL = "";
+  $attr = array("", "", "");
   foreach ($data[0] as $component) {
     $compId = intval($component->compId);
     if ($compId < 0) { // insert new components instead of updating:
@@ -23,20 +22,35 @@ if (count($data[0]) > 0) {
       continue; // skip all components with an invalid Id.
     }
     if (isset($component->name)) {
-      $compNameSQL .= ($compNameSQL == "" ? "name = CASE" : "") . " WHEN id = " . $compId . " THEN '" . str_replace("'", "\'", $component->name) . "'";
+      $attr[0] .= ($attr[0] == "" ? "name = CASE" : "") . " WHEN id = " . $compId . " THEN '" . str_replace("'", "\'", $component->name) . "'";
       $runQuery = true;
     }
     if (isset($component->description)) {
-      $compDescSQL .= ($compDescSQL == "" ? "description = CASE" : "") . " WHEN id = " . $compId . " THEN '" . str_replace("'", "\'", $component->description) . "'";
+      $attr[1] .= ($attr[1] == "" ? "description = CASE" : "") . " WHEN id = " . $compId . " THEN '" . str_replace("'", "\'", $component->description) . "'";
+      $runQuery = true;
+    }
+    if (isset($component->order)) {
+      $attr[2] .= ($attr[2] == "" ? "`order` = CASE" : "") . " WHEN id = " . $compId . " THEN " . str_replace("'", "\'", $component->order);
       $runQuery = true;
     }
   }
   if (isset($runQuery)) { // construct & run query if any data needs updating:
-    $sql = "UPDATE component SET " . ($compNameSQL == "" ? "" : $compNameSQL . " ELSE name END") . ($compDescSQL == "" ? "" : ($compNameSQL == "" ? " " : ", ") . $compDescSQL . " ELSE description END") . ";";
+    // comma management:
+    if ($attr[0] != "") {
+      $attr[0] .= " ELSE name END";
+    } if ($attr[1] != "") {
+      $attr[1] .= " ELSE description END";
+    } if ($attr[2] != "") {
+      $attr[2] .= " ELSE `order` END";
+    }
+    $attributeSQL = implode(', ', array_filter(array_map('trim', $attr)));
+
+    $sql = "UPDATE component SET " . $attributeSQL . ";";
     $stmt = $dbh->prepare($sql);
     $result = $stmt->execute();
 
     if (!$result) {
+      echo $sql;
       $stmt->close();
       $dbh->close();
       exit;
