@@ -33,23 +33,58 @@
       }
 
       while ($unit = $result->fetch_assoc()) {
-        $fakeRank = rand(1, 4);
+        //Get total nbr of tasks in unit
+        $sql = "SELECT SUM(totalTasks) FROM tile where unitId=?;";
+        $stmt = $dbh->prepare($sql);
+        $stmt->bind_param("i", $unit['uId']);
+        $stmt->execute();
+        $stmt->bind_result($unitTaskCount);
+        $stmt->fetch();
+        $stmt->close();
+
+        //get number of tasks this user has completed
+        $sql = "SELECT COUNT(tc.id) FROM taskcompletion tc
+        RIGHT JOIN tile t ON tc.tileId = t.id
+        RIGHT JOIN unit u ON t.unitId = u.id
+        where u.id = ? AND tc.userId = ? AND tc.isComplete = 1;";
+        $stmt = $dbh->prepare($sql);
+        $stmt->bind_param("ii", $unit['uId'], $userId);
+        $stmt->execute();
+        $stmt->bind_result($unitTaskCompleted);
+        $stmt->fetch();
+        $stmt->close();
+
+        //calculate total unit xp percentage for current user
+        if ($unitTaskCount == 0) {
+          $unitXpPercentage = 0;
+        } else {
+          $unitXpPercentage = ($unitTaskCompleted / $unitTaskCount) * 100;
+          $unitXpPercentage = floor($unitXpPercentage);
+        }
+        //assign rank
+        if($unitXpPercentage < 25){
+          $rank = 1;
+        } else if($unitXpPercentage < 50){
+          $rank = 2;
+        } else if($unitXpPercentage < 75){
+          $rank = 3;
+        } else {
+          $rank = 4;
+        }
 
         ?>
         <div class="unit-card" id="<?php echo $unit['uId']; ?>"<?php echo $unit['termCode'] != $termCode ? "style='display: none;'" : ""; ?>>
           <div class="term-code-label">Term Code: <?php echo $unit['termCode'];?></div>
           <div class="xp-container">
             <div class="xp-label">XP:</div>
-            <div class="xp-bar"><div class="xp-progress"></div></div>
+            <div class="xp-bar"><div class="xp-progress" style="width: <?php echo $unitXpPercentage; ?>%;"></div></div>
           </div>
-          <img class="rank-icon-<?php echo $fakeRank; ?>" src="assets/<?php echo $fakeRank; ?>.svg"/>
+          <img class="rank-icon-<?php echo $rank; ?>" src="assets/<?php echo $rank; ?>.svg"/>
           <div class="unit-title"><?php echo $unit['name']; ?></div>
-          <div class="rank-highlight rank-<?php echo $fakeRank; ?>"></div>
+          <div class="rank-highlight rank-<?php echo $rank; ?>"></div>
         </div>
 
       <?php }
-        $stmt->close();
-        $dbh->close();
       ?>
     </div>
     <script>
