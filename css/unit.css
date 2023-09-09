@@ -289,10 +289,12 @@ textarea {
 
 /* Tile Components & Content Items: */
 .modal-component { /*!!! this is for the divs that hold the component and its contents (feel free to style) */
-
+  border-left: solid 4px #02d7f2;
+  margin-bottom: 40px;
 }
 .modal-component-title{
   color: #02d7f2;
+  font-size: 20px;
   padding: 10px 15px
 }
 input.modal-component-title {

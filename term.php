@@ -73,27 +73,32 @@
         }
 
         ?>
-        <div class="unit-card" id="<?php echo $unit['uId']; ?>"<?php echo $unit['termCode'] != $termCode ? "style='display: none;'" : ""; ?>>
-          <div class="term-code-label">Term Code: <?php echo $unit['termCode'];?></div>
-          <div class="xp-container">
-            <div class="xp-label">XP:</div>
-            <div class="xp-bar"><div class="xp-progress" style="width: <?php echo $unitXpPercentage; ?>%;"></div></div>
+        <a href="unit.php?id=<?php echo $unit['uId']; ?>">
+          <div class="unit-card" id="<?php echo $unit['uId']; ?>"<?php echo $unit['termCode'] != $termCode ? "style='display: none;'" : ""; ?>>
+            <div class="term-code-label">Term Code: <?php echo $unit['termCode'];?></div>
+            <div class="xp-container">
+              <div class="xp-label">XP:</div>
+              <div class="xp-bar"><div class="xp-progress" style="width: <?php echo $unitXpPercentage; ?>%;"></div></div>
+            </div>
+            <img class="rank-icon-<?php echo $rank; ?>" src="assets/<?php echo $rank; ?>.svg"/>
+            <div class="unit-title"><?php echo $unit['name']; ?></div>
+            <div class="rank-highlight rank-<?php echo $rank; ?>"></div>
           </div>
-          <img class="rank-icon-<?php echo $rank; ?>" src="assets/<?php echo $rank; ?>.svg"/>
-          <div class="unit-title"><?php echo $unit['name']; ?></div>
-          <div class="rank-highlight rank-<?php echo $rank; ?>"></div>
-        </div>
+        </a>
 
       <?php }
       ?>
     </div>
+    <div class="show-prev-units">Show all previous units</div>
+
     <script>
         const cards = document.querySelectorAll(".unit-card"); //select all the tiles.
-        cards.forEach(card => { //!!! change this later
-            card.addEventListener("click", function(){
-                window.location.href = "unit.php?id=" + card.id;
+        const prevUnitButton = document.querySelector(".show-prev-units");
+        prevUnitButton.addEventListener("click", function(){
+            cards.forEach(card => {
+              card.style.display = "block";
             });
-        });
+          });
     </script>
 </body>
 </html>
