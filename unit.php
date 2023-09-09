@@ -185,6 +185,51 @@ $unit = $result->fetch_assoc();
     <?php } ?>
   </div>
 
+  <div id="classInfoContent" style="display: none;">
+    <div class="centre">
+        <h1>Class Info</h1>
+        <h1><?php echo  $unit["code"]. "   " . $unit["name"]; ?></h1>
+        <p style="margin-top: 12px;"><?php echo  $unit["description"]; ?></p>
+      </div>
+      <div class="centre">
+          <h1>Participants:</h1>
+          <p style="margin: 12px 0;">Below are all of the students and lecturers enrolled in this unit.</p>
+          <?php // Get user's based on unit:
+              $sql = "SELECT uId, firstName, lastName, role, email FROM user u RIGHT JOIN (SELECT uu.userId as uId FROM unitUser uu WHERE unitId = ". intval($unit['id']) .") uu ON uId = u.id ORDER BY role DESC";
+              $stmt = $dbh->prepare($sql);
+              $stmt->execute();
+              $result = $stmt->get_result();
+              if (!$result) { // if query or database connection fails:
+                  echo "404 Unit Not Found";
+                  $stmt->close();
+                  $dbh->close();
+                  exit;
+              } ?>
+          <table class="studentsTable">
+            <thead>
+              <tr>
+                  <th> Name </th>
+                  <th> Email </th>
+                  <th> Role </th>
+              </tr>
+            </thead>
+            <tbody>
+              <?php
+              while ($user = $result->fetch_assoc()) { ?>
+              <tr>
+                  <td><?php echo $user['firstName']; ?> <?php echo $user['lastName']; ?></td>
+                  <td><?php echo $user['email']; ?></td>
+                  <td><?php if ($user['role'] == 2) {
+                      echo 'Teacher';
+                  } else{
+                      echo 'Student';
+                  } ?></td>
+              </tr>
+              <?php }
+              $stmt->close(); ?>
+            </tbody>
+          </table>
+      </div>
   </div>
 
   <div class="body-content">
@@ -484,7 +529,8 @@ $unit = $result->fetch_assoc();
 
       if (navTile.id == "classinfo") {
         console.log("loadNavTile classinfo");
-        //!!! fill out with appropriate content
+        var cInfoHolder = $("#modalContclassinfo");
+        cInfoHolder.append($("#classInfoContent").show());
       }
 
       if (navTile.id == "timetable") {
@@ -792,7 +838,7 @@ $unit = $result->fetch_assoc();
       });
     }
 
-    <?php if ($userRole['role'] == 2) { // lecturer only functions: 
+    <?php if ($userRole['role'] == 2) { // lecturer only functions:
     ?>
 
       function deleteComponent(compId) {

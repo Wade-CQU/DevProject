@@ -542,3 +542,29 @@ textarea.modal-component-description {
 .commentIcon.lecturerIcon {
   background: darkred;
 }
+
+.centre {
+    margin: 40px auto;
+    padding: 10px;
+    color: white;
+}
+.centre h1 {
+  color: #02d7f2;
+  font-family: "Blender Pro";
+}
+.studentsTable {
+  margin: auto;
+  width: 90%;
+}
+table.studentsTable th {
+  background: #5d5d5d;
+  padding: 6px;
+}
+table.studentsTable td {
+  background: #363739;
+  text-align: center;
+  padding: 6px;
+}
+table.studentsTable tr:hover td {
+  background: #3b3f49;
+}
