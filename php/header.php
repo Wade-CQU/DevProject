@@ -39,6 +39,29 @@ if($termTaskCount == 0){
     <div class="term-xp-bar">
         <div class="term-xp-progress" style="width:<?php echo $termTaskCompleted; ?>%;"></div>
     </div>
-    <a href="/devproject/profilePage.php"><img class="profile-icon" src="https://cdn-icons-png.flaticon.com/512/64/64572.png"></a>
-    <a href="/devproject/php/logout.php">Logout</a>
+    <div class="dropdown-container">
+      <button onclick="displayProfileDropdown()" class="dropbtn"><img class="profile-icon" src="https://cdn-icons-png.flaticon.com/512/64/64572.png"></button>
+      <div id="profileDropDown" class="dropdown-content">
+        <a href="/devproject/profilePage.php">View Profile</a>
+        <form action="php/Misc/toggleTheme.php" method="post">
+            <button type="submit">Toggle Theme</button>
+        </form>
+        <a href="/devproject/php/logout.php">Logout</a>
+      </div>
+    </div>
 </header>
+<script>
+  const dropDownBox = document.getElementById("profileDropDown");
+  
+  function displayProfileDropdown() {
+    dropDownBox.style.display = "block";
+  }
+
+  //Close the dropdown menu if the user clicks outside of it
+  window.onclick = function(event) {
+    if (!event.target.matches('.dropbtn') && !event.target.matches('.profile-icon')) {
+      dropDownBox.style.display = "none";
+    }
+  }
+
+</script>

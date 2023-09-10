@@ -288,7 +288,7 @@ textarea {
 }
 
 /* Tile Components & Content Items: */
-.modal-component { /*!!! this is for the divs that hold the component and its contents (feel free to style) */
+.modal-component {
   border-left: solid 4px #02d7f2;
   margin-bottom: 40px;
 }
@@ -322,9 +322,6 @@ textarea.modal-component-description {
   width: 100%;
   display: list-item;
   list-style-type: square;
-}
-.modal-content-item.unordered {
-
 }
 .modal-content-item.ordered {
   list-style-type: decimal;
@@ -386,6 +383,7 @@ textarea.modal-component-description {
   cursor: pointer;
   font-weight: bold;
   letter-spacing: 3px;
+  margin-bottom: 25px;
 }
 
 .modal-edit-button:hover {
@@ -497,7 +495,7 @@ textarea.modal-component-description {
   border-radius: 5px;
 }
 
-
+/* Comment section */
 .commentsInput {
   width: 100%;
   margin-top: 12px;
@@ -544,7 +542,6 @@ textarea.modal-component-description {
 .commentIcon.lecturerIcon {
   background: darkred;
 }
-
 .centre {
     margin: 40px auto;
     padding: 10px;
@@ -672,4 +669,24 @@ table.studentsTable tr:hover td {
   position: absolute;
   cursor: grabbing;
   pointer-events: none;
+}
+/* Assignment Modal */
+.assignment-table{
+  margin-right: auto;
+  margin-left: auto;
+  margin-top: 50px;
+  margin-bottom: 80px;
+}
+.assignment-table tr th:nth-child(even) {
+  padding-left: 20px;
+  color: white;
+}
+.assignment-table tr th:nth-child(odd) {
+  padding-left: 20px;
+  color: #FF7700;
+}
+.assignment-table tr th {
+  text-align: left;
+  padding: 7px;
+  border-bottom: 1px solid #ddd;
 }

@@ -104,14 +104,13 @@ $unit = $result->fetch_assoc();
 
   <!-- invis div for STUDENT Assignment tile ------ Links to assHolder.append($("#assContent").show()); on like line 420 -->
   <div id="assContent" style="display:none;">
-    <h1>Assignments for <?php echo $unit['name']; ?></h1>
-    <br><br>
+    <div class="modal-unit-heading">Assignments for <?php echo $unit['name']; ?></div>
     <?php
     while ($assignment = $assResult->fetch_assoc()) {
       $assCount++;
     ?>
       <div>
-        <table style="color:white">
+        <table class="assignment-table">
           <tr>
             <th>Assignment #</th>
             <th><?php echo $assCount; ?></th>
