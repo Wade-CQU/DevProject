@@ -271,13 +271,18 @@ $unit = $result->fetch_assoc();
         </div>
       </div>
     </div>
-    <div class="section-heading">LEARNING</div>
+    <div class="section-heading">
+      <span>LEARNING</span>
+      <div id="tileEditBtn" onclick="toggleTileEdit();">✎ Edit</div>
+      <div id="tileSaveBtn" onclick="saveTileArrangement();" style="display:none;">Save Changes</div>
+      <div id="tileCancelBtn" onclick="toggleTileEdit(true, true);" style="display:none;">Cancel</div>
+    </div>
     <div class="section-divider"></div>
 
     <div class="weekly-content-container">
       <?php
       // Get unit's tiles (!!! if not cached):
-      $sql = "SELECT id, icon, name, label, description FROM tile WHERE unitId = ? ORDER BY `order` ASC;";
+      $sql = "SELECT id, icon, name, label, description, `order` FROM tile WHERE unitId = ? ORDER BY `order` ASC;";
       $stmt = $dbh->prepare($sql);
 
       $stmt->bind_param("i", $_GET['id']);
@@ -328,7 +333,7 @@ $unit = $result->fetch_assoc();
         }
 
       ?>
-        <div class="unitTileDiv">
+        <div class="unitTileDiv" data-initial="<?php echo $tile['order']; ?>">
           <div class="unitTileHolder" id="<?php echo $tile['id']; ?>" data-tile-name="<?php echo $tile['name']; ?>" data-tile-label="<?php echo $tile['label']; ?>" data-tile-description="<?php echo $tile['description']; ?>">
             <div class="unitTile">
               <div class="unitTileIconHolder">
@@ -348,8 +353,17 @@ $unit = $result->fetch_assoc();
               </div>
             </div>
           </div>
-          <div class="unitTileDescription">
-            <?php echo $tile['description']; ?>
+          <div class="unitTileEditCell" style="display: none;">
+            <div class="unitTileIconHolder">
+              <img src="" alt="">
+            </div>
+            <div class="unitTileContents">
+              <input type="text" value="<?php echo $tile['name']; ?>" style="color: white;">
+              <input type="text" value="<?php echo $tile['label']; ?>">
+            </div>
+            <div class="unitTileGrip">
+              <span>: : :</span>
+            </div>
           </div>
         </div>
       <?php }
@@ -1080,8 +1094,107 @@ $unit = $result->fetch_assoc();
       function ensureString(input) {
         return input === null ? "" : String(input);
       }
+
+      // Tile editing:
+      function toggleTileEdit(close = false, cancel = false) {
+        if (close) {
+          if (cancel) {
+            restoreTileOrder()
+          }
+          $("#tileEditBtn").show();
+          $("#tileSaveBtn").hide();
+          $("#tileCancelBtn").hide();
+          $(".unitTileHolder").show();
+          $(".unitTileEditCell").hide();
+        } else {
+          $("#tileEditBtn").hide();
+          $("#tileSaveBtn").show();
+          $("#tileCancelBtn").show();
+          $(".unitTileHolder").hide();
+          $(".unitTileEditCell").show();
+        }
+      }
+
+      // tile saving:
+      function saveTileArrangement() {
+        if (!confirm("Are you sure you want to save these changes?")) {
+          return;
+        }
+        $('.unitTileDiv').each(function() { // set data attributes to new defaults following save.
+          $(this).attr("data-initial", $(this).index());
+        });
+        toggleTileEdit(true);
+      }
+
+      // tile drag & dropping:
+      var tileDragging = false;
+      var activeTile;
+      var tileDragIndex;
+      var tileOffset;
+      $(function() {
+        $(".unitTileDiv").on("mouseenter", function(event){
+          let tile = $(this);
+          if (tileDragging && tile.index() != tileDragIndex) {
+            if (tile.index() < tileDragIndex) {
+              tile.before(activeTile.parent());
+              tileDragIndex = activeTile.parent().index();
+            } else {
+              tile.after(activeTile.parent());
+              tileDragIndex = activeTile.parent().index();
+            }
+          }
+        });
+        $(".unitTileGrip").on('mousedown', function(event) {
+          activeTile = $(this).parent();
+          activeTile.width(activeTile.width());
+          tileDragIndex = activeTile.parent().index();
+          activeTile.parent().width(activeTile.parent().width());
+          activeTile.parent().height(activeTile.parent().height());
+          let startPos = activeTile.offset();
+          tileOffset = {x: event.pageX - startPos.left, y: event.pageY - startPos.top};
+          activeTile.addClass('tileDragging');
+          tileDragging = true;
+        });
+      });
+      $(document).on('mouseup', function() {
+        if (tileDragging) {
+          activeTile.removeClass('tileDragging');
+          activeTile.css({
+            width: "",
+            left: "",
+            top: ""
+          });
+          activeTile.parent().css({
+            width: "",
+            height: ""
+          });
+          tileDragging = false;
+        }
+      });
+      $(document).on("mousemove", function(event) {
+        if (tileDragging) {
+          var mouseX = event.pageX - tileOffset.x;
+          var mouseY = event.pageY - tileOffset.y;
+          activeTile.css({
+              left: mouseX + "px",
+              top: mouseY + "px"
+          });
+        }
+      });
+
+      function restoreTileOrder() {
+        let parent = $(".weekly-content-container");
+        let items = $('.unitTileDiv').toArray();
+        items.sort(function(a, b) {
+            var indexA = $(a).attr('data-initial');
+            var indexB = $(b).attr('data-initial');
+            return indexA - indexB;
+        });
+        $.each(items, function(index, element) {
+            parent.append(element);
+        });
+      }
     <?php } ?>
   </script>
 </body>
-
 </html>
