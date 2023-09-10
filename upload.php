@@ -1,5 +1,5 @@
 <?php
-//TODO Upload multiple files
+//TODO Delete contents on upload for data purging
 include("php/session.php");
 include("php/dbConnect.php");
 ?>
@@ -22,17 +22,26 @@ include("php/dbConnect.php");
   $unitId = $_GET['unitId'];
   $studentId = $_GET['userId'];
   $assignmentId = $_GET['assignmentId'];
+  $date = date("Y-m-d H:i:s");
+  $grade = 0;
+  $status = 1;
+  echo $date;
   echo "Assignment ID = " . $assignmentId . " ----- ";
   echo "Unit ID = " . $unitId . " ----- ";
-  //$unitId = 1;
-  //$userId = 1;
-  //$assignmentId = 1;
-  $target_dir = "Assignments/$unitId/$userId/$assignmentId/";
+
+  $target_dir = "Assignments/$unitId/$assignmentId/$userId/";
   $target_file = $target_dir . basename($_FILES["fileToUpload"]["name"]);
   $uploadOk = 1;
   $imageFileType = strtolower(pathinfo($target_file, PATHINFO_EXTENSION));
 
+  //Creates sql to add a submission
+  $sql = "INSERT INTO submission (assignmentsId, userId, grade, status, submitDate) VALUES (?, ?, ?, ?, ?);";
+  $stmt = $dbh->prepare($sql);
+  $stmt->bind_param("iiiis", $assignmentId, $studentId, $grade, $status, $date);
+  $stmt->execute();
+  $stmt->close();
 
+  //TODO check if user has uploaded already then update submitDate
 
   if (is_dir("Assignments/") == false) {
     mkdir("Assignments/", 0777);
@@ -42,12 +51,12 @@ include("php/dbConnect.php");
     mkdir("Assignments/$unitId/", 0777);
     echo "here 2 ";
   }
-  if (is_dir("Assignments/$unitId/$userId/") == false) {
-    mkdir("Assignments/$unitId/$userId/", 0777);
+  if (is_dir("Assignments/$unitId/$assignmentId/") == false) {
+    mkdir("Assignments/$unitId/$assignmentId/", 0777);
     echo "here 3 ";
   }
-  if (is_dir("Assignments/$unitId/$userId/$assignmentId/") == false) {
-    mkdir("Assignments/$unitId/$userId/$assignmentId/", 0777);
+  if (is_dir("Assignments/$unitId/$assignmentId/$userId/") == false) {
+    mkdir("Assignments/$unitId/$assignmentId/$userId/", 0777);
     echo "here 4 ";
   } else {
     echo "here else ";

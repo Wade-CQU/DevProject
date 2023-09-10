@@ -178,7 +178,7 @@ $unit = $result->fetch_assoc();
           </tr>
           <tr>
             <th>Mark Assignment: </th>
-            <th><a href="/devproject/php/assigmentMark.php?unitId=<?php echo $_GET['id']; ?>">Mark Assignment</a></th>
+            <th><a href="/devproject/php/assigmentMark.php?unitId=<?php echo $_GET['id']; ?>&assignmentId=<?php echo $assTCount; ?>">Mark Assignment</a></th>
           </tr>
         </table>
       </div>
@@ -478,8 +478,21 @@ $unit = $result->fetch_assoc();
       if (navTile.id == "assignments") {
         console.log("loadNavTile assignments");
         var assHolder = $("#modalContassignments");
-        assHolder.append($("#assContent").show());
-        //assHolder.append($("#assTeacherContent").show());
+        
+        //TESTING STUFF
+        //assHolder.append($("#assContent").show());
+        assHolder.append($("#assTeacherContent").show());
+        
+        //PRODUCTION IF
+        /*
+        if (<?php echo $userRole['role']; ?> == 2){
+          assHolder.append($("#assTeacherContent").show());
+        } else{
+          assHolder.append($("#assContent").show());
+        }
+        */
+
+
       }
 
       if (navTile.id == "classinfo") {
