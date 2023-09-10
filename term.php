@@ -8,6 +8,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link href="css/default.css" rel="stylesheet" />
+    <script src="frameworks/jquery-3.7.0.min.js"></script>
     <link href="css/term.css" rel="stylesheet" />
     <title>Your Units</title>
     <?php if (isset($_COOKIE['lightTheme'])) { ?>
@@ -24,41 +25,71 @@
       $stmt = $dbh->prepare($sql);
       $stmt->execute();
       $result = $stmt->get_result();
-
       if (!$result) { // if query or database connection fails:
         echo "404 Unit Not Found"; // !!! review?
         $stmt->close();
         $dbh->close();
         exit;
       }
-
       while ($unit = $result->fetch_assoc()) {
-        $fakeRank = rand(1, 4);
-
-        ?>
-        <div class="unit-card" id="<?php echo $unit['uId']; ?>"<?php echo $unit['termCode'] != $termCode ? "style='display: none;'" : ""; ?>>
-          <div class="term-code-label">Term Code: <?php echo $unit['termCode'];?></div>
-          <div class="xp-container">
-            <div class="xp-label">XP:</div>
-            <div class="xp-bar"><div class="xp-progress"></div></div>
-          </div>
-          <img class="rank-icon-<?php echo $fakeRank; ?>" src="assets/<?php echo $fakeRank; ?>.svg"/>
-          <div class="unit-title"><?php echo $unit['name']; ?></div>
-          <div class="rank-highlight rank-<?php echo $fakeRank; ?>"></div>
-        </div>
-
-      <?php }
+        //Get total nbr of tasks in unit
+        $sql = "SELECT SUM(totalTasks) FROM tile where unitId=?;";
+        $stmt = $dbh->prepare($sql);
+        $stmt->bind_param("i", $unit['uId']);
+        $stmt->execute();
+        $stmt->bind_result($unitTaskCount);
+        $stmt->fetch();
         $stmt->close();
-        $dbh->close();
+        //get number of tasks this user has completed
+        $sql = "SELECT COUNT(tc.id) FROM taskcompletion tc
+        RIGHT JOIN tile t ON tc.tileId = t.id
+        RIGHT JOIN unit u ON t.unitId = u.id
+        where u.id = ? AND tc.userId = ? AND tc.isComplete = 1;";
+        $stmt = $dbh->prepare($sql);
+        $stmt->bind_param("ii", $unit['uId'], $userId);
+        $stmt->execute();
+        $stmt->bind_result($unitTaskCompleted);
+        $stmt->fetch();
+        $stmt->close();
+        //calculate total unit xp percentage for current user
+        if ($unitTaskCount == 0) {
+          $unitXpPercentage = 0;
+        } else {
+          $unitXpPercentage = ($unitTaskCompleted / $unitTaskCount) * 100;
+          $unitXpPercentage = floor($unitXpPercentage);
+        }
+        //assign rank
+        if($unitXpPercentage < 25){
+          $rank = 1;
+        } else if($unitXpPercentage < 50){
+          $rank = 2;
+        } else if($unitXpPercentage < 75){
+          $rank = 3;
+        } else {
+          $rank = 4;
+        }
+        ?>
+        <a href="unit.php?id=<?php echo $unit['uId']; ?>"<?php echo $unit['termCode'] != $termCode ? " style='display: none;'" : ""; ?>>
+          <div class="unit-card" id="<?php echo $unit['uId']; ?>">
+            <div class="term-code-label">Term Code: <?php echo $unit['termCode'];?></div>
+            <div class="xp-container">
+              <div class="xp-label">XP:</div>
+              <div class="xp-bar"><div class="xp-progress" style="width: <?php echo $unitXpPercentage; ?>%;"></div></div>
+            </div>
+            <img class="rank-icon-<?php echo $rank; ?>" src="assets/<?php echo $rank; ?>.svg"/>
+            <div class="unit-title"><?php echo $unit['name']; ?></div>
+            <div class="rank-highlight rank-<?php echo $rank; ?>"></div>
+          </div>
+        </a>
+      <?php }
       ?>
     </div>
+    <div class="show-prev-units" onclick="showPrevUnits(this);">Show all previous units</div>
     <script>
-        const cards = document.querySelectorAll(".unit-card"); //select all the tiles.
-        cards.forEach(card => { //!!! change this later
-            card.addEventListener("click", function(){
-                window.location.href = "unit.php?id=" + card.id;
-            });
-        });
+      function showPrevUnits(button) {
+        $(button).hide();
+        $(".unit-card").parent().show();
+      }
     </script>
 </body>
 </html>

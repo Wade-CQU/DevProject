@@ -72,7 +72,7 @@ textarea {
   background-color: #54FF00;
 }
 
-.section-heading{
+.section-heading, .section-heading span {
   font-size: 2rem;
   font-family: 'Blender Pro';
   color: #f2e900;
@@ -178,7 +178,7 @@ textarea {
 .unitTileContents {
   padding: 8px;
   text-align: center;
-  display: inline-block;
+  display: grid;
   vertical-align: middle;
 }
 .unitTileTitle {
@@ -289,10 +289,12 @@ textarea {
 
 /* Tile Components & Content Items: */
 .modal-component { /*!!! this is for the divs that hold the component and its contents (feel free to style) */
-
+  border-left: solid 4px #02d7f2;
+  margin-bottom: 40px;
 }
 .modal-component-title{
   color: #02d7f2;
+  font-size: 20px;
   padding: 10px 15px
 }
 input.modal-component-title {
@@ -303,6 +305,7 @@ input.modal-component-title {
 }
 .modal-component-description{
   color: white;
+  overflow: hidden;
   padding: 10px 15px
 }
 textarea.modal-component-description {
@@ -406,7 +409,6 @@ textarea.modal-component-description {
 }
 
 .edit-field {
-  border: dashed #dfdff3 2px;
   margin-top: 15px;
   padding-bottom: 8px;
 }
@@ -541,4 +543,133 @@ textarea.modal-component-description {
 }
 .commentIcon.lecturerIcon {
   background: darkred;
+}
+
+.centre {
+    margin: 40px auto;
+    padding: 10px;
+    color: white;
+}
+.centre h1 {
+  color: #02d7f2;
+  font-family: "Blender Pro";
+}
+.studentsTable {
+  margin: auto;
+  width: 90%;
+}
+table.studentsTable th {
+  background: #5d5d5d;
+  padding: 6px;
+}
+table.studentsTable td {
+  background: #363739;
+  text-align: center;
+  padding: 6px;
+}
+table.studentsTable tr:hover td {
+  background: #3b3f49;
+}
+
+#tileSaveBtn, #tileCancelBtn, #tileEditBtn {
+  float: right;
+  border: 1px orange solid;
+  color: #ffd400;
+  font-size: 16px;
+  padding: 6px;
+  border-radius: 8px;
+  font-weight: bold;
+  user-select: none;
+  letter-spacing: 2px;
+  cursor: pointer;
+}
+#tileSaveBtn:hover, #tileCancelBtn:hover, #tileEditBtn:hover {
+  background: #ff230061;
+}
+/* DRAGGING SHENANAGINS */
+.dragComp {
+  display: flex;
+  background: #434344;
+  border-radius: 16px;
+  justify-content: flex-start;
+  align-items: center;
+  max-height: 41px;
+  white-space: nowrap;
+  overflow: hidden;
+}
+.dragCompHolder {
+  background: #2b2b2d;
+  padding: 16px;
+  border-radius: 16px;
+  min-height: 69px;
+  margin: 8px;
+}
+.modal-component-drag {
+  user-select: none;
+  cursor: grab;
+  margin: 0 12px;
+  font-weight: bold;
+  color: #ffee00;
+  white-space: nowrap;
+}
+.compDragging {
+  position: absolute;
+  cursor: grabbing;
+  pointer-events: none;
+}
+.componentCondenser {
+  float: right;
+  padding: 4px 12px;
+  color: yellow;
+  cursor: pointer;
+  user-select: none;
+  margin-left: auto;
+}
+.componentCondenserToggle {
+  margin: 12px;
+  color: yellow;
+  cursor: pointer;
+  user-select: none;
+}
+.collapseToggleContainer {
+  display: flex;
+  justify-content: flex-end;
+}
+.dragComp .modal-component-description {
+  font-size: 14px;
+}
+.dragComp .modal-component-title {
+  font-weight: bold;
+  font-size: 14px;
+}
+.unitTileEditCell {
+  display: flex;
+  background-color: #1e1f22;
+  padding: 8px;
+  border-radius: 16px;
+  border: 4px dashed #181818;
+  margin-bottom: 30px;
+}
+
+.unitTileContents input {
+  background: #303339;
+  color: #11d7f2;
+  font-size: 18px;
+  font-family: 'Blender Pro';
+  padding: 4px;
+}
+.unitTileGrip {
+    user-select: none;
+    cursor: grab;
+    padding: 0 4px;
+    font-weight: bold;
+    color: #ffee00;
+    white-space: nowrap;
+    display: flex;
+    align-items: center;
+}
+.tileDragging {
+  position: absolute;
+  cursor: grabbing;
+  pointer-events: none;
 }

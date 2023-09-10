@@ -184,3 +184,11 @@ h1{
         rgba(107, 62, 152, 0.019) 88%,
         rgba(107, 62, 152, 0) 100% );
 }
+
+.show-prev-units{
+    margin-left: 5%;
+    margin-top: 30px;
+    padding: 5px;
+    color: #FF7700;
+    cursor: pointer;
+}

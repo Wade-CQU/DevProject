@@ -185,6 +185,51 @@ $unit = $result->fetch_assoc();
     <?php } ?>
   </div>
 
+  <div id="classInfoContent" style="display: none;">
+    <div class="centre">
+        <h1>Class Info</h1>
+        <h1><?php echo  $unit["code"]. "   " . $unit["name"]; ?></h1>
+        <p style="margin-top: 12px;"><?php echo  $unit["description"]; ?></p>
+      </div>
+      <div class="centre">
+          <h1>Participants:</h1>
+          <p style="margin: 12px 0;">Below are all of the students and lecturers enrolled in this unit.</p>
+          <?php // Get user's based on unit:
+              $sql = "SELECT uId, firstName, lastName, role, email FROM user u RIGHT JOIN (SELECT uu.userId as uId FROM unitUser uu WHERE unitId = ". intval($unit['id']) .") uu ON uId = u.id ORDER BY role DESC";
+              $stmt = $dbh->prepare($sql);
+              $stmt->execute();
+              $result = $stmt->get_result();
+              if (!$result) { // if query or database connection fails:
+                  echo "404 Unit Not Found";
+                  $stmt->close();
+                  $dbh->close();
+                  exit;
+              } ?>
+          <table class="studentsTable">
+            <thead>
+              <tr>
+                  <th> Name </th>
+                  <th> Email </th>
+                  <th> Role </th>
+              </tr>
+            </thead>
+            <tbody>
+              <?php
+              while ($user = $result->fetch_assoc()) { ?>
+              <tr>
+                  <td><?php echo $user['firstName']; ?> <?php echo $user['lastName']; ?></td>
+                  <td><?php echo $user['email']; ?></td>
+                  <td><?php if ($user['role'] == 2) {
+                      echo 'Teacher';
+                  } else{
+                      echo 'Student';
+                  } ?></td>
+              </tr>
+              <?php }
+              $stmt->close(); ?>
+            </tbody>
+          </table>
+      </div>
   </div>
 
   <div class="body-content">
@@ -226,13 +271,18 @@ $unit = $result->fetch_assoc();
         </div>
       </div>
     </div>
-    <div class="section-heading">LEARNING</div>
+    <div class="section-heading">
+      <span>LEARNING</span>
+      <div id="tileEditBtn" onclick="toggleTileEdit();">✎ Edit</div>
+      <div id="tileSaveBtn" onclick="saveTileArrangement();" style="display:none;">Save Changes</div>
+      <div id="tileCancelBtn" onclick="toggleTileEdit(true, true);" style="display:none;">Cancel</div>
+    </div>
     <div class="section-divider"></div>
 
     <div class="weekly-content-container">
       <?php
       // Get unit's tiles (!!! if not cached):
-      $sql = "SELECT id, icon, name, label, description FROM tile WHERE unitId = ? ORDER BY `order` ASC;";
+      $sql = "SELECT id, icon, name, label, description, `order` FROM tile WHERE unitId = ? ORDER BY `order` ASC;";
       $stmt = $dbh->prepare($sql);
 
       $stmt->bind_param("i", $_GET['id']);
@@ -283,7 +333,7 @@ $unit = $result->fetch_assoc();
         }
 
       ?>
-        <div class="unitTileDiv">
+        <div class="unitTileDiv" data-initial="<?php echo $tile['order']; ?>">
           <div class="unitTileHolder" id="<?php echo $tile['id']; ?>" data-tile-name="<?php echo $tile['name']; ?>" data-tile-label="<?php echo $tile['label']; ?>" data-tile-description="<?php echo $tile['description']; ?>">
             <div class="unitTile">
               <div class="unitTileIconHolder">
@@ -303,8 +353,17 @@ $unit = $result->fetch_assoc();
               </div>
             </div>
           </div>
-          <div class="unitTileDescription">
-            <?php echo $tile['description']; ?>
+          <div class="unitTileEditCell" style="display: none;">
+            <div class="unitTileIconHolder">
+              <img src="" alt="">
+            </div>
+            <div class="unitTileContents">
+              <input type="text" value="<?php echo $tile['name']; ?>" style="color: white;">
+              <input type="text" value="<?php echo $tile['label']; ?>">
+            </div>
+            <div class="unitTileGrip">
+              <span>: : :</span>
+            </div>
           </div>
         </div>
       <?php }
@@ -497,7 +556,8 @@ $unit = $result->fetch_assoc();
 
       if (navTile.id == "classinfo") {
         console.log("loadNavTile classinfo");
-        //!!! fill out with appropriate content
+        var cInfoHolder = $("#modalContclassinfo");
+        cInfoHolder.append($("#classInfoContent").show());
       }
 
       if (navTile.id == "timetable") {
@@ -694,23 +754,32 @@ $unit = $result->fetch_assoc();
       });
     }
     var currentCompId = -1; // Used for created components:
+    var activeComp;
+    var offset;
+    var dragIndex;
+    var modalScroll;
     function createEditableComponent(holder, data = null) {
       let di = data == null; // used to differentiate new component's values when applicable.
       if (di) {
         data = {
           id: currentCompId,
           name: "",
-          description: ""
+          description: "",
+          order: -1
         };
         currentCompId--;
       }
-      let component = $("<div>").addClass("modal-component edit-field").attr("id", "editComp" + data.id);
-      holder.append(component);
+      /// Create complete component:
+      let component = $("<div>").addClass("modal-component edit-field").attr("id", "editComp" + data.id).hide();
       let componentHead = $("<div>").addClass("component-head");
-      componentHead.append($("<input type='text'>").addClass("modal-component-title").val(data.name).data("initial", !di ? data.name : "𓁔𓃸").prop("placeholder", "Enter a heading here..."));
-      componentHead.append($("<div>").addClass("edit-modal-delete-component").html("Delete").attr("onclick", "deleteComponent(" + data.id + ");"));
+      componentHead.append($("<input type='text'>").addClass("modal-component-title").val(data.name).data("initial", !di ? data.name : "𓁔𓃸").prop("placeholder", "Enter heading...").change(function() {
+        $(this).parent().parent().parent().find(".dragTitle").html(this.value);
+      }));
+      componentHead.append($("<div>").addClass("componentCondenser").html("▲").attr("onclick", "condenseComponent(" + data.id + ");"));
       component.append(componentHead);
-      component.append($("<textarea>").addClass("modal-component-description").val(data.description).data("initial", !di ? data.description : "𓁔𓃸").prop("placeholder", "Write a description here..."));
+      component.append($("<textarea>").addClass("modal-component-description").val(data.description).data("initial", !di ? data.description : "𓁔𓃸").prop("placeholder", "Write a description here...").change(function() {
+        $(this).parent().parent().find(".dragDescription").html(this.value);
+      }));
       component.append($("<div>").addClass("modal-inner-content").attr("id", "editCompContent" + data.id));
       let addBtnHolder = $("<div>").on("click", function() {
         createEditableContent(null, data.id);
@@ -718,6 +787,82 @@ $unit = $result->fetch_assoc();
       component.append(addBtnHolder);
       addBtnHolder.append($("<div>").addClass("add-content-btn").attr("id", "add-content-btn" + data.id).html("+"));
       addBtnHolder.append($("<div>").addClass("add-content-btn-label").html("Add Content"));
+      addBtnHolder.append($("<div>").addClass("edit-modal-delete-component").html("Delete").attr("onclick", "deleteComponent(" + data.id + ");"));
+
+      /// Create condensed modal:
+      let dragArea = $("#compDragArea");
+      let condensedCompHolder = $("<div>").addClass("dragCompHolder").attr("id", "dragCompHolder"+data.id).data("initial", data.order);
+      let condensedComp = $("<div>").addClass("dragComp").attr("id", "dragComp"+data.id).data("id", data.id);
+      condensedCompHolder.append(condensedComp);
+      condensedCompHolder.on("mouseenter", function(event){
+        let comp = $(this);
+        if (dragging && comp.index() != dragIndex) {
+          if (comp.index() < dragIndex) {
+            comp.before(activeComp.parent());
+            dragIndex = activeComp.parent().index();
+          } else {
+            comp.after(activeComp.parent());
+            dragIndex = activeComp.parent().index();
+          }
+        }
+      });
+      // append the editable component to its condensed holder:
+      condensedCompHolder.append(component);
+      dragArea.append(condensedCompHolder);
+
+      let dragGrip = $("<div>").addClass("modal-component-drag").html(": : :");
+      condensedComp.append(dragGrip);
+      condensedComp.append($("<div>").addClass("modal-component-title dragTitle").html(data.name));
+      condensedComp.append($("<div>").addClass("modal-component-description dragDescription").html(data.description));
+      condensedComp.append($("<div>").addClass("componentCondenser").html("▼").attr("onclick", "condenseComponent(" + data.id + ");"));
+
+      dragGrip.on('mousedown', function(event) {
+        activeComp = $(this).parent();
+        activeComp.width(activeComp.width());
+        dragIndex = activeComp.parent().index();
+        let startPos = activeComp.offset();
+        offset = {x: event.pageX - startPos.left, y: event.pageY - startPos.top};
+        modalScroll = activeComp.parent().parent().parent().parent();
+        activeComp.addClass('compDragging');
+        dragging = true;
+      });
+    }
+    var dragging = false;
+    $(document).ready(function() {
+      $(document).on('mouseup', function() {
+        if (dragging) {
+          activeComp.removeClass('compDragging');
+          activeComp.css({
+            width: "",
+            left: "",
+            top: ""
+          });
+          dragging = false;
+        }
+      });
+      $(document).on("mousemove", function(event) {
+        if (dragging) {
+          // var mouseX = event.pageX - offset.x;
+          var mouseY = event.pageY - offset.y + modalScroll.scrollTop() - $(document).scrollTop();
+          activeComp.css({
+              // left: mouseX + "px",
+              top: mouseY + "px"
+          });
+        }
+      });
+    });
+    function condenseComponent(id) {
+      $("#dragComp"+id).toggle();
+      $("#editComp"+id).toggle();
+    }
+    function condenseAll(open = false) {
+      if (open) {
+        $(".dragComp").hide();
+        $(".modal-component.edit-field").show();
+      } else {
+        $(".dragComp").show();
+        $(".modal-component.edit-field").hide();
+      }
     }
     var currentContId = -1; // Used for creating content:
     function createEditableContent(ele = null, compId = null) {
@@ -729,12 +874,13 @@ $unit = $result->fetch_assoc();
           name: "",
           url: "",
           isTask: 0,
+          order: -1,
           componentId: compId
         };
         currentCompId--;
       }
 
-      let contentHolder = $("<div>").attr("id", "editContent" + ele.id).addClass("edit-content-holder");
+      let contentHolder = $("<div>").attr("id", "editContent" + ele.id).addClass("edit-content-holder").data("initial", ele.order);
       let typeRow = $("<div>").addClass("edit-content-row-type");
       typeRow.append($("<div>").addClass("edit-content-label").html("Type:"));
       var typeSelect = $("<select>").addClass("edit-content-field");
@@ -788,14 +934,20 @@ $unit = $result->fetch_assoc();
       buttonHolder.append($("<div>").addClass("save-cancel-btn").html("Cancel").attr("onclick", "$('#modalContainerEdit" + tileId + "').remove(); document.querySelector('#modalContainer" + tileId + "').style.display = 'block';"));
       buttonHolder.append($("<div>").addClass("save-cancel-btn").html("Add Component").attr("onclick", "createEditableComponent($('#editModalCont" + tileId + "'));").css("float", "right"));
       holder.append(buttonHolder);
+
+      let toggleHolder = $("<div>").addClass("collapseToggleContainer");
+      toggleHolder.append($("<div>").addClass("componentCondenserToggle").html("Collapse All ▲").attr("onclick", "condenseAll();"));
+      toggleHolder.append($("<div>").addClass("componentCondenserToggle").html("Open All ▼").attr("onclick", "condenseAll(true);"));
+      holder.append(toggleHolder);
+
       var componentsArray = JSON.parse(data.components);
       if (!componentsArray) {
         return;
       }
+      holder.append($("<div id='compDragArea'>"));
       componentsArray.forEach(function(ele) {
         createEditableComponent(holder, ele);
       });
-
       var contentArray = JSON.parse(data.content);
       if (!contentArray) {
         return;
@@ -805,23 +957,22 @@ $unit = $result->fetch_assoc();
       });
     }
 
-    <?php if ($userRole['role'] == 2) { // lecturer only functions: 
+    <?php if ($userRole['role'] == 2) { // lecturer only functions:
     ?>
-
       function deleteComponent(compId) {
         if (!confirm("Are you sure you want to delete this component? All its associated content will be deleted with it.")) {
           return;
         }
 
         if (compId < 0) { // if a newly client-created component, delete from client-side:
-          $("#editComp" + compId).remove();
+          $("#editComp" + compId).parent().remove();
           return;
         }
         var formData = new FormData();
         formData.append("componentId", compId);
         var promise = postAJAX("php/tiles/deleteComponent.php", formData);
         promise.then(function(data) {
-          $("#editComp" + compId).remove();
+          $("#editComp" + compId).parent().remove();
           alert("Component and its children were successfully deleted."); // !!! convert alerts and confirmations into proper displays/modals (talk with Ky) !!!
         }).catch(function(error) {
           alert("There was an error deleting this component, please try again later."); // !!! ^^^
@@ -874,6 +1025,11 @@ $unit = $result->fetch_assoc();
             component.description = description.val().trim();
             modified = true;
           }
+          let draggedComp = $("#dragCompHolder"+component.compId);
+          if (draggedComp.data("initial") != draggedComp.index()) {
+            component.order = draggedComp.index();
+            modified = true;
+          }
 
           // append to data for insertion:
           if (modified) {
@@ -907,6 +1063,11 @@ $unit = $result->fetch_assoc();
           let status = $(ele.find(".edit-content-status")[0]);
           if (status.prop("checked") != status.data("initial")) {
             content.status = (status.prop("checked") ? 1 : 0);
+            modified = true;
+          }
+          let order = ele.index();
+          if (order != ele.data("initial")) {
+            content.order = order;
             modified = true;
           }
           content.componentId = (ele.parent().attr("id")).match(/-?\d+$/)[0];
@@ -946,8 +1107,107 @@ $unit = $result->fetch_assoc();
       function ensureString(input) {
         return input === null ? "" : String(input);
       }
+
+      // Tile editing:
+      function toggleTileEdit(close = false, cancel = false) {
+        if (close) {
+          if (cancel) {
+            restoreTileOrder()
+          }
+          $("#tileEditBtn").show();
+          $("#tileSaveBtn").hide();
+          $("#tileCancelBtn").hide();
+          $(".unitTileHolder").show();
+          $(".unitTileEditCell").hide();
+        } else {
+          $("#tileEditBtn").hide();
+          $("#tileSaveBtn").show();
+          $("#tileCancelBtn").show();
+          $(".unitTileHolder").hide();
+          $(".unitTileEditCell").show();
+        }
+      }
+
+      // tile saving:
+      function saveTileArrangement() {
+        if (!confirm("Are you sure you want to save these changes?")) {
+          return;
+        }
+        $('.unitTileDiv').each(function() { // set data attributes to new defaults following save.
+          $(this).attr("data-initial", $(this).index());
+        });
+        toggleTileEdit(true);
+      }
+
+      // tile drag & dropping:
+      var tileDragging = false;
+      var activeTile;
+      var tileDragIndex;
+      var tileOffset;
+      $(function() {
+        $(".unitTileDiv").on("mouseenter", function(event){
+          let tile = $(this);
+          if (tileDragging && tile.index() != tileDragIndex) {
+            if (tile.index() < tileDragIndex) {
+              tile.before(activeTile.parent());
+              tileDragIndex = activeTile.parent().index();
+            } else {
+              tile.after(activeTile.parent());
+              tileDragIndex = activeTile.parent().index();
+            }
+          }
+        });
+        $(".unitTileGrip").on('mousedown', function(event) {
+          activeTile = $(this).parent();
+          activeTile.width(activeTile.width());
+          tileDragIndex = activeTile.parent().index();
+          activeTile.parent().width(activeTile.parent().width());
+          activeTile.parent().height(activeTile.parent().height());
+          let startPos = activeTile.offset();
+          tileOffset = {x: event.pageX - startPos.left, y: event.pageY - startPos.top};
+          activeTile.addClass('tileDragging');
+          tileDragging = true;
+        });
+      });
+      $(document).on('mouseup', function() {
+        if (tileDragging) {
+          activeTile.removeClass('tileDragging');
+          activeTile.css({
+            width: "",
+            left: "",
+            top: ""
+          });
+          activeTile.parent().css({
+            width: "",
+            height: ""
+          });
+          tileDragging = false;
+        }
+      });
+      $(document).on("mousemove", function(event) {
+        if (tileDragging) {
+          var mouseX = event.pageX - tileOffset.x;
+          var mouseY = event.pageY - tileOffset.y;
+          activeTile.css({
+              left: mouseX + "px",
+              top: mouseY + "px"
+          });
+        }
+      });
+
+      function restoreTileOrder() {
+        let parent = $(".weekly-content-container");
+        let items = $('.unitTileDiv').toArray();
+        items.sort(function(a, b) {
+            var indexA = $(a).attr('data-initial');
+            var indexB = $(b).attr('data-initial');
+            return indexA - indexB;
+        });
+        $.each(items, function(index, element) {
+            parent.append(element);
+        });
+      }
     <?php } ?>
   </script>
 </body>
-
 </html>
