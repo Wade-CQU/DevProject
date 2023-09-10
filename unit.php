@@ -847,12 +847,13 @@ $unit = $result->fetch_assoc();
           name: "",
           url: "",
           isTask: 0,
+          order: -1,
           componentId: compId
         };
         currentCompId--;
       }
 
-      let contentHolder = $("<div>").attr("id", "editContent" + ele.id).addClass("edit-content-holder");
+      let contentHolder = $("<div>").attr("id", "editContent" + ele.id).addClass("edit-content-holder").data("initial", ele.order);
       let typeRow = $("<div>").addClass("edit-content-row-type");
       typeRow.append($("<div>").addClass("edit-content-label").html("Type:"));
       var typeSelect = $("<select>").addClass("edit-content-field");
@@ -931,7 +932,6 @@ $unit = $result->fetch_assoc();
 
     <?php if ($userRole['role'] == 2) { // lecturer only functions:
     ?>
-
       function deleteComponent(compId) {
         if (!confirm("Are you sure you want to delete this component? All its associated content will be deleted with it.")) {
           return;
@@ -1036,6 +1036,11 @@ $unit = $result->fetch_assoc();
           let status = $(ele.find(".edit-content-status")[0]);
           if (status.prop("checked") != status.data("initial")) {
             content.status = (status.prop("checked") ? 1 : 0);
+            modified = true;
+          }
+          let order = ele.index();
+          if (order != ele.data("initial")) {
+            content.order = order;
             modified = true;
           }
           content.componentId = (ele.parent().attr("id")).match(/-?\d+$/)[0];

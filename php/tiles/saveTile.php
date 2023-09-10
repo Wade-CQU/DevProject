@@ -50,7 +50,6 @@ if (count($data[0]) > 0) {
     $result = $stmt->execute();
 
     if (!$result) {
-      echo $sql;
       $stmt->close();
       $dbh->close();
       exit;
@@ -61,7 +60,7 @@ if (count($data[0]) > 0) {
 }
 
 // update all content:
-$attr = array("", "", "", "");
+$attr = array("", "", "", "", "");
 if (count($data[1]) > 0) {
   // prepare content data:
   foreach ($data[1] as $content) {
@@ -92,6 +91,10 @@ if (count($data[1]) > 0) {
       $attr[3] .= ($attr[3] == "" ? "type = CASE" : "") . " WHEN id = " . $contId . " THEN " . intval($content->type);
       $runQuery = true;
     }
+    if (isset($content->order)) {
+      $attr[4] .= ($attr[4] == "" ? "`order` = CASE" : "") . " WHEN id = " . $contId . " THEN " . intval($content->order);
+      $runQuery = true;
+    }
   }
   if (isset($runQuery)) { // only update if there are updates to be made:
     // comma management:
@@ -103,6 +106,8 @@ if (count($data[1]) > 0) {
       $attr[2] .= " ELSE isTask END";
     } if ($attr[3] != "") {
       $attr[3] .= " ELSE type END";
+    } if ($attr[4] != "") {
+      $attr[4] .= " ELSE `order` END";
     }
     $attributeSQL = implode(', ', array_filter(array_map('trim', $attr)));
 
@@ -123,9 +128,9 @@ if (count($data[1]) > 0) {
 
 // Inserting all new components & their new content:
 foreach ($dataToInsert[0] as $component) {
-  $sql = "INSERT INTO component (`tileId`, `name`, `icon`, `description`, `order`) VALUES (?,?,6,?,69);"; // !!! Re-evaluate the ordering once the drag & dropping is done. !!! icon not implemented either
+  $sql = "INSERT INTO component (`tileId`, `name`, `icon`, `description`, `order`) VALUES (?,?,6,?,?);"; // !!! icon not implemented either
   $stmt = $dbh->prepare($sql);
-  $stmt->bind_param("iss", $component->tileId, $component->name, $component->description);
+  $stmt->bind_param("issi", $component->tileId, $component->name, $component->description, $component->order);
   $stmt->execute();
 
   // Insert new content in new component if applicable:
@@ -134,7 +139,7 @@ foreach ($dataToInsert[0] as $component) {
     $sql = "INSERT INTO content (`componentId`, `type`, `name`, `url`, `order`, `isTask`) VALUES ";
     $inserts = array();
     foreach ($dataToInsert[2][$component->compId] as $content) {
-      array_push($inserts, "($newCompId,". intval($content->type) . ",'". str_replace("'", "\'", $content->name) ."','". str_replace("'", "\'", $content->url) ."',69,". intval($content->status) .")"); // !!! add string fixers
+      array_push($inserts, "($newCompId,". intval($content->type) . ",'". str_replace("'", "\'", $content->name) ."','". str_replace("'", "\'", $content->url) ."',". intval($content->order) .",". intval($content->status) .")"); // !!! add string fixers
     }
     if (count($inserts) > 0) {
       $attributeSQL = implode(', ', array_filter(array_map('trim', $inserts))) . ";";
@@ -148,7 +153,7 @@ $sql = "INSERT INTO content (`componentId`, `type`, `name`, `url`, `order`, `isT
 $inserts = array();
 foreach ($dataToInsert[1] as $compId => $contentArray) {
   foreach ($contentArray as $content) {
-    array_push($inserts, "(". intval($compId) .",". intval($content->type) . ",'". str_replace("'", "\'", $content->name) ."','". str_replace("'", "\'", $content->url) ."',69,". intval($content->status) .")"); // !!! add string fixers
+    array_push($inserts, "(". intval($compId) .",". intval($content->type) . ",'". str_replace("'", "\'", $content->name) ."','". str_replace("'", "\'", $content->url) ."',". intval($content->order) .",". intval($content->status) .")"); // !!! add string fixers
   }
 }
 if (count($inserts) > 0) {
