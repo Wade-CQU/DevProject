@@ -8,6 +8,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link href="css/default.css" rel="stylesheet" />
+    <script src="frameworks/jquery-3.7.0.min.js"></script>
     <link href="css/term.css" rel="stylesheet" />
     <title>Your Units</title>
     <?php if (isset($_COOKIE['lightTheme'])) { ?>
@@ -24,14 +25,12 @@
       $stmt = $dbh->prepare($sql);
       $stmt->execute();
       $result = $stmt->get_result();
-
       if (!$result) { // if query or database connection fails:
         echo "404 Unit Not Found"; // !!! review?
         $stmt->close();
         $dbh->close();
         exit;
       }
-
       while ($unit = $result->fetch_assoc()) {
         //Get total nbr of tasks in unit
         $sql = "SELECT SUM(totalTasks) FROM tile where unitId=?;";
@@ -41,7 +40,6 @@
         $stmt->bind_result($unitTaskCount);
         $stmt->fetch();
         $stmt->close();
-
         //get number of tasks this user has completed
         $sql = "SELECT COUNT(tc.id) FROM taskcompletion tc
         RIGHT JOIN tile t ON tc.tileId = t.id
@@ -53,7 +51,6 @@
         $stmt->bind_result($unitTaskCompleted);
         $stmt->fetch();
         $stmt->close();
-
         //calculate total unit xp percentage for current user
         if ($unitTaskCount == 0) {
           $unitXpPercentage = 0;
@@ -71,10 +68,9 @@
         } else {
           $rank = 4;
         }
-
         ?>
-        <a href="unit.php?id=<?php echo $unit['uId']; ?>">
-          <div class="unit-card" id="<?php echo $unit['uId']; ?>"<?php echo $unit['termCode'] != $termCode ? "style='display: none;'" : ""; ?>>
+        <a href="unit.php?id=<?php echo $unit['uId']; ?>"<?php echo $unit['termCode'] != $termCode ? " style='display: none;'" : ""; ?>>
+          <div class="unit-card" id="<?php echo $unit['uId']; ?>">
             <div class="term-code-label">Term Code: <?php echo $unit['termCode'];?></div>
             <div class="xp-container">
               <div class="xp-label">XP:</div>
@@ -85,20 +81,15 @@
             <div class="rank-highlight rank-<?php echo $rank; ?>"></div>
           </div>
         </a>
-
       <?php }
       ?>
     </div>
-    <div class="show-prev-units">Show all previous units</div>
-
+    <div class="show-prev-units" onclick="showPrevUnits(this);">Show all previous units</div>
     <script>
-        const cards = document.querySelectorAll(".unit-card"); //select all the tiles.
-        const prevUnitButton = document.querySelector(".show-prev-units");
-        prevUnitButton.addEventListener("click", function(){
-            cards.forEach(card => {
-              card.style.display = "block";
-            });
-          });
+      function showPrevUnits(button) {
+        $(button).hide();
+        $(".unit-card").parent().show();
+      }
     </script>
 </body>
 </html>
