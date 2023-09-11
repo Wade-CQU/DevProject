@@ -147,14 +147,13 @@ $unit = $result->fetch_assoc();
 
   <!-- Invisible div for TEACHER assignment view -->
   <div id="assTeacherContent" style="display:none;">
-    <h1>Assignments for <?php echo $unit['name']; ?></h1>
-    <br><br>
+  <div class="modal-unit-heading">Assignments for <?php echo $unit['name']; ?></div>
     <?php
     while ($assignment = $assTResult->fetch_assoc()) {
       $assTCount++;
     ?>
       <div>
-        <table style="color:white">
+        <table class="assignment-table">
           <tr>
             <th>Assignment #</th>
             <th><?php echo $assTCount; ?></th>

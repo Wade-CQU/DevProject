@@ -1,65 +1,40 @@
 /* Override dark theme because :( */
 h1, h2 {
-    color: #000b61;
+    color: #1E1F22;
 }
 html {
-  background-color: #FFFFFF;
-}
-header {
-  background-color: #e5e5e5;
-}
-.unit-card{
     background-color: #FFFFFF;
-    box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
 }
 
-.xp-label{
-    color: #434000;
-}
-.xp-bar{
-    background-color: #084100;
-}
-.xp-progress{
-    background-color: #54FF00;
-}
-.unit-title{
-  color: blue;
-}
-.profile-title {
-    color: white;
-}
-.term-xp-bar {
-    background-color: #003b12;
-}
-.term-xp-label {
-    color: #1b00ff;
-}
-.term-code-label {
-    color: #24243d;
-}
 
 /*UNIT*/
-.section-heading {
-    color: #0027f2;
+.section-heading, .section-heading span, .modal-component-title, .modal-unit-heading, .centre p{
+    color: #1E1F22;
+}
+.modal-component-title, .modal-unit-heading{
+    font-weight: bold;
 }
 .section-divider {
-    background-color: #0400f2;
+    background-color: #1E1F22;
 }
 .unit-heading, .unitTileHolder, .nav-tile {
-  box-shadow: 5px 8px 8px rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+    box-shadow: 5px 8px 8px rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
 }
 .modal-content {
-  background: white;
+    background: white;
 }
 .modal-unit-description {
     color: #0c00af;
-}
-.modal-component-title {
-    color: #0033cb;
 }
 .modal-component-description {
     color: #292929;
 }
 .modal-content-item * {
-  color: #8d0800;
+    color: #2c2c2c;
+}
+.assignment-table tr th:nth-child(even) {
+    color: #2c2c2c;
+}
+.assignment-table tr th:nth-child(odd) {
+    color: #1E1F22;
 }
