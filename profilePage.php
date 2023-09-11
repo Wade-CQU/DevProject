@@ -34,9 +34,6 @@
                   <h1><?php echo  $user["firstName"]. "   " . $user["lastName"]; ?></h1>
                   <h2><?php echo  $user["email"]; ?></h2>
           <?php } ?>
-          <form action="php/Misc/toggleTheme.php" method="post">
-            <button type="submit">Toggle Theme</button>
-          </form>
         </div>
     </div>
     <div class="split right">
