@@ -10,7 +10,7 @@ $assignmentId = $_GET['assignmentId'];
 $count = 0;
 
 //Get data for Assignment
-$sql = "SELECT id, unitId, due, total, discription, specification FROM assignments WHERE unitId = ?";
+$sql = "SELECT id, unitId, due, total, description, specification FROM assignments WHERE unitId = ?";
 $stmt = $dbh->prepare($sql);
 $stmt->bind_param("i", $unitId);
 $stmt->execute();
@@ -51,7 +51,7 @@ $files1 = scandir($dir);
         <table class="centre-allign" style="color:white">
             <tr>
                 <th>Description: </th>
-                <th><?php echo $assignment['discription']; ?></th>
+                <th><?php echo $assignment['description']; ?></th>
             </tr>
             <tr>
                 <th>Due Date: </th>
@@ -102,6 +102,26 @@ $files1 = scandir($dir);
                                         echo "$dir/$value/$assValue";
                                     }
                                     ?>">Download Submission</a>
+                    </th>
+                </tr>
+                <tr>
+                    <th>Submission Date:</th>
+                    <th>
+                        <?php
+                        $sql = "SELECT submitDate FROM submission WHERE assignmentsId = ? AND userId = ?";
+                        $stmt = $dbh->prepare($sql);
+                        $stmt->bind_param("ii", $assignmentId, $value);
+                        $stmt->execute();
+                        $mark = $stmt->get_result();
+                        $stmt->close();
+
+                        while ($sub = $mark->fetch_assoc()) {
+                            echo $sub['submitDate'];
+                        }
+
+                        ?>
+
+
                     </th>
                 </tr>
                 <tr>

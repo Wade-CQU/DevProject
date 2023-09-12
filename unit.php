@@ -34,7 +34,7 @@ $stmt->close();
 //Get data for the assignment tile
 $unitId = $_GET['id'];
 $assCount = 0;
-$sql = "SELECT id, unitId, due, total, discription, specification FROM assignments WHERE unitId = ?";
+$sql = "SELECT id, unitId, due, total, description, specification FROM assignments WHERE unitId = ?";
 $stmt = $dbh->prepare($sql);
 $stmt->bind_param("i", $unitId);
 $stmt->execute();
@@ -44,7 +44,7 @@ $stmt->close();
 //Get data for the Teacher assignment tile
 $unitId = $_GET['id'];
 $assTCount = 0;
-$sql = "SELECT id, unitId, due, total, discription, specification FROM assignments WHERE unitId = ?";
+$sql = "SELECT id, unitId, due, total, description, specification FROM assignments WHERE unitId = ?";
 $stmt = $dbh->prepare($sql);
 $stmt->bind_param("i", $unitId);
 $stmt->execute();
@@ -117,7 +117,7 @@ $unit = $result->fetch_assoc();
           </tr>
           <tr>
             <th>Description: </th>
-            <th><?php echo $assignment['discription']; ?></th>
+            <th><?php echo $assignment['description']; ?></th>
           </tr>
           <tr>
             <th>Due Date: </th>
@@ -160,7 +160,7 @@ $unit = $result->fetch_assoc();
           </tr>
           <tr>
             <th>Description: </th>
-            <th><?php echo $assignment['discription']; ?></th>
+            <th><?php echo $assignment['description']; ?></th>
           </tr>
           <tr>
             <th>Due Date: </th>

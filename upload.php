@@ -1,5 +1,4 @@
 <?php
-//TODO Delete contents on upload for data purging
 include("php/session.php");
 include("php/dbConnect.php");
 ?>
