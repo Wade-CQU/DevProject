@@ -61,6 +61,10 @@ $files1 = scandir($dir);
                 <th>Specification: </th>
                 <th><?php echo $assignment['specification']; ?></th>
             </tr>
+            <tr>
+                <th>Grade:</th>
+                <th><?php echo $assignment['total']; ?></th>
+            </tr>
             <?php
             foreach ($files1 as $key => $value) {
                 if (in_array($key, $skipped)) {
