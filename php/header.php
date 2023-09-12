@@ -1,7 +1,7 @@
-<?php 
+<?php
 
 //Get total nbr of tasks in unit
-$sql = "SELECT SUM(totalTasks) FROM tile t 
+$sql = "SELECT SUM(totalTasks) FROM tile t
 RIGHT JOIN unitUser uu on t.unitId = uu.unitId WHERE uu.userId=?;";
 $stmt = $dbh->prepare($sql);
 $stmt->bind_param("i", $userId);
@@ -11,9 +11,9 @@ $stmt->fetch();
 $stmt->close();
 
 //get number of tasks this user has completed
-$sql = "SELECT COUNT(tc.id) FROM taskcompletion tc 
-RIGHT JOIN tile t ON tc.tileId = t.id 
-RIGHT JOIN unit u ON t.unitId = u.id 
+$sql = "SELECT COUNT(tc.id) FROM taskcompletion tc
+RIGHT JOIN tile t ON tc.tileId = t.id
+RIGHT JOIN unit u ON t.unitId = u.id
 where tc.userId = ? AND tc.isComplete = 1;";
 $stmt = $dbh->prepare($sql);
 $stmt->bind_param("i", $userId);
@@ -44,7 +44,11 @@ if($termTaskCount == 0){
       <div id="profileDropDown" class="dropdown-content">
         <a href="/devproject/profilePage.php">View Profile</a>
         <form action="php/Misc/toggleTheme.php" method="post">
-            <button type="submit">Toggle Theme</button>
+          <input type="text" id="redirect" name="redirect" value="" hidden>
+          <script>
+            document.getElementById("redirect").value = window.location.href;
+          </script>
+          <button type="submit">Toggle Theme</button>
         </form>
         <a href="/devproject/php/logout.php">Logout</a>
       </div>
@@ -52,7 +56,7 @@ if($termTaskCount == 0){
 </header>
 <script>
   const dropDownBox = document.getElementById("profileDropDown");
-  
+
   function displayProfileDropdown() {
     dropDownBox.style.display = "block";
   }
