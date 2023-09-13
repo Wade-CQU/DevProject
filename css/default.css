@@ -32,6 +32,7 @@ header{
   align-self: flex-start;
   margin-left: 15px;
   cursor: pointer;
+  padding: 12px 0px;
 }
 .profile-icon{
   width: 30px;

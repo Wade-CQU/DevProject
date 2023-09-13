@@ -33,7 +33,7 @@ if($termTaskCount == 0){
 ?>
 <header>
   <a href="/devproject/term.php">
-    <img class="nav-logo" src="/devproject/assets/Logo.svg" alt="Pluto logo" onclick="document.location = '';">
+    <img class="nav-logo" src="/devproject/assets/NU-LOGO.svg" alt="Pluto logo" onclick="document.location = '';">
   </a>
     <div class="term-xp-label">Term XP:</div>
     <div class="term-xp-bar">

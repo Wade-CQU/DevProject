@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg id="Layer_2" data-name="Layer 2" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 470.52002 471.10704">
+  <defs>
+    <style>
+      .cls-1 {
+        fill: url(#radial-gradient-2);
+      }
+
+      .cls-1, .cls-2, .cls-3, .cls-4 {
+        stroke-width: 0px;
+      }
+
+      .cls-2 {
+        fill: url(#radial-gradient);
+      }
+
+      .cls-3 {
+        fill: url(#radial-gradient-3);
+      }
+
+      .cls-4 {
+        fill: url(#radial-gradient-4);
+      }
+    </style>
+    <radialGradient id="radial-gradient" cx="220.44113" cy="180.74074" fx="220.44113" fy="180.74074" r="180.74074" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#fff"/>
+      <stop offset=".99637" stop-color="#fee15b"/>
+    </radialGradient>
+    <radialGradient id="radial-gradient-2" cx="215.00838" cy="198.25868" fx="215.00838" fy="198.25868" r="134.91655" gradientTransform="translate(-27.49735 25.62265) rotate(-10.64769)" xlink:href="#radial-gradient"/>
+    <radialGradient id="radial-gradient-3" cx="176.66223" cy="267.18881" fx="176.66223" fy="267.18881" r="115.93693" gradientTransform="translate(117.00851 -122.4112) rotate(14.63307)" xlink:href="#radial-gradient"/>
+    <radialGradient id="radial-gradient-4" cx="165.55087" cy="369.84924" fx="165.55087" fy="369.84924" r="67.31401" gradientTransform="translate(448.39547 -154.27025) rotate(58.34698)" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#fff"/>
+      <stop offset=".99637" stop-color="#f9e8cc"/>
+    </radialGradient>
+  </defs>
+  <polygon class="cls-2" points="221.62631 361.48148 214.3736 186.88837 39.70039 181.92593 214.2935 174.67322 219.25594 0 226.50865 174.59312 401.18187 179.55556 226.58875 186.80827 221.62631 361.48148"/>
+  <polygon class="cls-1" points="246.23904 313.17083 216.83782 186.08757 88.01104 206.53865 215.0943 177.13744 194.64322 48.31066 224.04443 175.39391 352.87121 154.94283 225.78795 184.34405 246.23904 313.17083"/>
+  <polygon class="cls-3" points="191.88782 293.10914 215.67911 183.57301 108.07273 152.18743 217.60886 175.97873 248.99444 68.37234 225.20314 177.90847 332.80953 209.29405 223.2734 185.50275 191.88782 293.10914"/>
+  <polygon class="cls-4" points="163.37227 216.44111 217.30628 180.01866 184.74076 123.67188 221.16321 177.60589 277.50999 145.04037 223.57598 181.46282 256.1415 237.8096 219.71905 183.87559 163.37227 216.44111"/>
+</svg>

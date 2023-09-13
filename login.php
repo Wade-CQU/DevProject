@@ -95,8 +95,12 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
   <link rel="stylesheet" href="/devproject/css/login.css">
 </head>
 
-<body style="background-image: url('/devproject/assets/NeptuneBackground.png');">
-
+<body>
+    <div class="backgroundComponents">
+        <img src="assets/Pluto-svg.svg" class="pluto-svg floatInSpace">
+        <img src="assets/ShiningStar.svg" class="shining-star-svg">  
+        <div class="glow glowing"></div> 
+    </div>
     <?php 
         if(!empty($login_err)){
             echo '<div class="alert alert-danger">' . $login_err . '</div>';
@@ -126,7 +130,24 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
     </div>
         <p>DEV USE ONLY - <a href="php/register.php">register account</a>.</p>
   </form>
-
+    <script>
+        function generateRandom(max) {
+        var num = Math.floor(Math.random() * max);
+        return num;
+    }
+    let nbrOfStars = 250;
+    const container = document.querySelector(".backgroundComponents");
+    for (let i = 0; i < nbrOfStars; i++) {
+        const starDiv = document.createElement("div");
+        let starSize = generateRandom(7) + "px";
+        starDiv.className = "star";
+        starDiv.style.top = generateRandom(100) + "%";
+        starDiv.style.left = generateRandom(100) + "%";
+        starDiv.style.width = starSize;
+        starDiv.style.height = starSize;
+        container.appendChild(starDiv);
+    }
+    </script>
 </body>
 
 </html>
