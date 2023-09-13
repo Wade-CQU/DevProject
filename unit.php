@@ -537,17 +537,17 @@ $unit = $result->fetch_assoc();
         var assHolder = $("#modalContassignments");
         
         //TESTING STUFF
-        //assHolder.append($("#assContent").show());
+        assHolder.append($("#assContent").show());
         //assHolder.append($("#assTeacherContent").show());
         
         //PRODUCTION IF
-        
+        /*
         if (<?php echo $userRole['role']; ?> == 2){
           assHolder.append($("#assTeacherContent").show());
         } else{
           assHolder.append($("#assContent").show());
         }
-        
+        */
 
 
       }
