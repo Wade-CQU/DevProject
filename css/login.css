@@ -1,5 +1,62 @@
+@keyframes floatInSpace {
+    0%{
+        transform: translateY(0px);
+    }
+    50%{
+        transform: translateY(-40px);
+    }
+    100%{
+        transform: translateY(0px);
+    }
+}
+@keyframes glowing {
+    0%{
+        box-shadow: 0 0 100px 70px rgb(250, 255, 180);
+    }
+    50%{
+        box-shadow: 0 0 100px rgb(250, 255, 180);
+    }
+    100%{
+        box-shadow: 0 0 100px 70px rgb(250, 255, 180);
+    }
+}
+.floatInSpace{
+    animation: floatInSpace 15s ease 0s infinite;
+}
+.glowing{
+    animation: glowing 10s ease 0s infinite;
+}
 body{
-    background-color: #080710;
+    background-color: black;
+}
+.star{
+    position: absolute;
+    background-color: white;
+    border-radius: 50%;
+}
+.pluto-svg{
+    position: absolute;
+    top: 4%;
+    left: -9%;
+    width: 45%;
+    z-index: 2;
+}
+.shining-star-svg{
+    position: absolute;
+    top: 14%;
+    left: 60%;
+    width: 530px;
+    z-index: 2;
+}
+.glow {
+    position: absolute;
+    background-color: rgb(255, 253, 232);
+    width: 50px;
+    height: 50px;
+    top: 14%;
+    left: 60%;
+    transform: translate(224px, 178px);
+    border-radius: 50%;
 }
 .background{
     width: 430px;
@@ -44,6 +101,7 @@ form{
     backdrop-filter: blur(10px);
     box-shadow: 0 0 40px rgba(8,7,16,0.6);
     padding: 50px 35px;
+    z-index: 5;
 }
 form *{
     font-family: 'Poppins',sans-serif;
