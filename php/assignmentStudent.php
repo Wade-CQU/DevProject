@@ -103,8 +103,18 @@ $files1 = scandir($dir);
                 <th>-</th>
             </tr>
             <tr>
-                <th>Link to Submission: </th>
-                <th> DOWNLOAD </th>
+                <th>Student submission: </th>
+                <th>
+                    <a href="<?php
+                                $download = scandir("$dir/$userId/");
+                                foreach ($download as $key => $assgnmentId) {
+                                    if (in_array($key, $skipped)) {
+                                        continue;
+                                    }
+                                    echo "$dir/$userId/$assgnmentId";
+                                }
+                                ?>">Download Submission</a>
+                </th>
             </tr>
             <tr>
                 <th>-</th>
@@ -126,7 +136,7 @@ $files1 = scandir($dir);
 
                     <textarea id="comment" name="comment" rows="6" cols="50">
                         Leave a comment for the student.
-                    </textarea>   
+                    </textarea>
 
                 </th>
             </tr>
@@ -136,7 +146,7 @@ $files1 = scandir($dir);
             <tr>
                 <th>Upload Marking Sheet:</th>
                 <th>
-                    <form action="/DevProject/upload.php?assignmentId" method="post" enctype="multipart/form-data">
+                    <form action="/DevProject/upload.php" method="post" enctype="multipart/form-data">
                         <input type="file" name="fileToUpload" id="fileToUpload">
                     </form>
                 </th>
@@ -145,10 +155,10 @@ $files1 = scandir($dir);
                 <td colspan="3"></td>
             </tr>
             <tr>
-                <th>Button</th>
-                <th>Button</th>
+                <th><button onclick="document.location='/devproject/php/assigmentMark.php?unitId=<?php echo $unitId; ?>&assignmentId=<?php echo $assignmentId ?>'">Go back</button> </th>
+                <th><button onclick="document.location='/devproject/php/assigmentMark.php?unitId=<?php echo $unitId; ?>&assignmentId=<?php echo $assignmentId ?>'">Submit</button></th>
             </tr>
-            
+
 
         </table>
     </div>
@@ -185,6 +195,7 @@ $files1 = scandir($dir);
     }
 
     .blank_row {
-    height: 100px !important; /* overwrites any other rules */
+        height: 100px !important;
+        /* overwrites any other rules */
     }
 </style>
