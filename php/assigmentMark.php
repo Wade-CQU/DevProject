@@ -91,64 +91,13 @@ $files1 = scandir($dir);
                     </th>
                 </tr>
                 <tr>
-                    <th>Student submission: </th>
+                    <th>Grade Student</th>
                     <th>
-                        <a href="<?php
-                                    $download = scandir("$dir/$value/");
-                                    foreach ($download as $key => $assValue) {
-                                        if (in_array($key, $skipped)) {
-                                            continue;
-                                        }
-                                        echo "$dir/$value/$assValue";
-                                    }
-                                    ?>">Download Submission</a>
-                    </th>
-                </tr>
-                <tr>
-                    <th>Submission Date:</th>
-                    <th>
-                        <?php
-                        $sql = "SELECT submitDate FROM submission WHERE assignmentsId = ? AND userId = ?";
-                        $stmt = $dbh->prepare($sql);
-                        $stmt->bind_param("ii", $assignmentId, $value);
-                        $stmt->execute();
-                        $mark = $stmt->get_result();
-                        $stmt->close();
-
-                        while ($sub = $mark->fetch_assoc()) {
-                            echo $sub['submitDate'];
-                        }
-
-                        ?>
-
-
-                    </th>
-                </tr>
-                <tr>
-                    <th>Student Mark: </th>
-                    <th>
-                        <?php
-                        $sql = "SELECT grade FROM submission WHERE assignmentsId = ? AND userId = ?";
-                        $stmt = $dbh->prepare($sql);
-                        $stmt->bind_param("ii", $assignmentId, $value);
-                        $stmt->execute();
-                        $mark = $stmt->get_result();
-                        $stmt->close();
-
-                        ?>
-                        
-                        <form action="assignmentGrade.php" method="post">
+                    <form action="assignmentStudent.php" method="post">
                             <input type="text" name="userId" value="<?php echo $value ?>" hidden>
                             <input type="text" name="assignmentId" value="<?php echo $assignmentId ?>" hidden>
                             <input type="text" name="unitId" value="<?php echo $unitId ?>" hidden>
-                            <input type="text" name="grade" value="
-                            <?php
-                            while ($grade = $mark->fetch_assoc()) {
-                                echo $grade['grade'];
-                            }
-                            ?>
-                        ">
-                            <input type="submit" value="Submit Grade">
+                            <input type="submit" value="Grade Student">
                         </form>
                     </th>
                 </tr>
