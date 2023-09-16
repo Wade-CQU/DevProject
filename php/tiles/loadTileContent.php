@@ -18,10 +18,15 @@ $stmt->bind_param("i", $_POST['tileId']);
 $stmt->execute();
 $result = $stmt->get_result();
 
-if (!$result || $result->num_rows == 0) {
-  trigger_error(!$result ? "COMPONENT ACQUISITION FAILED" : "NO COMPONENTS FOUND", E_USER_ERROR);
+if (!$result) {
+  trigger_error("COMPONENT ACQUISITION FAILED", E_USER_ERROR);
   $stmt->close();
   $dbh->close();
+  exit;
+} else if ($result->num_rows == 0) {
+  echo json_encode(array(
+    "components" => 0
+  ));
   exit;
 }
 
