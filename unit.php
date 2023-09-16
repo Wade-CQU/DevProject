@@ -184,50 +184,102 @@ $unit = $result->fetch_assoc();
   </div>
 <!-- Invisible div for class info modal  -->
   <div id="classInfoContent" style="display: none;">
+    <div class="centre" id="classInfoDiv">
+      <h1>Unit Info</h1>
+      <h1 style="float: left;" id="classInfoHeader"><?php echo $unit["code"]. ": " . $unit["name"]; ?></h1>
+      <?php if ($role == 2) { ?>
+      <button type="button" class="modal-edit-button" onclick="toggleClassInfoEdit();" style="float: right;">✎ EDIT</button>
+    <?php } ?>
+      <p style="clear: both; margin-top: 12px;" id="classInfoDescr"><?php echo  $unit["description"]; ?></p>
+    </div>
+    <?php if ($role == 2) { ?>
+    <div class="centre" style="display: none;" id="classInfoEditDiv">
+      <h1>Unit Info</h1>
+      <input type="text" id="unitCodeEdit" value="<?php echo $unit["code"]; ?>" class="modal-component-title" style="width: 25%;" placeholder="Unit Code..." data-initial="<?php echo $unit["code"]; ?>">
+      <input type="text" id="unitNameEdit" value="<?php echo $unit["name"]; ?>" class="modal-component-title" style="width: 75%;" placeholder="Unit Name..." data-initial="<?php echo $unit["name"]; ?>">
+      <textarea class="modal-component-description" id="unitDescriptionEdit" style="height: 200px;" data-initial="<?php echo $unit["description"]; ?>"><?php echo  $unit["description"]; ?></textarea>
+      <div style="display: flex;">
+        <button type="button" class="save-cancel-btn" onclick="cancelClassInfoEdit();">Cancel</button>
+        <button type="button" class="save-cancel-btn" onclick="saveUnitInfo();">Save Unit</button>
+      </div>
+    </div>
+    <script>
+      function toggleClassInfoEdit() {
+        $("#classInfoDiv").toggle();
+        $("#classInfoEditDiv").toggle();
+      }
+      function cancelClassInfoEdit() {
+        let codeEdit = document.getElementById("unitCodeEdit");
+        codeEdit.value = codeEdit.dataset.initial;
+        let nameEdit = document.getElementById("unitNameEdit");
+        nameEdit.value = nameEdit.dataset.initial;
+        let descEdit = document.getElementById("unitDescriptionEdit");
+        descEdit.value = descEdit.dataset.initial;
+        toggleClassInfoEdit();
+      }
+      function saveUnitInfo() {
+        let codeEdit = document.getElementById("unitCodeEdit");
+        let nameEdit = document.getElementById("unitNameEdit");
+        let descEdit = document.getElementById("unitDescriptionEdit");
+        let formData = new FormData();
+        formData.append("unitId", <?php echo $unit['id']; ?>);
+        formData.append("code", codeEdit.value);
+        formData.append("name", nameEdit.value);
+        formData.append("description", descEdit.value);
+        postAJAX("php/unit/updateUnit.php", formData).then(()=>{
+          codeEdit.dataset.initial = codeEdit.value;
+          nameEdit.dataset.initial = nameEdit.value;
+          descEdit.dataset.initial = descEdit.value;
+          toggleClassInfoEdit();
+          let unitNameString = codeEdit.value + ": " + nameEdit.value;
+          document.title = codeEdit.value + ": " + nameEdit.value;
+          document.getElementById("classInfoHeader").innerHTML = codeEdit.value + ": " + nameEdit.value;
+          document.getElementById("classInfoDescr").innerHTML = descEdit.value;
+        }, ()=>{
+          alert("There was an error updating this unit...");
+        });
+      }
+    </script>
+    <?php } ?>
     <div class="centre">
-        <h1>Class Info</h1>
-        <h1><?php echo  $unit["code"]. "   " . $unit["name"]; ?></h1>
-        <p style="margin-top: 12px;"><?php echo  $unit["description"]; ?></p>
-      </div>
-      <div class="centre">
-          <h1>Participants:</h1>
-          <p style="margin: 12px 0;">Below are all of the students and lecturers enrolled in this unit.</p>
-          <?php // Get user's based on unit:
-              $sql = "SELECT uId, firstName, lastName, role, email FROM user u RIGHT JOIN (SELECT uu.userId as uId FROM unitUser uu WHERE unitId = ". intval($unit['id']) .") uu ON uId = u.id ORDER BY role DESC";
-              $stmt = $dbh->prepare($sql);
-              $stmt->execute();
-              $result = $stmt->get_result();
-              if (!$result) { // if query or database connection fails:
-                  echo "404 Unit Not Found";
-                  $stmt->close();
-                  $dbh->close();
-                  exit;
-              } ?>
-          <table class="studentsTable">
-            <thead>
-              <tr>
-                  <th> Name </th>
-                  <th> Email </th>
-                  <th> Role </th>
-              </tr>
-            </thead>
-            <tbody>
-              <?php
-              while ($user = $result->fetch_assoc()) { ?>
-              <tr>
-                  <td><?php echo $user['firstName']; ?> <?php echo $user['lastName']; ?></td>
-                  <td><?php echo $user['email']; ?></td>
-                  <td><?php if ($user['role'] == 2) {
-                      echo 'Teacher';
-                  } else{
-                      echo 'Student';
-                  } ?></td>
-              </tr>
-              <?php }
-              $stmt->close(); ?>
-            </tbody>
-          </table>
-      </div>
+      <h1>Participants:</h1>
+      <p style="margin: 12px 0;">Below are all of the students and lecturers enrolled in this unit.</p>
+      <?php // Get user's based on unit:
+        $sql = "SELECT uId, firstName, lastName, role, email FROM user u RIGHT JOIN (SELECT uu.userId as uId FROM unitUser uu WHERE unitId = ". intval($unit['id']) .") uu ON uId = u.id ORDER BY role DESC";
+        $stmt = $dbh->prepare($sql);
+        $stmt->execute();
+        $result = $stmt->get_result();
+        if (!$result) { // if query or database connection fails:
+            echo "404 Unit Not Found";
+            $stmt->close();
+            $dbh->close();
+            exit;
+        } ?>
+      <table class="studentsTable">
+        <thead>
+          <tr>
+            <th> Name </th>
+            <th> Email </th>
+            <th> Role </th>
+          </tr>
+        </thead>
+        <tbody>
+          <?php
+          while ($user = $result->fetch_assoc()) { ?>
+          <tr>
+            <td><?php echo $user['firstName']; ?> <?php echo $user['lastName']; ?></td>
+            <td><?php echo $user['email']; ?></td>
+            <td><?php if ($user['role'] == 2) {
+                echo 'Teacher';
+            } else{
+                echo 'Student';
+            } ?></td>
+          </tr>
+          <?php }
+          $stmt->close(); ?>
+        </tbody>
+      </table>
+    </div>
   </div>
 <!-- Invisible div for unit timetables -->
   <div id="timetableContent" style="display: none;">

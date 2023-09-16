@@ -17,6 +17,7 @@
 session_start();
 if (isset($_SESSION["id"])) {
   $userId = $_SESSION["id"];
+  $role = $_SESSION["role"];
   $termCode = 22023; // !!! hard-coded until jack finishes session control.
 } else {
   header("Location: login.php");
