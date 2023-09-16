@@ -2,18 +2,13 @@
 include("php/session.php");
 include("php/dbConnect.php");
 
-// Get user's role:
-$sql = "SELECT role FROM user WHERE id = ?";
-$stmt = $dbh->prepare($sql);
-$stmt->bind_param("i", $userId);
-$stmt->execute();
-$result = $stmt->get_result();
-$userRole = $result->fetch_assoc();
+$unitId = intval($_GET['id']);
+$userRole = $role; // !!!
 
 //Get total nbr of tasks in unit
-$sql = "SELECT SUM(totalTasks) FROM tile where unitId=?;";
+$sql = "SELECT SUM(totalTasks) FROM tile where unitId = ?;";
 $stmt = $dbh->prepare($sql);
-$stmt->bind_param("i", $_GET['id']);
+$stmt->bind_param("i", $unitId);
 $stmt->execute();
 $stmt->bind_result($unitTaskCount);
 $stmt->fetch();
@@ -21,18 +16,17 @@ $stmt->close();
 
 //get number of tasks this user has completed
 $sql = "SELECT COUNT(tc.id) FROM taskcompletion tc
-RIGHT JOIN tile t ON tc.tileId = t.id
-RIGHT JOIN unit u ON t.unitId = u.id
-where u.id = ? AND tc.userId = ? AND tc.isComplete = 1;";
+        RIGHT JOIN tile t ON tc.tileId = t.id
+        RIGHT JOIN unit u ON t.unitId = u.id
+        where u.id = ? AND tc.userId = ? AND tc.isComplete = 1;";
 $stmt = $dbh->prepare($sql);
-$stmt->bind_param("ii", $_GET['id'], $userId);
+$stmt->bind_param("ii", $unitId, $userId);
 $stmt->execute();
 $stmt->bind_result($unitTaskCompleted);
 $stmt->fetch();
 $stmt->close();
 
 //Get data for the assignment tile
-$unitId = $_GET['id'];
 $assCount = 0;
 $sql = "SELECT id, unitId, due, total, description, specification FROM assignments WHERE unitId = ?";
 $stmt = $dbh->prepare($sql);
@@ -42,7 +36,6 @@ $assResult = $stmt->get_result();
 $stmt->close();
 
 //Get data for the Teacher assignment tile
-$unitId = $_GET['id'];
 $assTCount = 0;
 $sql = "SELECT id, unitId, due, total, description, specification FROM assignments WHERE unitId = ?";
 $stmt = $dbh->prepare($sql);
@@ -72,7 +65,7 @@ if ($unitTaskCount == 0) {
 // Get unit record:
 $sql = "SELECT id, code, name, description FROM unit WHERE EXISTS (SELECT 1 FROM unitUser WHERE unitId = ? AND userId = $userId) AND ID = ? LIMIT 1;";
 $stmt = $dbh->prepare($sql);
-$stmt->bind_param("ii", $_GET['id'], $_GET['id']);
+$stmt->bind_param("ii", $unitId, $unitId);
 $stmt->execute();
 $result = $stmt->get_result();
 
@@ -134,7 +127,7 @@ $unit = $result->fetch_assoc();
           <tr>
             <th>Upload your assignment:</th>
             <th>
-              <form action="/DevProject/upload.php?assignmentId=<?php echo $assCount; ?>&unitId=<?php echo $_GET['id']; ?>&userId=<?php echo $userId ?>" method="post" enctype="multipart/form-data">
+              <form action="/DevProject/upload.php?assignmentId=<?php echo $assCount; ?>&unitId=<?php echo $unitId; ?>&userId=<?php echo $userId ?>" method="post" enctype="multipart/form-data">
                 <input type="file" name="fileToUpload" id="fileToUpload">
                 <input type="submit" value="Submit" name="submit">
               </form>
@@ -176,7 +169,7 @@ $unit = $result->fetch_assoc();
           </tr>
           <tr>
             <th>Mark Assignment: </th>
-            <th><a href="/devproject/php/assigmentMark.php?unitId=<?php echo $_GET['id']; ?>&assignmentId=<?php echo $assTCount; ?>">Mark Assignment</a></th>
+            <th><a href="/devproject/php/assigmentMark.php?unitId=<?php echo $unitId; ?>&assignmentId=<?php echo $assTCount; ?>">Mark Assignment</a></th>
           </tr>
         </table>
       </div>
@@ -222,7 +215,7 @@ $unit = $result->fetch_assoc();
         let nameEdit = document.getElementById("unitNameEdit");
         let descEdit = document.getElementById("unitDescriptionEdit");
         let formData = new FormData();
-        formData.append("unitId", <?php echo $unit['id']; ?>);
+        formData.append("unitId", <?php echo $unitId; ?>);
         formData.append("code", codeEdit.value);
         formData.append("name", nameEdit.value);
         formData.append("description", descEdit.value);
@@ -244,8 +237,8 @@ $unit = $result->fetch_assoc();
     <div class="centre">
       <h1>Participants:</h1>
       <p style="margin: 12px 0;">Below are all of the students and lecturers enrolled in this unit.</p>
-      <?php // Get user's based on unit:
-        $sql = "SELECT uId, firstName, lastName, role, email FROM user u RIGHT JOIN (SELECT uu.userId as uId FROM unitUser uu WHERE unitId = ". intval($unit['id']) .") uu ON uId = u.id ORDER BY role DESC";
+      <?php // Get users based on unit:
+        $sql = "SELECT uId, firstName, lastName, role, email FROM user u RIGHT JOIN (SELECT uu.userId as uId FROM unitUser uu WHERE unitId = $unitId) uu ON uId = u.id ORDER BY role DESC";
         $stmt = $dbh->prepare($sql);
         $stmt->execute();
         $result = $stmt->get_result();
@@ -269,14 +262,9 @@ $unit = $result->fetch_assoc();
           <tr>
             <td><?php echo $user['firstName']; ?> <?php echo $user['lastName']; ?></td>
             <td><?php echo $user['email']; ?></td>
-            <td><?php if ($user['role'] == 2) {
-                echo 'Teacher';
-            } else{
-                echo 'Student';
-            } ?></td>
+            <td><?php echo ($user['role'] == 2) ? 'Teacher' : 'Student'; ?></td>
           </tr>
-          <?php }
-          $stmt->close(); ?>
+          <?php } $stmt->close(); ?>
         </tbody>
       </table>
     </div>
@@ -287,7 +275,6 @@ $unit = $result->fetch_assoc();
         <h1><?php echo $unit['code']; ?> - Timetable</h1>
         <p style="margin: 12px;">All scheduled classes for this unit can be found below. Join the classes via the provided links below.</p>
         <?php // Get timetable based on unit
-        $unitId = intval($unit['id']);
         $sql = "SELECT unitId, classTime, link, details FROM timetable WHERE unitId = ?";
         $stmt = $dbh->prepare($sql);
         $stmt->bind_param("i", $unitId);
@@ -296,8 +283,7 @@ $unit = $result->fetch_assoc();
         if (!$result) { // if query or database connection fails:
             $stmt->close();
             exit;
-        }
-        ?>
+        } ?>
         <table class="studentsTable">
           <tr>
             <th>Class</th>
@@ -314,9 +300,7 @@ $unit = $result->fetch_assoc();
               <tr>
                 <td colspan="3">There are currently no classes for this unit.</td>
               </tr>
-          <?php }
-          $stmt->close();
-          ?>
+          <?php } $stmt->close(); ?>
         </table>
     </div>
   </div>
@@ -362,9 +346,11 @@ $unit = $result->fetch_assoc();
     </div>
     <div class="section-heading">
       <span>LEARNING</span>
+      <?php if ($userRole == 2) { ?>
       <div id="tileEditBtn" onclick="toggleTileEdit();">✎ Edit</div>
       <div id="tileSaveBtn" onclick="saveTileArrangement();" style="display:none;">Save Changes</div>
       <div id="tileCancelBtn" onclick="toggleTileEdit(true, true);" style="display:none;">Cancel</div>
+      <?php } ?>
     </div>
     <div class="section-divider"></div>
 
@@ -374,7 +360,7 @@ $unit = $result->fetch_assoc();
       $sql = "SELECT id, icon, name, label, description, `order` FROM tile WHERE unitId = ? ORDER BY `order` ASC;";
       $stmt = $dbh->prepare($sql);
 
-      $stmt->bind_param("i", $_GET['id']);
+      $stmt->bind_param("i", $unitId);
       $stmt->execute();
       $result = $stmt->get_result();
       $stmt->close();
@@ -487,7 +473,7 @@ $unit = $result->fetch_assoc();
           loadModalFrame(tile, false);
 
           //Add edit button for lecturer
-          if (<?php echo $userRole['role']; ?> == 2) { // perform role management in session.php and never send these functions to the students !!!
+          if (<?php echo $userRole; ?> == 2) { // perform role management in session.php and never send these functions to the students !!!
             const thisModalContainer = document.querySelector("#modalContainer" + tile.id + ".modal");
             const thisModalContent = thisModalContainer.childNodes[0];
             var editButton = document.createElement('div');
@@ -633,7 +619,7 @@ $unit = $result->fetch_assoc();
 
         //PRODUCTION IF
         /*
-        if (<?php echo $userRole['role']; ?> == 2){
+        if (<?php echo $userRole; ?> == 2){
           assHolder.append($("#assTeacherContent").show());
         } else{
           assHolder.append($("#assContent").show());
@@ -730,7 +716,7 @@ $unit = $result->fetch_assoc();
         }
 
         if (ele.type == 2) {
-          content.attr('href', 'files/<?php echo $unit['id']; ?>/content/' + ele.url);
+          content.attr('href', 'files/<?php echo $unitId; ?>/content/' + ele.url);
           content.attr('download', ele.url);
         } else if (ele.type == 3) {
           content.attr('href', "https://" + ele.url); // !!! this should be more adaptable
@@ -1043,7 +1029,7 @@ $unit = $result->fetch_assoc();
       });
     }
 
-    <?php if ($userRole['role'] == 2) { // lecturer only functions:
+    <?php if ($userRole == 2) { // lecturer only functions:
     ?>
       function deleteComponent(compId) {
         if (!confirm("Are you sure you want to delete this component? All its associated content will be deleted with it.")) {
