@@ -881,7 +881,7 @@ $unit = $result->fetch_assoc();
     function generateComment(tileId, data) {
       let name = data.name;
       let message = data.comment;
-      let date = "!!! we need a date column";
+      let date = data.postDate;
       var comment = $("<div id='comment" + data.cid + "'>").addClass("comment");
       var iconElement = $("<div>").addClass("commentIcon");
       if (data.role == 2) {

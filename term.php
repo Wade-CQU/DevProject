@@ -17,7 +17,7 @@
 </head>
 <body>
     <?php require("php/header.php"); ?>
-    <h1>WELCOME TO TERM <?php echo strval($termCode)[0]; ?>, WEEK 1</h1>
+    <h1>WELCOME TO TERM <?php echo strval($termCode)[0]; ?></h1>
     <div class="side-scroll-container">
     <?php
       // Get unit's based on user:
