@@ -169,11 +169,17 @@ textarea {
   background-color: white;
   border-radius: 16px;
   padding: 12px;
-  display: inline-block;
+  display: flex;
   min-height: 60px;
   width: 80px;
   min-width: 80px;
   vertical-align: middle;
+  justify-content: center;
+  align-items: center;
+}
+.unitTileIconHolder span {
+  font-weight: bold;
+  font-size: 230%;
 }
 .unitTileContents {
   padding: 8px;
@@ -690,3 +696,30 @@ table.studentsTable tr:hover td {
   padding: 7px;
   border-bottom: 1px solid #ddd;
 }
+
+/* */
+.modal-content-item:hover {
+  background-color: #7dc3ff1f;
+}
+.classEdit input {
+    width: 100%;
+    font-size: 16px;
+    text-align: center;
+    background: #555557;
+    color: #00f1ff;
+    border-radius: 16px;
+    padding: 4px;
+}
+.addClassRowBtn {
+    padding: 4px 8px;
+    margin: 12px;
+    border-radius: 4px;
+    user-select: none;
+    border: 1px solid white;
+    cursor: pointer;
+}
+.studentsTable a {
+  color: #ffb01e;
+}
+
+/* TILE EDITING */

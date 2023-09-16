@@ -275,7 +275,7 @@ $unit = $result->fetch_assoc();
         <h1><?php echo $unit['code']; ?> - Timetable</h1>
         <p style="margin: 12px;">All scheduled classes for this unit can be found below. Join the classes via the provided links below.</p>
         <?php // Get timetable based on unit
-        $sql = "SELECT unitId, classTime, link, details FROM timetable WHERE unitId = ?";
+        $sql = "SELECT id, unitId, classTime, link, details FROM timetable WHERE unitId = ?";
         $stmt = $dbh->prepare($sql);
         $stmt->bind_param("i", $unitId);
         $stmt->execute();
@@ -284,24 +284,131 @@ $unit = $result->fetch_assoc();
             $stmt->close();
             exit;
         } ?>
-        <table class="studentsTable">
+        <table class="studentsTable" id="timetableTable">
           <tr>
             <th>Class</th>
             <th>Time</th>
             <th>Link</th>
+            <th class="classEdit" style="display:none;">Action</th>
           </tr>
           <?php while ($timetable = $result->fetch_assoc()) { $ttCheck = true; ?>
-          <tr>
-            <td><?php echo $timetable['details']; ":"?></td>
-            <td><?php echo $timetable['classTime']; ?></td>
-            <td><a href="<?php echo $timetable['link']; ?>"><?php echo $timetable['link']; ?></a></td>
-          </tr>
+            <tr id="classRecord<?php echo $timetable['id']; ?>" class="classEdit">
+              <td id="classRecordDetails<?php echo $timetable['id']; ?>"><?php echo $timetable['details']; ?></td>
+              <td id="classRecordTime<?php echo $timetable['id']; ?>"><?php echo $timetable['classTime']; ?></td>
+              <td><a href="<?php echo $timetable['link']; ?>" id="classRecordLink<?php echo $timetable['id']; ?>"><?php echo $timetable['link']; ?></a></td>
+            </tr>
+            <?php if ($userRole == 2) { ?>
+            <tr id="classEditRecord<?php echo $timetable['id']; ?>" class="classEdit timetableEditRow" style="display: none;" data-class-id="<?php echo $timetable['id']; ?>">
+              <td><input type="text" value="<?php echo $timetable['details']; ":"?>" id="classEditDetails<?php echo $timetable['id']; ?>"></td>
+              <td><input type="text" value="<?php echo $timetable['classTime']; ":"?>" id="classEditTime<?php echo $timetable['id']; ?>"></td>
+              <td><input type="text" value="<?php echo $timetable['link']; ":"?>" id="classEditLink<?php echo $timetable['id']; ?>"></td>
+              <td><button type="button" class="edit-modal-delete-component" onclick="deleteTimetableClass(this,<?php echo $timetable['id']; ?>);" style="float: none;">Delete</button></td>
+            </tr>
+            <?php } ?>
           <?php } if (!isset($ttCheck)) { ?>
-              <tr>
-                <td colspan="3">There are currently no classes for this unit.</td>
-              </tr>
+            <tr class="classRecordRow">
+              <td colspan="3">There are currently no classes for this unit.</td>
+            </tr>
           <?php } $stmt->close(); ?>
         </table>
+        <?php if ($userRole == 2) { ?>
+        <button type="button" class="modal-edit-button classEdit" onclick="toggleTimetableEdit();" style="margin-top: 12px;">✎ Edit</button>
+        <div class="classEdit" style="display: none;">
+          <button type="button" onclick="createTimetableRow();" class="addClassRowBtn">+ Add Row</button>
+          <hr>
+          <button type="button" onclick="cancelTimetableEdit();" class="save-cancel-btn">Cancel</button>
+          <button type="button" onclick="saveTimetable();" class="save-cancel-btn">Save</button>
+        </div>
+        <script>
+          function toggleTimetableEdit() {
+            $(".classEdit").toggle();
+          }
+          function deleteTimetableClass(btn, classId) {
+            if (!confirm("Are you sure you want to delete this class from the unit timetable? This action will be permanent.")) {
+              return;
+            }
+            let formData = new FormData();
+            formData.append("classId", classId);
+            postAJAX("php/unit/deleteTimetableRecord.php", formData).then(()=>{
+              $(btn).parent().parent().remove();
+              $("#classRecord"+classId).remove();
+            }, ()=>{
+              alert("There was an error deleting this class from the timetable...");
+            });
+          }
+          function cancelTimetableEdit() {
+            $(".timetableEditRow").each(function(index) {
+              const $this = $(this);
+              if ($this.attr("data-class-id")) {
+                let classId = $this.attr("data-class-id");
+                $this.find("#classEditTime" + classId).val(document.getElementById("classRecordTime"+classId).innerHTML);
+                $this.find("#classEditLink" + classId).val(document.getElementById("classRecordLink"+classId).innerHTML);
+                $this.find("#classEditDetails" + classId).val(document.getElementById("classRecordDetails"+classId).innerHTML);
+              }
+            });
+            toggleTimetableEdit();
+          }
+          function createTimetableRow() {
+            var row = $('<tr>').addClass('classEdit timetableEditRow');
+            var detailsInput = $('<input>').attr('class', 'classEditDetails');
+            var timeInput = $('<input>').attr('type', 'text').attr('class', 'classEditTime');
+            var linkInput = $('<input>').attr('type', 'text').attr('class', 'classEditLink');
+            var deleteButton = $('<button>').attr('type', 'button')
+              .addClass('edit-modal-delete-component').text('Delete').css('float', 'none')
+              .on('click', function() {
+                deleteTimetableClass(this);
+              });
+            row.append(
+              $('<td>').append(detailsInput),
+              $('<td>').append(timeInput),
+              $('<td>').append(linkInput),
+              $('<td>').append(deleteButton)
+            );
+            $("#timetableTable").append(row);
+          }
+          function saveTimetable() {
+            let toUpdate = [];
+            let toInsert = [];
+            $(".timetableEditRow").each(function(index) {
+              let data = {};
+              const $this = $(this);
+              if ($this.attr("data-class-id")) {
+                data.classId = $this.attr("data-class-id");
+                data.classTime = $this.find("#classEditTime" + data.classId).val();
+                data.link = $this.find("#classEditLink" + data.classId).val();
+                data.details = $this.find("#classEditDetails" + data.classId).val();
+                let time = document.getElementById("classRecordTime"+data.classId).innerHTML;
+                let link = document.getElementById("classRecordLink"+data.classId).innerHTML;
+                let details = document.getElementById("classRecordDetails"+data.classId).innerHTML;
+                if (time != data.classTime || link != data.link || details != data.details) {
+                  toUpdate.push(data);
+                }
+              } else {
+                data.classTime = $this.find(".classEditTime").val();
+                data.link = $this.find(".classEditLink").val();
+                data.details = $this.find(".classEditDetails").val();
+                toInsert.push(data);
+              }
+            });
+            let jsonObject = [toInsert, toUpdate, <?php echo $unitId; ?>];
+            if (toInsert.length > 0 || toUpdate.length > 0) {
+              if (!confirm("Are you sure you want to save these changes?")) {
+                return;
+              }
+              var formData = new FormData();
+              formData.append("timetableUpdate", JSON.stringify(jsonObject));
+              var promise = postAJAX("php/unit/updateTimetable.php", formData);
+              promise.then(function(data) {
+                window.location.reload();
+              }).catch(function(error) {
+                alert("There was an error saving this unit's timetable...");
+              });
+            } else { // if no changes, just go back:
+              cancelTimetableEdit();
+            }
+          }
+        </script>
+        <?php } ?>
     </div>
   </div>
 
@@ -356,10 +463,8 @@ $unit = $result->fetch_assoc();
 
     <div class="weekly-content-container">
       <?php
-      // Get unit's tiles (!!! if not cached):
       $sql = "SELECT id, icon, name, label, description, `order` FROM tile WHERE unitId = ? ORDER BY `order` ASC;";
       $stmt = $dbh->prepare($sql);
-
       $stmt->bind_param("i", $unitId);
       $stmt->execute();
       $result = $stmt->get_result();
@@ -371,8 +476,7 @@ $unit = $result->fetch_assoc();
         exit;
       }
 
-      while ($tile = $result->fetch_assoc()) {
-        //get the count of total tasks for this tile
+      while ($tile = $result->fetch_assoc()) { //get the count of total tasks for this tile:
         $sql = "SELECT COUNT(cn.id) FROM Content cn
               RIGHT JOIN Component cm ON cn.componentId = cm.id
               WHERE cm.tileId = ? AND cn.isTask = 1";
@@ -406,13 +510,12 @@ $unit = $result->fetch_assoc();
           $xpPercentage = ($completedTaskCount / $taskCount) * 100;
           $xpPercentage = floor($xpPercentage);
         }
-
       ?>
         <div class="unitTileDiv" data-initial="<?php echo $tile['order']; ?>">
           <div class="unitTileHolder" id="<?php echo $tile['id']; ?>" data-tile-name="<?php echo $tile['name']; ?>" data-tile-label="<?php echo $tile['label']; ?>" data-tile-description="<?php echo $tile['description']; ?>">
             <div class="unitTile">
               <div class="unitTileIconHolder">
-                <img src="" alt="">
+                <span style="color: <?php echo ($xpPercentage == 100) ? "#007f17" : ($xpPercentage == 0 ? "#ff3d00" : "#00abff"); ?>;"><?php echo sprintf('%02d', $tile['icon']); ?></span>
               </div>
               <div class="unitTileContents">
                 <p class="unitTileTitle"><?php echo $tile['name']; ?></p>
@@ -422,15 +525,13 @@ $unit = $result->fetch_assoc();
             <div class="unitTileXpHolder">
               <p class="unitTileXpLabel">XP:</p>
               <div class="unitTileXpBar">
-                <div class="unitTileXpProgress" style="width:<?php echo $xpPercentage; ?>%;">
-
-                </div>
+                <div class="unitTileXpProgress" style="width:<?php echo $xpPercentage; ?>%;"></div>
               </div>
             </div>
           </div>
           <div class="unitTileEditCell" style="display: none;">
             <div class="unitTileIconHolder">
-              <img src="" alt="">
+              <input type="number" id="" value="" class="editTileIconInput">
             </div>
             <div class="unitTileContents">
               <input type="text" value="<?php echo $tile['name']; ?>" style="color: white;">
@@ -1164,7 +1265,6 @@ $unit = $result->fetch_assoc();
           formData.append("tileUpdateJSON", JSON.stringify(jsonData));
           var promise = postAJAX("php/tiles/saveTile.php", formData);
           promise.then(function(data) {
-            alert("Tile successfully updated.");
             $("#modalContainerEdit" + tileId).remove(); // !!! reload tile too
           }).catch(function(error) {
             alert("There was an error saving this tile's components & content, please try again later.");

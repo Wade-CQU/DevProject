@@ -2,10 +2,10 @@
 require("../session.php");
 require("../dbConnect.php");
 
-$contentId = intval($_POST['contentId']);
+$classId = intval($_POST['classId']);
 
-// Delete the content:
-$sql = "DELETE FROM content WHERE ID = $contentId;";
+// Delete the class from the timetable:
+$sql = "DELETE FROM timetable WHERE id = $classId;";
 $stmt = $dbh->prepare($sql);
 $stmt->execute();
 $stmt->close();
