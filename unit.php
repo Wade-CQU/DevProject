@@ -182,7 +182,7 @@ $unit = $result->fetch_assoc();
       </div>
     <?php } ?>
   </div>
-
+<!-- Invisible div for class info modal  -->
   <div id="classInfoContent" style="display: none;">
     <div class="centre">
         <h1>Class Info</h1>
@@ -228,6 +228,45 @@ $unit = $result->fetch_assoc();
             </tbody>
           </table>
       </div>
+  </div>
+<!-- Invisible div for unit timetables -->
+  <div id="timetableContent" style="display: none;">
+    <div class="centre" style="text-align: center;">
+        <h1><?php echo $unit['code']; ?> - Timetable</h1>
+        <p style="margin: 12px;">All scheduled classes for this unit can be found below. Join the classes via the provided links below.</p>
+        <?php // Get timetable based on unit
+        $unitId = intval($unit['id']);
+        $sql = "SELECT unitId, classTime, link, details FROM timetable WHERE unitId = ?";
+        $stmt = $dbh->prepare($sql);
+        $stmt->bind_param("i", $unitId);
+        $stmt->execute();
+        $result = $stmt->get_result();
+        if (!$result) { // if query or database connection fails:
+            $stmt->close();
+            exit;
+        }
+        ?>
+        <table class="studentsTable">
+          <tr>
+            <th>Class</th>
+            <th>Time</th>
+            <th>Link</th>
+          </tr>
+          <?php while ($timetable = $result->fetch_assoc()) { $ttCheck = true; ?>
+          <tr>
+            <td><?php echo $timetable['details']; ":"?></td>
+            <td><?php echo $timetable['classTime']; ?></td>
+            <td><a href="<?php echo $timetable['link']; ?>"><?php echo $timetable['link']; ?></a></td>
+          </tr>
+          <?php } if (!isset($ttCheck)) { ?>
+              <tr>
+                <td colspan="3">There are currently no classes for this unit.</td>
+              </tr>
+          <?php }
+          $stmt->close();
+          ?>
+        </table>
+    </div>
   </div>
 
   <div class="body-content">
@@ -535,11 +574,11 @@ $unit = $result->fetch_assoc();
       if (navTile.id == "assignments") {
         console.log("loadNavTile assignments");
         var assHolder = $("#modalContassignments");
-        
+
         //TESTING STUFF
         assHolder.append($("#assContent").show());
         //assHolder.append($("#assTeacherContent").show());
-        
+
         //PRODUCTION IF
         /*
         if (<?php echo $userRole['role']; ?> == 2){
@@ -551,16 +590,13 @@ $unit = $result->fetch_assoc();
 
 
       }
-
       if (navTile.id == "classinfo") {
-        console.log("loadNavTile classinfo");
         var cInfoHolder = $("#modalContclassinfo");
         cInfoHolder.append($("#classInfoContent").show());
       }
-
       if (navTile.id == "timetable") {
-        console.log("loadNavTile timetable");
-        //!!! fill out with appropriate content
+        var timetableHolder = $("#modalConttimetable");
+        timetableHolder.append($("#timetableContent").show());
       }
 
       //make modal closeable
