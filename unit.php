@@ -2,13 +2,8 @@
 include("php/session.php");
 include("php/dbConnect.php");
 
-// Get user's role:
-$sql = "SELECT role FROM user WHERE id = ?";
-$stmt = $dbh->prepare($sql);
-$stmt->bind_param("i", $userId);
-$stmt->execute();
-$result = $stmt->get_result();
-$userRole = $result->fetch_assoc();
+$unitId = intval($_GET['id']);
+$userRole = $role; // !!!
 
 //Get total nbr of tasks in unit
 $sql = "SELECT SUM(totalTasks) FROM tile where unitId = ?;";
@@ -119,23 +114,7 @@ $unit = $result->fetch_assoc();
           </tr>
           <tr>
             <th>Due Date: </th>
-            <th><?php
-                $date = strtotime($assignment['due']);
-                $remaining = $date - time();
-                $days_remaining = floor($remaining / 86400);
-                $hours_remaining = floor(($remaining % 86400) / 3600);
-                if ($days_remaining > 0) {
-                  echo $assignment['due'] . " | Days Left: " . $days_remaining;
-                }
-                if ($days_remaining == 0) {
-                  echo $assignment['due'] . " | Hours Left: " . $hours_remaining . " DUE TODAY!";
-                }
-                if ($days_remaining < 0) {
-                  echo $assignment['due'] . " | Past Due Date.";
-                }
-
-
-                ?></th>
+            <th><?php echo $assignment['due']; ?></th>
           </tr>
           <tr>
             <th>Specification: </th>
@@ -154,48 +133,6 @@ $unit = $result->fetch_assoc();
               </form>
             </th>
           </tr>
-          <tr>
-            <th>Status: </th>
-            <th>
-              <?php
-
-              $sql = "SELECT status, grade, comment FROM submission WHERE userId = ? AND assignmentsId = ?";
-              $stmt = $dbh->prepare($sql);
-              //echo "USERID: " . $userId;
-              //echo " ASSIGNMENT ID = " . $assCount;
-              $stmt->bind_param("ii", $userId, $assCount);
-              $stmt->execute();
-              $resultSub = $stmt->get_result();
-              $submission = $resultSub->fetch_assoc();
-              $stmt->close();
-              if (isset($submission['status'])) {
-                if ($submission['status'] == 1) {
-                  echo "Waiting for Grade.";
-                } else if ($submission['status'] == 2) {
-                  echo "Graded. | " . "Mark: " . $submission['grade'] . " | " . "\n<br>Comment: " . $submission['comment'] . "\n<br>";
-                  //Marking sheet DIR
-                  $mark_dir = "Assignments/$unitId/$assCount/$userId/markingsheet";
-                  $skipped = array('0', '1');
-              ?>
-                  <a href="<?php
-                            $download = scandir("$mark_dir/");
-                            foreach ($download as $key => $assgnmentName) {
-                              if (in_array($key, $skipped)) {
-                                continue;
-                              }
-                              echo "$mark_dir/$assgnmentName";
-                            }
-                            ?>">Download Marking Sheet.</a>
-            </th>
-        <?php
-                }
-              } else {
-                echo "Not submitted.";
-              }
-
-        ?>
-        </th>
-          </tr>
         </table>
       </div>
     <?php } ?>
@@ -203,7 +140,7 @@ $unit = $result->fetch_assoc();
 
   <!-- Invisible div for TEACHER assignment view -->
   <div id="assTeacherContent" style="display:none;">
-    <div class="modal-unit-heading">Assignments for <?php echo $unit['name']; ?></div>
+  <div class="modal-unit-heading">Assignments for <?php echo $unit['name']; ?></div>
     <?php
     while ($assignment = $assTResult->fetch_assoc()) {
       $assTCount++;
@@ -961,14 +898,14 @@ $unit = $result->fetch_assoc();
         var assHolder = $("#modalContassignments");
 
         //TESTING STUFF
-        //assHolder.append($("#assContent").show());
+        assHolder.append($("#assContent").show());
         //assHolder.append($("#assTeacherContent").show());
 
         //PRODUCTION IF
         /*
         if (<?php echo $userRole; ?> == 2){
           assHolder.append($("#assTeacherContent").show());
-        } else {
+        } else{
           assHolder.append($("#assContent").show());
         }
         */
@@ -1167,7 +1104,6 @@ $unit = $result->fetch_assoc();
     var offset;
     var dragIndex;
     var modalScroll;
-
     function createEditableComponent(holder, data = null) {
       let di = data == null; // used to differentiate new component's values when applicable.
       if (di) {
@@ -1200,10 +1136,10 @@ $unit = $result->fetch_assoc();
       addBtnHolder.append($("<div>").addClass("edit-modal-delete-component").html("Delete").attr("onclick", "deleteComponent(" + data.id + ");"));
       /// Create condensed modal:
       let dragArea = $("#compDragArea");
-      let condensedCompHolder = $("<div>").addClass("dragCompHolder").attr("id", "dragCompHolder" + data.id).data("initial", data.order);
-      let condensedComp = $("<div>").addClass("dragComp").attr("id", "dragComp" + data.id).data("id", data.id);
+      let condensedCompHolder = $("<div>").addClass("dragCompHolder").attr("id", "dragCompHolder"+data.id).data("initial", data.order);
+      let condensedComp = $("<div>").addClass("dragComp").attr("id", "dragComp"+data.id).data("id", data.id);
       condensedCompHolder.append(condensedComp);
-      condensedCompHolder.on("mouseenter", function(event) {
+      condensedCompHolder.on("mouseenter", function(event){
         let comp = $(this);
         if (dragging && comp.index() != dragIndex) {
           if (comp.index() < dragIndex) {
@@ -1230,10 +1166,7 @@ $unit = $result->fetch_assoc();
         activeComp.width(activeComp.width());
         dragIndex = activeComp.parent().index();
         let startPos = activeComp.offset();
-        offset = {
-          x: event.pageX - startPos.left,
-          y: event.pageY - startPos.top
-        };
+        offset = {x: event.pageX - startPos.left, y: event.pageY - startPos.top};
         modalScroll = activeComp.parent().parent().parent().parent();
         activeComp.addClass('compDragging');
         dragging = true;
@@ -1259,18 +1192,16 @@ $unit = $result->fetch_assoc();
           // var mouseX = event.pageX - offset.x;
           var mouseY = event.pageY - offset.y + modalScroll.scrollTop() - $(document).scrollTop();
           activeComp.css({
-            // left: mouseX + "px",
-            top: mouseY + "px"
+              // left: mouseX + "px",
+              top: mouseY + "px"
           });
         }
       });
     });
-
     function condenseComponent(id) {
-      $("#dragComp" + id).toggle();
-      $("#editComp" + id).toggle();
+      $("#dragComp"+id).toggle();
+      $("#editComp"+id).toggle();
     }
-
     function condenseAll(open = false) {
       if (open) {
         $(".dragComp").hide();
@@ -1434,7 +1365,7 @@ $unit = $result->fetch_assoc();
             component.description = description.val().trim();
             modified = true;
           }
-          let draggedComp = $("#dragCompHolder" + component.compId);
+          let draggedComp = $("#dragCompHolder"+component.compId);
           if (draggedComp.data("initial") != draggedComp.index()) {
             component.order = draggedComp.index();
             modified = true;
@@ -1513,5 +1444,4 @@ $unit = $result->fetch_assoc();
       <?php } ?>
   </script>
 </body>
-
 </html>

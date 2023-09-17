@@ -51,7 +51,7 @@ include("php/dbConnect.php");
   } else {
     $uploadOk = 0;
     //echo "Directory already exists";
-
+    
   }
 
   // Check if $uploadOk is set to 0 by an error
@@ -75,7 +75,8 @@ include("php/dbConnect.php");
   }
 
   ?>
-  <button onclick="document.location='/devproject/unit.php?id=<?php echo $unitId; ?>'">Go back</button>
+
+
 </body>
 
 </html>
