@@ -1,4 +1,7 @@
 <?php
+
+//TODO :( https://stackoverflow.com/questions/7843355/submit-two-forms-with-one-button
+
 include("session.php");
 include("dbConnect.php");
 
@@ -25,7 +28,7 @@ $unit = $resultUnit->fetch_assoc();
 $stmt->close();
 
 //Get Data for Submission
-$sqlUnit = "SELECT id, assignmentsId, userId, grade, status, submitDate FROM submission where userId = ? AND assignmentsId = ?";
+$sqlUnit = "SELECT id, assignmentsId, userId, grade, status, submitDate, comment FROM submission where userId = ? AND assignmentsId = ?";
 $stmt = $dbh->prepare($sqlUnit);
 $stmt->bind_param("ii", $userId, $assignmentId);
 $stmt->execute();
@@ -107,11 +110,11 @@ $files1 = scandir($dir);
                 <th>
                     <a href="<?php
                                 $download = scandir("$dir/$userId/");
-                                foreach ($download as $key => $assgnmentId) {
+                                foreach ($download as $key => $assgnmentName) {
                                     if (in_array($key, $skipped)) {
                                         continue;
                                     }
-                                    echo "$dir/$userId/$assgnmentId";
+                                    echo "$dir/$userId/$assgnmentName";
                                 }
                                 ?>">Download Submission</a>
                 </th>
@@ -120,24 +123,25 @@ $files1 = scandir($dir);
                 <th>-</th>
             </tr>
             <tr>
-                <th>Mark Assignment</th>
+                <th>Mark Assignment:</th>
                 <th>
-                    <form action="assignmentGrade.php" method="post">
+                    <!-- <form action="assignmentGrade.php" method="post" id="gradeForm"> -->
+                    <form action="/DevProject/php/uploadMarkSheet.php?assignmentId=<?php echo $assignmentId; ?>&unitId=<?php echo $unitId ?>&userId=<?php echo $userId ?>" method="post" id="markingSheet" enctype="multipart/form-data">
+                        <input type="text" name="userId" value="<?php echo $userId ?>" hidden>
+                        <input type="text" name="assignmentId" value="<?php echo $assignmentId ?>" hidden>
+                        <input type="text" name="unitId" value="<?php echo $unitId ?>" hidden>
                         <input type="text" name="grade" size="3" minlength="1" maxlength="3" value="<?php echo $submission['grade'] ?>">
-                    </form>
                 </th>
             </tr>
             <tr>
                 <th>-</th>
             </tr>
             <tr>
-                <th>Leave a comment</th>
+                <th>Leave a comment:</th>
                 <th>
-
-                    <textarea id="comment" name="comment" rows="6" cols="50">
-                        Leave a comment for the student.
-                    </textarea>
-
+                    <label>Leave a comment for the Student:</label></br>
+                    <textarea id="comment" name="comment" rows="6" cols="50"><?php echo $submission['comment'] ?></textarea>
+                    <!-- </form> -->
                 </th>
             </tr>
             <tr>
@@ -146,8 +150,8 @@ $files1 = scandir($dir);
             <tr>
                 <th>Upload Marking Sheet:</th>
                 <th>
-                    <form action="/DevProject/upload.php" method="post" enctype="multipart/form-data">
-                        <input type="file" name="fileToUpload" id="fileToUpload">
+                    <!-- <form action="/DevProject/php/uploadMarkSheet.php?assignmentId=<?php echo $assignmentId; ?>&unitId=<?php echo $unitId ?>&userId=<?php echo $userId ?>" method="post" id="markingSheet" enctype="multipart/form-data"> -->
+                    <input type="file" name="fileToUpload" id="fileToUpload">
                     </form>
                 </th>
             </tr>
@@ -156,7 +160,7 @@ $files1 = scandir($dir);
             </tr>
             <tr>
                 <th><button onclick="document.location='/devproject/php/assigmentMark.php?unitId=<?php echo $unitId; ?>&assignmentId=<?php echo $assignmentId ?>'">Go back</button> </th>
-                <th><button onclick="document.location='/devproject/php/assigmentMark.php?unitId=<?php echo $unitId; ?>&assignmentId=<?php echo $assignmentId ?>'">Submit</button></th>
+                <th><button onclick="submitForms()">Submit</button></th>
             </tr>
 
 
@@ -168,6 +172,12 @@ $files1 = scandir($dir);
 
 </html>
 
+<script>
+    submitForms = function() {
+        //document.getElementById("gradeForm").submit();
+        document.getElementById("markingSheet").submit();
+    }
+</script>
 
 
 <style>

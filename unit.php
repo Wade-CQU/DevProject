@@ -2,6 +2,8 @@
 include("php/session.php");
 include("php/dbConnect.php");
 
+//Marking sheet DIR
+
 // Get user's role:
 $sql = "SELECT role FROM user WHERE id = ?";
 $stmt = $dbh->prepare($sql);
@@ -121,7 +123,23 @@ $unit = $result->fetch_assoc();
           </tr>
           <tr>
             <th>Due Date: </th>
-            <th><?php echo $assignment['due']; ?></th>
+            <th><?php
+                $date = strtotime($assignment['due']);
+                $remaining = $date - time();
+                $days_remaining = floor($remaining / 86400);
+                $hours_remaining = floor(($remaining % 86400) / 3600);
+                if ($days_remaining > 0) {
+                  echo $assignment['due'] . " | Days Left: " . $days_remaining;
+                }
+                if ($days_remaining == 0) {
+                  echo $assignment['due'] . " | Hours Left: " . $hours_remaining . " DUE TODAY!";
+                }
+                if ($days_remaining < 0) {
+                  echo $assignment['due'] . " | Past Due Date.";
+                }
+
+
+                ?></th>
           </tr>
           <tr>
             <th>Specification: </th>
@@ -140,6 +158,48 @@ $unit = $result->fetch_assoc();
               </form>
             </th>
           </tr>
+          <tr>
+            <th>Status: </th>
+            <th>
+              <?php
+
+              $sql = "SELECT status, grade, comment FROM submission WHERE userId = ? AND assignmentsId = ?";
+              $stmt = $dbh->prepare($sql);
+              //echo "USERID: " . $userId;
+              //echo " ASSIGNMENT ID = " . $assCount;
+              $stmt->bind_param("ii", $userId, $assCount);
+              $stmt->execute();
+              $resultSub = $stmt->get_result();
+              $submission = $resultSub->fetch_assoc();
+              $stmt->close();
+              if (isset($submission['status'])) {
+                if ($submission['status'] == 1) {
+                  echo "Waiting for Grade.";
+                } else if ($submission['status'] == 2) {
+                  echo "Graded. | " . "Mark: " . $submission['grade'] . " | " . "\n<br>Comment: " . $submission['comment'] . "\n<br>";
+                  //Marking sheet DIR
+                  $mark_dir = "Assignments/$unitId/$assCount/$userId/markingsheet";
+                  $skipped = array('0', '1');
+              ?>
+                  <a href="<?php
+                            $download = scandir("$mark_dir/");
+                            foreach ($download as $key => $assgnmentName) {
+                              if (in_array($key, $skipped)) {
+                                continue;
+                              }
+                              echo "$mark_dir/$assgnmentName";
+                            }
+                            ?>">Download Marking Sheet.</a>
+            </th>
+        <?php
+                }
+              } else {
+                echo "Not submitted.";
+              }
+
+        ?>
+        </th>
+          </tr>
         </table>
       </div>
     <?php } ?>
@@ -147,7 +207,7 @@ $unit = $result->fetch_assoc();
 
   <!-- Invisible div for TEACHER assignment view -->
   <div id="assTeacherContent" style="display:none;">
-  <div class="modal-unit-heading">Assignments for <?php echo $unit['name']; ?></div>
+    <div class="modal-unit-heading">Assignments for <?php echo $unit['name']; ?></div>
     <?php
     while ($assignment = $assTResult->fetch_assoc()) {
       $assTCount++;
@@ -185,49 +245,49 @@ $unit = $result->fetch_assoc();
 
   <div id="classInfoContent" style="display: none;">
     <div class="centre">
-        <h1>Class Info</h1>
-        <h1><?php echo  $unit["code"]. "   " . $unit["name"]; ?></h1>
-        <p style="margin-top: 12px;"><?php echo  $unit["description"]; ?></p>
-      </div>
-      <div class="centre">
-          <h1>Participants:</h1>
-          <p style="margin: 12px 0;">Below are all of the students and lecturers enrolled in this unit.</p>
-          <?php // Get user's based on unit:
-              $sql = "SELECT uId, firstName, lastName, role, email FROM user u RIGHT JOIN (SELECT uu.userId as uId FROM unitUser uu WHERE unitId = ". intval($unit['id']) .") uu ON uId = u.id ORDER BY role DESC";
-              $stmt = $dbh->prepare($sql);
-              $stmt->execute();
-              $result = $stmt->get_result();
-              if (!$result) { // if query or database connection fails:
-                  echo "404 Unit Not Found";
-                  $stmt->close();
-                  $dbh->close();
-                  exit;
-              } ?>
-          <table class="studentsTable">
-            <thead>
-              <tr>
-                  <th> Name </th>
-                  <th> Email </th>
-                  <th> Role </th>
-              </tr>
-            </thead>
-            <tbody>
-              <?php
-              while ($user = $result->fetch_assoc()) { ?>
-              <tr>
-                  <td><?php echo $user['firstName']; ?> <?php echo $user['lastName']; ?></td>
-                  <td><?php echo $user['email']; ?></td>
-                  <td><?php if ($user['role'] == 2) {
-                      echo 'Teacher';
-                  } else{
-                      echo 'Student';
+      <h1>Class Info</h1>
+      <h1><?php echo  $unit["code"] . "   " . $unit["name"]; ?></h1>
+      <p style="margin-top: 12px;"><?php echo  $unit["description"]; ?></p>
+    </div>
+    <div class="centre">
+      <h1>Participants:</h1>
+      <p style="margin: 12px 0;">Below are all of the students and lecturers enrolled in this unit.</p>
+      <?php // Get user's based on unit:
+      $sql = "SELECT uId, firstName, lastName, role, email FROM user u RIGHT JOIN (SELECT uu.userId as uId FROM unitUser uu WHERE unitId = " . intval($unit['id']) . ") uu ON uId = u.id ORDER BY role DESC";
+      $stmt = $dbh->prepare($sql);
+      $stmt->execute();
+      $result = $stmt->get_result();
+      if (!$result) { // if query or database connection fails:
+        echo "404 Unit Not Found";
+        $stmt->close();
+        $dbh->close();
+        exit;
+      } ?>
+      <table class="studentsTable">
+        <thead>
+          <tr>
+            <th> Name </th>
+            <th> Email </th>
+            <th> Role </th>
+          </tr>
+        </thead>
+        <tbody>
+          <?php
+          while ($user = $result->fetch_assoc()) { ?>
+            <tr>
+              <td><?php echo $user['firstName']; ?> <?php echo $user['lastName']; ?></td>
+              <td><?php echo $user['email']; ?></td>
+              <td><?php if ($user['role'] == 2) {
+                    echo 'Teacher';
+                  } else {
+                    echo 'Student';
                   } ?></td>
-              </tr>
-              <?php }
-              $stmt->close(); ?>
-            </tbody>
-          </table>
-      </div>
+            </tr>
+          <?php }
+          $stmt->close(); ?>
+        </tbody>
+      </table>
+    </div>
   </div>
 
   <div class="body-content">
@@ -535,19 +595,19 @@ $unit = $result->fetch_assoc();
       if (navTile.id == "assignments") {
         console.log("loadNavTile assignments");
         var assHolder = $("#modalContassignments");
-        
+
         //TESTING STUFF
-        assHolder.append($("#assContent").show());
+        //assHolder.append($("#assContent").show());
         //assHolder.append($("#assTeacherContent").show());
-        
+
         //PRODUCTION IF
-        /*
-        if (<?php echo $userRole['role']; ?> == 2){
+
+        if (<?php echo $userRole['role']; ?> == 2) {
           assHolder.append($("#assTeacherContent").show());
-        } else{
+        } else {
           assHolder.append($("#assContent").show());
         }
-        */
+
 
 
       }
@@ -756,6 +816,7 @@ $unit = $result->fetch_assoc();
     var offset;
     var dragIndex;
     var modalScroll;
+
     function createEditableComponent(holder, data = null) {
       let di = data == null; // used to differentiate new component's values when applicable.
       if (di) {
@@ -789,10 +850,10 @@ $unit = $result->fetch_assoc();
 
       /// Create condensed modal:
       let dragArea = $("#compDragArea");
-      let condensedCompHolder = $("<div>").addClass("dragCompHolder").attr("id", "dragCompHolder"+data.id).data("initial", data.order);
-      let condensedComp = $("<div>").addClass("dragComp").attr("id", "dragComp"+data.id).data("id", data.id);
+      let condensedCompHolder = $("<div>").addClass("dragCompHolder").attr("id", "dragCompHolder" + data.id).data("initial", data.order);
+      let condensedComp = $("<div>").addClass("dragComp").attr("id", "dragComp" + data.id).data("id", data.id);
       condensedCompHolder.append(condensedComp);
-      condensedCompHolder.on("mouseenter", function(event){
+      condensedCompHolder.on("mouseenter", function(event) {
         let comp = $(this);
         if (dragging && comp.index() != dragIndex) {
           if (comp.index() < dragIndex) {
@@ -819,7 +880,10 @@ $unit = $result->fetch_assoc();
         activeComp.width(activeComp.width());
         dragIndex = activeComp.parent().index();
         let startPos = activeComp.offset();
-        offset = {x: event.pageX - startPos.left, y: event.pageY - startPos.top};
+        offset = {
+          x: event.pageX - startPos.left,
+          y: event.pageY - startPos.top
+        };
         modalScroll = activeComp.parent().parent().parent().parent();
         activeComp.addClass('compDragging');
         dragging = true;
@@ -843,16 +907,18 @@ $unit = $result->fetch_assoc();
           // var mouseX = event.pageX - offset.x;
           var mouseY = event.pageY - offset.y + modalScroll.scrollTop() - $(document).scrollTop();
           activeComp.css({
-              // left: mouseX + "px",
-              top: mouseY + "px"
+            // left: mouseX + "px",
+            top: mouseY + "px"
           });
         }
       });
     });
+
     function condenseComponent(id) {
-      $("#dragComp"+id).toggle();
-      $("#editComp"+id).toggle();
+      $("#dragComp" + id).toggle();
+      $("#editComp" + id).toggle();
     }
+
     function condenseAll(open = false) {
       if (open) {
         $(".dragComp").hide();
@@ -957,6 +1023,7 @@ $unit = $result->fetch_assoc();
 
     <?php if ($userRole['role'] == 2) { // lecturer only functions:
     ?>
+
       function deleteComponent(compId) {
         if (!confirm("Are you sure you want to delete this component? All its associated content will be deleted with it.")) {
           return;
@@ -1023,7 +1090,7 @@ $unit = $result->fetch_assoc();
             component.description = description.val().trim();
             modified = true;
           }
-          let draggedComp = $("#dragCompHolder"+component.compId);
+          let draggedComp = $("#dragCompHolder" + component.compId);
           if (draggedComp.data("initial") != draggedComp.index()) {
             component.order = draggedComp.index();
             modified = true;
@@ -1143,7 +1210,7 @@ $unit = $result->fetch_assoc();
       var tileDragIndex;
       var tileOffset;
       $(function() {
-        $(".unitTileDiv").on("mouseenter", function(event){
+        $(".unitTileDiv").on("mouseenter", function(event) {
           let tile = $(this);
           if (tileDragging && tile.index() != tileDragIndex) {
             if (tile.index() < tileDragIndex) {
@@ -1162,7 +1229,10 @@ $unit = $result->fetch_assoc();
           activeTile.parent().width(activeTile.parent().width());
           activeTile.parent().height(activeTile.parent().height());
           let startPos = activeTile.offset();
-          tileOffset = {x: event.pageX - startPos.left, y: event.pageY - startPos.top};
+          tileOffset = {
+            x: event.pageX - startPos.left,
+            y: event.pageY - startPos.top
+          };
           activeTile.addClass('tileDragging');
           tileDragging = true;
         });
@@ -1187,8 +1257,8 @@ $unit = $result->fetch_assoc();
           var mouseX = event.pageX - tileOffset.x;
           var mouseY = event.pageY - tileOffset.y;
           activeTile.css({
-              left: mouseX + "px",
-              top: mouseY + "px"
+            left: mouseX + "px",
+            top: mouseY + "px"
           });
         }
       });
@@ -1197,15 +1267,16 @@ $unit = $result->fetch_assoc();
         let parent = $(".weekly-content-container");
         let items = $('.unitTileDiv').toArray();
         items.sort(function(a, b) {
-            var indexA = $(a).attr('data-initial');
-            var indexB = $(b).attr('data-initial');
-            return indexA - indexB;
+          var indexA = $(a).attr('data-initial');
+          var indexB = $(b).attr('data-initial');
+          return indexA - indexB;
         });
         $.each(items, function(index, element) {
-            parent.append(element);
+          parent.append(element);
         });
       }
     <?php } ?>
   </script>
 </body>
+
 </html>
