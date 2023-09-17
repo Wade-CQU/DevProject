@@ -90,7 +90,7 @@ body{
     bottom: -80px;
 }
 form{
-    height: 360px;
+    height: 400px;
     width: 400px;
     background-color: rgba(255,255,255,0.13);
     position: absolute;
@@ -126,7 +126,7 @@ label{
 input{
     display: block;
     height: 50px;
-    width: 100%;
+    width: 95%;
     background-color: rgb(0, 0, 0);
     border-radius: 12px;
     padding: 0 10px;

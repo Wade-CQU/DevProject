@@ -111,7 +111,7 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
     <form action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>" method="post">
 
         <div class="label">
-            <h1>PLUTO</h1>
+            <img src="assets/NU-logo.svg" class="nav-logo" style="padding:0px">
         </div>
 
         <div class="form-group">
@@ -129,7 +129,7 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
                 <input type="submit" class="btn btn-primary" value="Login">
             </div>
     </div>
-        <p>DEV USE ONLY - <a href="php/register.php">register account</a>.</p>
+        <!-- <p>DEV USE ONLY - <a href="php/register.php">register account</a>.</p> -->
   </form>
     <script>
         function generateRandom(max) {
