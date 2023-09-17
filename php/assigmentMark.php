@@ -29,8 +29,6 @@ $stmt->close();
 
 //Get files for population
 $skipped = array('0', '1');
-$dir = "../Assignments/$unitId/$assignmentId/";
-$files1 = scandir($dir);
 
 ?>
 <!DOCTYPE html>
@@ -66,94 +64,83 @@ $files1 = scandir($dir);
                 <th><?php echo $assignment['total']; ?></th>
             </tr>
             <?php
-            foreach ($files1 as $key => $value) {
-                if (in_array($key, $skipped)) {
-                    continue;
-                }
+
+            $sql = "SELECT assignmentsId FROM submission WHERE assignmentsId = $assignmentId";
+            $stmt = $dbh->prepare($sql);
+            $stmt->execute();
+            $checkResult = $stmt->get_result();
+            $check = $checkResult->fetch_assoc();
+            $stmt->close();
+            if (isset($check)) {
+
+
+                //Get files
+                $dir = "../Assignments/$unitId/$assignmentId/";
+                $files1 = scandir($dir);
+
+                //Loop all students with submissions
+                foreach ($files1 as $key => $value) {
+                    if (in_array($key, $skipped)) {
+                        continue;
+                    }
             ?>
-                <tr>
-                    <th> ------- </th>
-                    <th> ------- </th>
-                </tr>
-                <tr>
-                    <th>Student ID & Name: </th>
-                    <th>
-                        <?php
-                        $sql = "SELECT firstName, lastName FROM user WHERE id = $value";
-                        $stmt = $dbh->prepare($sql);
-                        $stmt->execute();
-                        $result = $stmt->get_result();
-                        $stmt->close();
-                        while ($user = $result->fetch_assoc()) {
-                            echo $value . " | " . $user['firstName'] . " " . $user['lastName'];
-                        }
-                        ?>
-                    </th>
-                </tr>
-                <tr>
-                    <th>Student submission: </th>
-                    <th>
-                        <a href="<?php
-                                    $download = scandir("$dir/$value/");
-                                    foreach ($download as $key => $assValue) {
-                                        if (in_array($key, $skipped)) {
-                                            continue;
-                                        }
-                                        echo "$dir/$value/$assValue";
-                                    }
-                                    ?>">Download Submission</a>
-                    </th>
-                </tr>
-                <tr>
-                    <th>Submission Date:</th>
-                    <th>
-                        <?php
-                        $sql = "SELECT submitDate FROM submission WHERE assignmentsId = ? AND userId = ?";
-                        $stmt = $dbh->prepare($sql);
-                        $stmt->bind_param("ii", $assignmentId, $value);
-                        $stmt->execute();
-                        $mark = $stmt->get_result();
-                        $stmt->close();
-
-                        while ($sub = $mark->fetch_assoc()) {
-                            echo $sub['submitDate'];
-                        }
-
-                        ?>
-
-
-                    </th>
-                </tr>
-                <tr>
-                    <th>Student Mark: </th>
-                    <th>
-                        <?php
-                        $sql = "SELECT grade FROM submission WHERE assignmentsId = ? AND userId = ?";
-                        $stmt = $dbh->prepare($sql);
-                        $stmt->bind_param("ii", $assignmentId, $value);
-                        $stmt->execute();
-                        $mark = $stmt->get_result();
-                        $stmt->close();
-
-                        ?>
-                        
-                        <form action="assignmentGrade.php" method="post">
-                            <input type="text" name="userId" value="<?php echo $value ?>" hidden>
-                            <input type="text" name="assignmentId" value="<?php echo $assignmentId ?>" hidden>
-                            <input type="text" name="unitId" value="<?php echo $unitId ?>" hidden>
-                            <input type="text" name="grade" value="
+                    <tr>
+                        <th> ------- </th>
+                        <th> ------- </th>
+                    </tr>
+                    <tr>
+                        <th>Student ID & Name: </th>
+                        <th>
                             <?php
-                            while ($grade = $mark->fetch_assoc()) {
-                                echo $grade['grade'];
+                            $sql = "SELECT firstName, lastName FROM user WHERE id = $value";
+                            $stmt = $dbh->prepare($sql);
+                            $stmt->execute();
+                            $result = $stmt->get_result();
+                            $stmt->close();
+                            while ($user = $result->fetch_assoc()) {
+                                echo $value . " | " . $user['firstName'] . " " . $user['lastName'];
                             }
                             ?>
-                        ">
-                            <input type="submit" value="Submit Grade">
-                        </form>
-                    </th>
-                </tr>
-            <?php } ?>
+                        </th>
+                    </tr>
+                    <tr>
+                        <th>Graded?</th>
+                        <th>
+                            <?php
+                            $sql = "SELECT status FROM submission WHERE userId = ? AND assignmentsId = ?";
+                            $stmt = $dbh->prepare($sql);
+                            $stmt->bind_param("ii", $value, $assignmentId);
+                            $stmt->execute();
+                            $resultSub = $stmt->get_result();
+                            $submission = $resultSub->fetch_assoc();
+                            $stmt->close();
+                            if ($submission['status'] == 1) {
+                                echo "Waiting for Grade.";
+                            } else if ($submission['status'] == 2) {
+                                echo "Graded.";
+                            } else {
+                                echo "Not submitted.";
+                            }
+                            ?>
+                        </th>
+                    </tr>
+                    <tr>
+                        <th>Grade Student</th>
+                        <th>
+                            <form action="assignmentStudent.php" method="post">
+                                <input type="text" name="userId" value="<?php echo $value ?>" hidden>
+                                <input type="text" name="assignmentId" value="<?php echo $assignmentId ?>" hidden>
+                                <input type="text" name="unitId" value="<?php echo $unitId ?>" hidden>
+                                <input type="submit" value="Grade Student">
+                            </form>
+                        </th>
+                    </tr>
+            <?php }
+            } else {
+                echo "<h1>NO SUBMISSIONS YET</h1>";
+            } ?>
         </table>
+        <button onclick="document.location='/devproject/unit.php?id=<?php echo $unitId; ?>'">Go back</button>
     </div>
 </body>
 
