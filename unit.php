@@ -2,8 +2,6 @@
 include("php/session.php");
 include("php/dbConnect.php");
 
-//Marking sheet DIR
-
 // Get user's role:
 $sql = "SELECT role FROM user WHERE id = ?";
 $stmt = $dbh->prepare($sql);
@@ -13,9 +11,9 @@ $result = $stmt->get_result();
 $userRole = $result->fetch_assoc();
 
 //Get total nbr of tasks in unit
-$sql = "SELECT SUM(totalTasks) FROM tile where unitId=?;";
+$sql = "SELECT SUM(totalTasks) FROM tile where unitId = ?;";
 $stmt = $dbh->prepare($sql);
-$stmt->bind_param("i", $_GET['id']);
+$stmt->bind_param("i", $unitId);
 $stmt->execute();
 $stmt->bind_result($unitTaskCount);
 $stmt->fetch();
@@ -23,18 +21,17 @@ $stmt->close();
 
 //get number of tasks this user has completed
 $sql = "SELECT COUNT(tc.id) FROM taskcompletion tc
-RIGHT JOIN tile t ON tc.tileId = t.id
-RIGHT JOIN unit u ON t.unitId = u.id
-where u.id = ? AND tc.userId = ? AND tc.isComplete = 1;";
+        RIGHT JOIN tile t ON tc.tileId = t.id
+        RIGHT JOIN unit u ON t.unitId = u.id
+        where u.id = ? AND tc.userId = ? AND tc.isComplete = 1;";
 $stmt = $dbh->prepare($sql);
-$stmt->bind_param("ii", $_GET['id'], $userId);
+$stmt->bind_param("ii", $unitId, $userId);
 $stmt->execute();
 $stmt->bind_result($unitTaskCompleted);
 $stmt->fetch();
 $stmt->close();
 
 //Get data for the assignment tile
-$unitId = $_GET['id'];
 $assCount = 0;
 $sql = "SELECT id, unitId, due, total, description, specification FROM assignments WHERE unitId = ?";
 $stmt = $dbh->prepare($sql);
@@ -44,7 +41,6 @@ $assResult = $stmt->get_result();
 $stmt->close();
 
 //Get data for the Teacher assignment tile
-$unitId = $_GET['id'];
 $assTCount = 0;
 $sql = "SELECT id, unitId, due, total, description, specification FROM assignments WHERE unitId = ?";
 $stmt = $dbh->prepare($sql);
@@ -74,7 +70,7 @@ if ($unitTaskCount == 0) {
 // Get unit record:
 $sql = "SELECT id, code, name, description FROM unit WHERE EXISTS (SELECT 1 FROM unitUser WHERE unitId = ? AND userId = $userId) AND ID = ? LIMIT 1;";
 $stmt = $dbh->prepare($sql);
-$stmt->bind_param("ii", $_GET['id'], $_GET['id']);
+$stmt->bind_param("ii", $unitId, $unitId);
 $stmt->execute();
 $result = $stmt->get_result();
 
@@ -152,7 +148,7 @@ $unit = $result->fetch_assoc();
           <tr>
             <th>Upload your assignment:</th>
             <th>
-              <form action="/DevProject/upload.php?assignmentId=<?php echo $assCount; ?>&unitId=<?php echo $_GET['id']; ?>&userId=<?php echo $userId ?>" method="post" enctype="multipart/form-data">
+              <form action="/DevProject/upload.php?assignmentId=<?php echo $assCount; ?>&unitId=<?php echo $unitId; ?>&userId=<?php echo $userId ?>" method="post" enctype="multipart/form-data">
                 <input type="file" name="fileToUpload" id="fileToUpload">
                 <input type="submit" value="Submit" name="submit">
               </form>
@@ -236,33 +232,85 @@ $unit = $result->fetch_assoc();
           </tr>
           <tr>
             <th>Mark Assignment: </th>
-            <th><a href="/devproject/php/assigmentMark.php?unitId=<?php echo $_GET['id']; ?>&assignmentId=<?php echo $assTCount; ?>">Mark Assignment</a></th>
+            <th><a href="/devproject/php/assigmentMark.php?unitId=<?php echo $unitId; ?>&assignmentId=<?php echo $assTCount; ?>">Mark Assignment</a></th>
           </tr>
         </table>
       </div>
     <?php } ?>
   </div>
-
+<!-- Invisible div for class info modal  -->
   <div id="classInfoContent" style="display: none;">
-    <div class="centre">
-      <h1>Class Info</h1>
-      <h1><?php echo  $unit["code"] . "   " . $unit["name"]; ?></h1>
-      <p style="margin-top: 12px;"><?php echo  $unit["description"]; ?></p>
+    <div class="centre" id="classInfoDiv">
+      <h1>Unit Info</h1>
+      <h1 style="float: left;" id="classInfoHeader"><?php echo $unit["code"]. ": " . $unit["name"]; ?></h1>
+      <?php if ($role == 2) { ?>
+      <button type="button" class="modal-edit-button" onclick="toggleClassInfoEdit();" style="float: right;">✎ EDIT</button>
+    <?php } ?>
+      <p style="clear: both; margin-top: 12px;" id="classInfoDescr"><?php echo  $unit["description"]; ?></p>
     </div>
+    <?php if ($role == 2) { ?>
+    <div class="centre" style="display: none;" id="classInfoEditDiv">
+      <h1>Unit Info</h1>
+      <input type="text" id="unitCodeEdit" value="<?php echo $unit["code"]; ?>" class="modal-component-title" style="width: 25%;" placeholder="Unit Code..." data-initial="<?php echo $unit["code"]; ?>">
+      <input type="text" id="unitNameEdit" value="<?php echo $unit["name"]; ?>" class="modal-component-title" style="width: 75%;" placeholder="Unit Name..." data-initial="<?php echo $unit["name"]; ?>">
+      <textarea class="modal-component-description" id="unitDescriptionEdit" style="height: 200px;" data-initial="<?php echo $unit["description"]; ?>"><?php echo  $unit["description"]; ?></textarea>
+      <div style="display: flex;">
+        <button type="button" class="save-cancel-btn" onclick="cancelClassInfoEdit();">Cancel</button>
+        <button type="button" class="save-cancel-btn" onclick="saveUnitInfo();">Save Unit</button>
+      </div>
+    </div>
+    <script>
+      function toggleClassInfoEdit() {
+        $("#classInfoDiv").toggle();
+        $("#classInfoEditDiv").toggle();
+      }
+      function cancelClassInfoEdit() {
+        let codeEdit = document.getElementById("unitCodeEdit");
+        codeEdit.value = codeEdit.dataset.initial;
+        let nameEdit = document.getElementById("unitNameEdit");
+        nameEdit.value = nameEdit.dataset.initial;
+        let descEdit = document.getElementById("unitDescriptionEdit");
+        descEdit.value = descEdit.dataset.initial;
+        toggleClassInfoEdit();
+      }
+      function saveUnitInfo() {
+        let codeEdit = document.getElementById("unitCodeEdit");
+        let nameEdit = document.getElementById("unitNameEdit");
+        let descEdit = document.getElementById("unitDescriptionEdit");
+        let formData = new FormData();
+        formData.append("unitId", <?php echo $unitId; ?>);
+        formData.append("code", codeEdit.value);
+        formData.append("name", nameEdit.value);
+        formData.append("description", descEdit.value);
+        postAJAX("php/unit/updateUnit.php", formData).then(()=>{
+          codeEdit.dataset.initial = codeEdit.value;
+          nameEdit.dataset.initial = nameEdit.value;
+          descEdit.dataset.initial = descEdit.value;
+          toggleClassInfoEdit();
+          let unitNameString = codeEdit.value + ": " + nameEdit.value;
+          document.title = codeEdit.value + ": " + nameEdit.value;
+          document.getElementById("classInfoHeader").innerHTML = codeEdit.value + ": " + nameEdit.value;
+          document.getElementById("classInfoDescr").innerHTML = descEdit.value;
+        }, ()=>{
+          alert("There was an error updating this unit...");
+        });
+      }
+    </script>
+    <?php } ?>
     <div class="centre">
       <h1>Participants:</h1>
       <p style="margin: 12px 0;">Below are all of the students and lecturers enrolled in this unit.</p>
-      <?php // Get user's based on unit:
-      $sql = "SELECT uId, firstName, lastName, role, email FROM user u RIGHT JOIN (SELECT uu.userId as uId FROM unitUser uu WHERE unitId = " . intval($unit['id']) . ") uu ON uId = u.id ORDER BY role DESC";
-      $stmt = $dbh->prepare($sql);
-      $stmt->execute();
-      $result = $stmt->get_result();
-      if (!$result) { // if query or database connection fails:
-        echo "404 Unit Not Found";
-        $stmt->close();
-        $dbh->close();
-        exit;
-      } ?>
+      <?php // Get users based on unit:
+        $sql = "SELECT uId, firstName, lastName, role, email FROM user u RIGHT JOIN (SELECT uu.userId as uId FROM unitUser uu WHERE unitId = $unitId) uu ON uId = u.id ORDER BY role DESC";
+        $stmt = $dbh->prepare($sql);
+        $stmt->execute();
+        $result = $stmt->get_result();
+        if (!$result) { // if query or database connection fails:
+            echo "404 Unit Not Found";
+            $stmt->close();
+            $dbh->close();
+            exit;
+        } ?>
       <table class="studentsTable">
         <thead>
           <tr>
@@ -274,19 +322,160 @@ $unit = $result->fetch_assoc();
         <tbody>
           <?php
           while ($user = $result->fetch_assoc()) { ?>
-            <tr>
-              <td><?php echo $user['firstName']; ?> <?php echo $user['lastName']; ?></td>
-              <td><?php echo $user['email']; ?></td>
-              <td><?php if ($user['role'] == 2) {
-                    echo 'Teacher';
-                  } else {
-                    echo 'Student';
-                  } ?></td>
-            </tr>
-          <?php }
-          $stmt->close(); ?>
+          <tr>
+            <td><?php echo $user['firstName']; ?> <?php echo $user['lastName']; ?></td>
+            <td><?php echo $user['email']; ?></td>
+            <td><?php echo ($user['role'] == 2) ? 'Teacher' : 'Student'; ?></td>
+          </tr>
+          <?php } $stmt->close(); ?>
         </tbody>
       </table>
+    </div>
+  </div>
+<!-- Invisible div for unit timetables -->
+  <div id="timetableContent" style="display: none;">
+    <div class="centre" style="text-align: center;">
+        <h1><?php echo $unit['code']; ?> - Timetable</h1>
+        <p style="margin: 12px;">All scheduled classes for this unit can be found below. Join the classes via the provided links below.</p>
+        <?php // Get timetable based on unit
+        $sql = "SELECT id, unitId, classTime, link, details FROM timetable WHERE unitId = ?";
+        $stmt = $dbh->prepare($sql);
+        $stmt->bind_param("i", $unitId);
+        $stmt->execute();
+        $result = $stmt->get_result();
+        if (!$result) { // if query or database connection fails:
+            $stmt->close();
+            exit;
+        } ?>
+        <table class="studentsTable" id="timetableTable">
+          <tr>
+            <th>Class</th>
+            <th>Time</th>
+            <th>Link</th>
+            <th class="classEdit" style="display:none;">Action</th>
+          </tr>
+          <?php while ($timetable = $result->fetch_assoc()) { $ttCheck = true; ?>
+            <tr id="classRecord<?php echo $timetable['id']; ?>" class="classEdit">
+              <td id="classRecordDetails<?php echo $timetable['id']; ?>"><?php echo $timetable['details']; ?></td>
+              <td id="classRecordTime<?php echo $timetable['id']; ?>"><?php echo $timetable['classTime']; ?></td>
+              <td><a href="<?php echo $timetable['link']; ?>" id="classRecordLink<?php echo $timetable['id']; ?>"><?php echo $timetable['link']; ?></a></td>
+            </tr>
+            <?php if ($userRole == 2) { ?>
+            <tr id="classEditRecord<?php echo $timetable['id']; ?>" class="classEdit timetableEditRow" style="display: none;" data-class-id="<?php echo $timetable['id']; ?>">
+              <td><input type="text" value="<?php echo $timetable['details']; ":"?>" id="classEditDetails<?php echo $timetable['id']; ?>"></td>
+              <td><input type="text" value="<?php echo $timetable['classTime']; ":"?>" id="classEditTime<?php echo $timetable['id']; ?>"></td>
+              <td><input type="text" value="<?php echo $timetable['link']; ":"?>" id="classEditLink<?php echo $timetable['id']; ?>"></td>
+              <td><button type="button" class="edit-modal-delete-component" onclick="deleteTimetableClass(this,<?php echo $timetable['id']; ?>);" style="float: none;">Delete</button></td>
+            </tr>
+            <?php } ?>
+          <?php } if (!isset($ttCheck)) { ?>
+            <tr class="classRecordRow">
+              <td colspan="3">There are currently no classes for this unit.</td>
+            </tr>
+          <?php } $stmt->close(); ?>
+        </table>
+        <?php if ($userRole == 2) { ?>
+        <button type="button" class="modal-edit-button classEdit" onclick="toggleTimetableEdit();" style="margin-top: 12px;">✎ Edit</button>
+        <div class="classEdit" style="display: none;">
+          <button type="button" onclick="createTimetableRow();" class="addClassRowBtn">+ Add Row</button>
+          <hr>
+          <button type="button" onclick="cancelTimetableEdit();" class="save-cancel-btn">Cancel</button>
+          <button type="button" onclick="saveTimetable();" class="save-cancel-btn">Save</button>
+        </div>
+        <script>
+          function toggleTimetableEdit() {
+            $(".classEdit").toggle();
+          }
+          function deleteTimetableClass(btn, classId = null) {
+            if (classId != null) {
+              if (!confirm("Are you sure you want to delete this class from the unit timetable? This action will be permanent.")) {
+                return;
+              }
+              let formData = new FormData();
+              formData.append("classId", classId);
+              postAJAX("php/unit/deleteTimetableRecord.php", formData).then(()=>{
+                $(btn).parent().parent().remove();
+                $("#classRecord"+classId).remove();
+              }, ()=>{
+                alert("There was an error deleting this class from the timetable...");
+              });
+            } else {
+              $(btn).parent().parent().remove();
+            }
+          }
+          function cancelTimetableEdit() {
+            $(".timetableEditRow").each(function(index) {
+              const $this = $(this);
+              if ($this.attr("data-class-id")) {
+                let classId = $this.attr("data-class-id");
+                $this.find("#classEditTime" + classId).val(document.getElementById("classRecordTime"+classId).innerHTML);
+                $this.find("#classEditLink" + classId).val(document.getElementById("classRecordLink"+classId).innerHTML);
+                $this.find("#classEditDetails" + classId).val(document.getElementById("classRecordDetails"+classId).innerHTML);
+              }
+            });
+            toggleTimetableEdit();
+          }
+          function createTimetableRow() {
+            var row = $('<tr>').addClass('classEdit timetableEditRow');
+            var detailsInput = $('<input>').attr('class', 'classEditDetails');
+            var timeInput = $('<input>').attr('type', 'text').attr('class', 'classEditTime');
+            var linkInput = $('<input>').attr('type', 'text').attr('class', 'classEditLink');
+            var deleteButton = $('<button>').attr('type', 'button')
+              .addClass('edit-modal-delete-component').text('Delete').css('float', 'none')
+              .on('click', function() {
+                deleteTimetableClass(this);
+              });
+            row.append(
+              $('<td>').append(detailsInput),
+              $('<td>').append(timeInput),
+              $('<td>').append(linkInput),
+              $('<td>').append(deleteButton)
+            );
+            $("#timetableTable").append(row);
+          }
+          function saveTimetable() {
+            let toUpdate = [];
+            let toInsert = [];
+            $(".timetableEditRow").each(function(index) {
+              let data = {};
+              const $this = $(this);
+              if ($this.attr("data-class-id")) {
+                data.classId = $this.attr("data-class-id");
+                data.classTime = $this.find("#classEditTime" + data.classId).val();
+                data.link = $this.find("#classEditLink" + data.classId).val();
+                data.details = $this.find("#classEditDetails" + data.classId).val();
+                let time = document.getElementById("classRecordTime"+data.classId).innerHTML;
+                let link = document.getElementById("classRecordLink"+data.classId).innerHTML;
+                let details = document.getElementById("classRecordDetails"+data.classId).innerHTML;
+                if (time != data.classTime || link != data.link || details != data.details) {
+                  toUpdate.push(data);
+                }
+              } else {
+                data.classTime = $this.find(".classEditTime").val();
+                data.link = $this.find(".classEditLink").val();
+                data.details = $this.find(".classEditDetails").val();
+                toInsert.push(data);
+              }
+            });
+            let jsonObject = [toInsert, toUpdate, <?php echo $unitId; ?>];
+            if (toInsert.length > 0 || toUpdate.length > 0) {
+              if (!confirm("Are you sure you want to save these changes?")) {
+                return;
+              }
+              var formData = new FormData();
+              formData.append("timetableUpdate", JSON.stringify(jsonObject));
+              var promise = postAJAX("php/unit/updateTimetable.php", formData);
+              promise.then(function(data) {
+                window.location.reload();
+              }).catch(function(error) {
+                alert("There was an error saving this unit's timetable...");
+              });
+            } else { // if no changes, just go back:
+              cancelTimetableEdit();
+            }
+          }
+        </script>
+        <?php } ?>
     </div>
   </div>
 
@@ -331,19 +520,19 @@ $unit = $result->fetch_assoc();
     </div>
     <div class="section-heading">
       <span>LEARNING</span>
+      <?php if ($userRole == 2) { ?>
       <div id="tileEditBtn" onclick="toggleTileEdit();">✎ Edit</div>
       <div id="tileSaveBtn" onclick="saveTileArrangement();" style="display:none;">Save Changes</div>
       <div id="tileCancelBtn" onclick="toggleTileEdit(true, true);" style="display:none;">Cancel</div>
+      <?php } ?>
     </div>
     <div class="section-divider"></div>
 
     <div class="weekly-content-container">
       <?php
-      // Get unit's tiles (!!! if not cached):
       $sql = "SELECT id, icon, name, label, description, `order` FROM tile WHERE unitId = ? ORDER BY `order` ASC;";
       $stmt = $dbh->prepare($sql);
-
-      $stmt->bind_param("i", $_GET['id']);
+      $stmt->bind_param("i", $unitId);
       $stmt->execute();
       $result = $stmt->get_result();
       $stmt->close();
@@ -354,8 +543,7 @@ $unit = $result->fetch_assoc();
         exit;
       }
 
-      while ($tile = $result->fetch_assoc()) {
-        //get the count of total tasks for this tile
+      while ($tile = $result->fetch_assoc()) { //get the count of total tasks for this tile:
         $sql = "SELECT COUNT(cn.id) FROM Content cn
               RIGHT JOIN Component cm ON cn.componentId = cm.id
               WHERE cm.tileId = ? AND cn.isTask = 1";
@@ -389,13 +577,12 @@ $unit = $result->fetch_assoc();
           $xpPercentage = ($completedTaskCount / $taskCount) * 100;
           $xpPercentage = floor($xpPercentage);
         }
-
       ?>
         <div class="unitTileDiv" data-initial="<?php echo $tile['order']; ?>">
-          <div class="unitTileHolder" id="<?php echo $tile['id']; ?>" data-tile-name="<?php echo $tile['name']; ?>" data-tile-label="<?php echo $tile['label']; ?>" data-tile-description="<?php echo $tile['description']; ?>">
+          <div class="unitTileHolder" id="unitTileId<?php echo $tile['id']; ?>" data-tile-id="<?php echo $tile['id']; ?>" data-tile-icon="<?php echo $tile['icon']; ?>" data-tile-name="<?php echo $tile['name']; ?>" data-tile-label="<?php echo $tile['label']; ?>" data-tile-description="<?php echo $tile['description']; ?>">
             <div class="unitTile">
               <div class="unitTileIconHolder">
-                <img src="" alt="">
+                <span style="color: <?php echo ($xpPercentage == 100) ? "#007f17" : ($xpPercentage == 0 ? "#ff3d00" : "#00abff"); ?>;"><?php echo sprintf('%02d', $tile['icon']); ?></span>
               </div>
               <div class="unitTileContents">
                 <p class="unitTileTitle"><?php echo $tile['name']; ?></p>
@@ -405,36 +592,219 @@ $unit = $result->fetch_assoc();
             <div class="unitTileXpHolder">
               <p class="unitTileXpLabel">XP:</p>
               <div class="unitTileXpBar">
-                <div class="unitTileXpProgress" style="width:<?php echo $xpPercentage; ?>%;">
-
-                </div>
+                <div class="unitTileXpProgress" style="width:<?php echo $xpPercentage; ?>%;"></div>
               </div>
             </div>
           </div>
-          <div class="unitTileEditCell" style="display: none;">
+          <div class="unitTileEditCell" data-tile-id="<?php echo $tile['id']; ?>" style="display: none;">
             <div class="unitTileIconHolder">
-              <img src="" alt="">
+              <input type="number" value="<?php echo $tile['icon']; ?>" class="editTileIconInput" max="99" min="0">
             </div>
             <div class="unitTileContents">
-              <input type="text" value="<?php echo $tile['name']; ?>" style="color: white;">
-              <input type="text" value="<?php echo $tile['label']; ?>">
+              <input type="text" value="<?php echo $tile['name']; ?>" class="editTileNameInput" style="color: white;">
+              <input type="text" value="<?php echo $tile['label']; ?>" class="editTileLabelInput">
             </div>
             <div class="unitTileGrip">
               <span>: : :</span>
             </div>
+            <div class="deleteTileDiv">
+              <span onclick="deleteTile(this, <?php echo $tile['id']; ?>);">✖</span>
+            </div>
           </div>
         </div>
-      <?php }
-
-      $dbh->close();
-      ?>
+      <?php } $dbh->close(); ?>
+      <button type="button" onclick="addEditTile(this);" class="addTileBtn" style="display: none;">Add Tile</button>
     </div>
+    <?php if ($userRole == 2) { ?>
+    <script>
+      // Tile editing:
+      function toggleTileEdit(close = false, cancel = false) {
+        if (close) {
+          if (cancel) {
+            restoreTileOrder();
+            $(".weekly-content-container").append($(".addTileBtn")); // re-append add tile button to end again.
+          }
+          $(".createdTile").remove();
+          $("#tileEditBtn").show();
+          $("#tileSaveBtn").hide();
+          $("#tileCancelBtn").hide();
+          $(".unitTileHolder").show();
+          $(".unitTileEditCell").hide();
+          $(".addTileBtn").hide();
+        } else {
+          $("#tileEditBtn").hide();
+          $("#tileSaveBtn").show();
+          $("#tileCancelBtn").show();
+          $(".unitTileHolder").hide();
+          $(".unitTileEditCell").show();
+          $(".addTileBtn").show();
+        }
+      }
+      function addEditTile(btn) {
+        var $unitTileEditCell = $('<div>').addClass('unitTileEditCell');
+        var $unitTileIconHolder = $('<div>').addClass('unitTileIconHolder');
+        var $iconInput = $('<input>').attr('type', 'number').attr('value', 0).addClass('editTileIconInput').attr('max', '99').attr('min', '0');
+        $unitTileIconHolder.append($iconInput);
+        var $unitTileContents = $('<div>').addClass('unitTileContents');
+        var $nameInput = $('<input>').attr('type', 'text').attr('placeholder', "Enter name...").addClass('editTileNameInput').css('color', 'white');
+        var $labelInput = $('<input>').attr('type', 'text').attr('placeholder', "Enter label...").addClass('editTileLabelInput');
+        $unitTileContents.append($nameInput, $labelInput);
+        var $unitTileGrip = $('<div>').addClass('unitTileGrip').on("mousedown", function() {
+          primeTileGrip(this);
+        });
+        var $span = $('<span>').text(': : :');
+        $unitTileGrip.append($span);
+        var $deleteTileDiv = $("<div>").addClass("deleteTileDiv");
+        var $deleteSpan = $("<span>").attr("onclick", "deleteTile(this);").text("✖");
+        $deleteTileDiv.append($deleteSpan);
+        $unitTileEditCell.append($unitTileIconHolder, $unitTileContents, $unitTileGrip, $deleteTileDiv);
+        var $unitTileDiv = $("<div>").addClass("unitTileDiv createdTile").on("mouseenter", function() {
+          primeTileDiv(this);
+        });
+        $(".weekly-content-container").append($unitTileDiv.append($unitTileEditCell));
+        $(".weekly-content-container").append($(btn)); // re-append add tile button to end again.
+      }
+      function deleteTile(btn, tileId = null) {
+        if (tileId != null) {
+          if (!confirm("Are you absolutely certain you want to delete this tile? All of its components, content, and tasks will be deleted IMMEDIATELY along with it.")) {
+            return;
+          } else if (!confirm("LAST WARNING. This action will be permanent.")) {
+            return;
+          }
+          let formData = new FormData();
+          formData.append("tileId", tileId);
+          postAJAX("php/unit/deleteUnitTile.php", formData).then(()=>{
+            $("#unitTileId"+tileId).parent().remove();
+          }, ()=>{
+            alert("There was an error deleting this tile. Probably for the best.");
+          });
+        } else {
+          $(btn).parent().parent().parent().remove();
+        }
+      }
+      function saveTileArrangement() {
+        let toUpdate = [];
+        let toInsert = [];
+        $(".unitTileEditCell").each(function(index) {
+          let data = {};
+          const $this = $(this);
+          if ($this.attr("data-tile-id")) {
+            data.tileId = $this.attr("data-tile-id");
+            data.icon = $this.find(".editTileIconInput").val();
+            data.name = $this.find(".editTileNameInput").val();
+            data.label = $this.find(".editTileLabelInput").val();
+            data.order = $this.parent().index();
+            let tile = document.getElementById("unitTileId"+data.tileId);
+            let order = tile.parentElement.dataset.initial;
+            if (data.icon != tile.dataset.tileIcon || data.name != tile.dataset.tileName || data.label != tile.dataset.tileLabel || data.order != order) {
+              toUpdate.push(data);
+            }
+          } else {
+            data.icon = $this.find(".editTileIconInput").val();
+            data.name = $this.find(".editTileNameInput").val();
+            data.label = $this.find(".editTileLabelInput").val();
+            data.order = $this.parent().index();
+            toInsert.push(data);
+          }
+        });
+        let jsonObject = [toInsert, toUpdate, <?php echo $unitId; ?>];
+        if (toInsert.length > 0 || toUpdate.length > 0) {
+          console.log(jsonObject);
+          if (!confirm("Are you sure you want to save these changes?")) {
+            return;
+          }
+          var formData = new FormData();
+          formData.append("tilesUpdate", JSON.stringify(jsonObject));
+          var promise = postAJAX("php/unit/updateTiles.php", formData);
+          promise.then(function(data) {
+            window.location.reload();
+          }).catch(function(error) {
+            alert("There was an error saving this unit's tiles...");
+          });
+        } else { // if no changes, just go back:
+          toggleTileEdit(true);
+        }
+      }
+      // tile drag & dropping:
+      var tileDragging = false;
+      var activeTile;
+      var tileDragIndex;
+      var tileOffset;
+      function primeTileDiv(div) {
+        let tile = $(div);
+        if (tileDragging && tile.index() != tileDragIndex) {
+          if (tile.index() < tileDragIndex) {
+            tile.before(activeTile.parent());
+            tileDragIndex = activeTile.parent().index();
+          } else {
+            tile.after(activeTile.parent());
+            tileDragIndex = activeTile.parent().index();
+          }
+        }
+      }
+      function primeTileGrip(grip) {
+        activeTile = $(grip).parent();
+        activeTile.width(activeTile.width());
+        tileDragIndex = activeTile.parent().index();
+        activeTile.parent().width(activeTile.parent().width());
+        activeTile.parent().height(activeTile.parent().height());
+        let startPos = activeTile.offset();
+        tileOffset = {x: event.pageX - startPos.left, y: event.pageY - startPos.top};
+        activeTile.addClass('tileDragging');
+        tileDragging = true;
+      }
+      $(function() {
+        $(".unitTileDiv").on("mouseenter", function(event){
+          primeTileDiv(this);
+        });
+        $(".unitTileGrip").on('mousedown', function(event) {
+          primeTileGrip(this);
+        });
+      });
+      $(document).on('mouseup', function() {
+        if (tileDragging) {
+          activeTile.removeClass('tileDragging');
+          activeTile.css({
+            width: "",
+            left: "",
+            top: ""
+          });
+          activeTile.parent().css({
+            width: "",
+            height: ""
+          });
+          tileDragging = false;
+        }
+      });
+      $(document).on("mousemove", function(event) {
+        if (tileDragging) {
+          var mouseX = event.pageX - tileOffset.x;
+          var mouseY = event.pageY - tileOffset.y;
+          activeTile.css({
+              left: mouseX + "px",
+              top: mouseY + "px"
+          });
+        }
+      });
+      function restoreTileOrder() {
+        let parent = $(".weekly-content-container");
+        let items = $('.unitTileDiv').toArray();
+        items.sort(function(a, b) {
+            var indexA = $(a).attr('data-initial');
+            var indexB = $(b).attr('data-initial');
+            return indexA - indexB;
+        });
+        $.each(items, function(index, element) {
+            parent.append(element);
+        });
+      }
+      <?php } ?>
+    </script>
   </div>
   <script>
     //select all the tiles
     const tiles = document.querySelectorAll(".unitTileHolder");
     const navTiles = document.querySelectorAll(".nav-tile");
-
     //loop through each tile and assign onclick function
     tiles.forEach(tile => {
       //store boolean to show if the modal has been created already to avoid loading more than once if tile is clicked more than once
@@ -443,7 +813,7 @@ $unit = $result->fetch_assoc();
       tile.addEventListener("click", function() {
         //if modal has already been loaded -> change visiblity
         if (contentLoaded) {
-          const thisModalContainer = document.querySelector("#modalContainer" + tile.id + ".modal");
+          const thisModalContainer = document.querySelector("#modalContainer" + tile.dataset.tileId + ".modal");
           thisModalContainer.style.display = "block";
 
           window.onclick = function(event) {
@@ -454,10 +824,9 @@ $unit = $result->fetch_assoc();
           //if modal is not yet created -> create and make visible
         } else {
           loadModalFrame(tile, false);
-
           //Add edit button for lecturer
-          if (<?php echo $userRole['role']; ?> == 2) { // perform role management in session.php and never send these functions to the students !!!
-            const thisModalContainer = document.querySelector("#modalContainer" + tile.id + ".modal");
+          if (<?php echo $userRole; ?> == 2) { // perform role management in session.php and never send these functions to the students !!!
+            const thisModalContainer = document.querySelector("#modalContainer" + tile.dataset.tileId + ".modal");
             const thisModalContent = thisModalContainer.childNodes[0];
             var editButton = document.createElement('div');
             editButton.className = "modal-edit-button";
@@ -467,15 +836,14 @@ $unit = $result->fetch_assoc();
             editButton.addEventListener("click", function() {
               thisModalContainer.style.display = "none";
               loadModalFrame(tile, true);
-              getTileContents(tile.id, "#editModalCont" + tile.id, true);
+              getTileContents(tile.dataset.tileId, "#editModalCont" + tile.dataset.tileId, true);
             });
           }
           contentLoaded = true;
         }
-        getTileContents(tile.id, "#modalCont" + tile.id, false);
+        getTileContents(tile.dataset.tileId, "#modalCont" + tile.dataset.tileId, false);
       })
     });
-
     navTiles.forEach(navTile => {
       //store boolean to show if the modal has been created already to avoid loading more than once if tile is clicked more than once
       var contentLoaded = false;
@@ -496,13 +864,12 @@ $unit = $result->fetch_assoc();
         }
       })
     });
-
     function loadModalFrame(tile, isEdit) {
       var modalContainer = document.createElement('div');
       modalContainer.className = "modal";
-      modalContainer.id = "modalContainer" + (isEdit ? "Edit" : "") + tile.id;
+      modalContainer.id = "modalContainer" + (isEdit ? "Edit" : "") + tile.dataset.tileId;
       var modalContent = document.createElement('div');
-      modalContent.id = (isEdit ? "editModalCont" : "modalCont") + tile.id;
+      modalContent.id = (isEdit ? "editModalCont" : "modalCont") + tile.dataset.tileId;
       modalContent.className = "modal-content";
       var closeButton = document.createElement('span');
       closeButton.className = "close";
@@ -511,7 +878,6 @@ $unit = $result->fetch_assoc();
       document.body.appendChild(modalContainer);
       modalContainer.appendChild(modalContent);
       modalContent.appendChild(closeButton);
-
       //Title section
       var contentHeading = document.createElement('div');
       contentHeading.className = "modal-unit-heading";
@@ -523,22 +889,22 @@ $unit = $result->fetch_assoc();
       contentDescription.textContent = tile.dataset.tileDescription;
       modalContent.appendChild(contentDescription);
 
-      //Weekly Quest section
-      var weeklyQuestContainer = document.createElement('div');
-      weeklyQuestContainer.className = "modal-weekly-quest-container";
-      modalContent.appendChild(weeklyQuestContainer);
+      if (!isEdit) {
+        //Weekly Quest section
+        var weeklyQuestContainer = document.createElement('div');
+        weeklyQuestContainer.className = "modal-weekly-quest-container";
+        modalContent.appendChild(weeklyQuestContainer);
 
-      var weeklyQuestTitle = document.createElement('div');
-      weeklyQuestTitle.className = "modal-weekly-quest-title";
-      weeklyQuestTitle.textContent = "Weekly Quest!";
-      weeklyQuestContainer.appendChild(weeklyQuestTitle);
+        var weeklyQuestTitle = document.createElement('div');
+        weeklyQuestTitle.className = "modal-weekly-quest-title";
+        weeklyQuestTitle.textContent = "Weekly Quest!";
+        weeklyQuestContainer.appendChild(weeklyQuestTitle);
 
-      var weeklyQuest = document.createElement('div');
-      weeklyQuest.className = "modal-weekly-quest";
-      weeklyQuest.id = "wq" + tile.id;
-      weeklyQuest.textContent = "Do some stuff and learn some thing.";
-      weeklyQuestContainer.appendChild(weeklyQuest);
-
+        var weeklyQuest = document.createElement('div');
+        weeklyQuest.className = "modal-weekly-quest";
+        weeklyQuest.id = "wq" + tile.dataset.tileId;
+        weeklyQuestContainer.appendChild(weeklyQuest);
+      }
       modalContainer.style.display = "block";
       //close modal functions
       if (isEdit) {
@@ -556,9 +922,7 @@ $unit = $result->fetch_assoc();
           }
         }
       }
-
     }
-
     //load modal for each nav tile
     function loadNavTileModal(navTile) {
       //load empty modal
@@ -601,28 +965,22 @@ $unit = $result->fetch_assoc();
         //assHolder.append($("#assTeacherContent").show());
 
         //PRODUCTION IF
-
-        if (<?php echo $userRole['role']; ?> == 2) {
+        /*
+        if (<?php echo $userRole; ?> == 2){
           assHolder.append($("#assTeacherContent").show());
         } else {
           assHolder.append($("#assContent").show());
         }
-
-
-
+        */
       }
-
       if (navTile.id == "classinfo") {
-        console.log("loadNavTile classinfo");
         var cInfoHolder = $("#modalContclassinfo");
         cInfoHolder.append($("#classInfoContent").show());
       }
-
       if (navTile.id == "timetable") {
-        console.log("loadNavTile timetable");
-        //!!! fill out with appropriate content
+        var timetableHolder = $("#modalConttimetable");
+        timetableHolder.append($("#timetableContent").show());
       }
-
       //make modal closeable
       closeButton.onclick = function() {
         modalContainer.style.display = "none";
@@ -633,7 +991,6 @@ $unit = $result->fetch_assoc();
         }
       }
     }
-
     // fetch tile component & contents:
     function getTileContents(id, parent, isEdit) {
       var formData = new FormData();
@@ -649,7 +1006,6 @@ $unit = $result->fetch_assoc();
         console.error('Error:', error); // !!! better solution
       });
     }
-
     // constructs the tile's components & content from JSON objects:
     function unpackTileJSON(data, parent, tileId) {
       $("#wq" + tileId).html("");
@@ -700,9 +1056,8 @@ $unit = $result->fetch_assoc();
           }
           contentHolder.append(taskBtn);
         }
-
         if (ele.type == 2) {
-          content.attr('href', 'files/<?php echo $unit['id']; ?>/content/' + ele.url);
+          content.attr('href', 'files/<?php echo $unitId; ?>/content/' + ele.url);
           content.attr('download', ele.url);
         } else if (ele.type == 3) {
           content.attr('href', "https://" + ele.url); // !!! this should be more adaptable
@@ -748,7 +1103,6 @@ $unit = $result->fetch_assoc();
         });
       });
     }
-
     function createComment(parent, tileId) {
       comment = $("#commentInput" + tileId).val();
 
@@ -762,11 +1116,10 @@ $unit = $result->fetch_assoc();
         alert("There was an error submitting this comment.")
       });
     }
-
     function generateComment(tileId, data) {
       let name = data.name;
       let message = data.comment;
-      let date = "!!! we need a date column";
+      let date = data.postDate;
       var comment = $("<div id='comment" + data.cid + "'>").addClass("comment");
       var iconElement = $("<div>").addClass("commentIcon");
       if (data.role == 2) {
@@ -778,7 +1131,6 @@ $unit = $result->fetch_assoc();
       comment.append(iconElement, nameElement, dateElement, messageElement);
       $("#commentHolder" + tileId).append(comment);
     }
-
     // Task ticking & unticking:
     function toggleTask(id) {
       let task = $("#task" + id);
@@ -793,7 +1145,6 @@ $unit = $result->fetch_assoc();
         return false;
       }
     }
-
     function requestTaskToggle(id, tileId) {
       let state = toggleTask(id);
       var formData = new FormData();
@@ -847,7 +1198,6 @@ $unit = $result->fetch_assoc();
       addBtnHolder.append($("<div>").addClass("add-content-btn").attr("id", "add-content-btn" + data.id).html("+"));
       addBtnHolder.append($("<div>").addClass("add-content-btn-label").html("Add Content"));
       addBtnHolder.append($("<div>").addClass("edit-modal-delete-component").html("Delete").attr("onclick", "deleteComponent(" + data.id + ");"));
-
       /// Create condensed modal:
       let dragArea = $("#compDragArea");
       let condensedCompHolder = $("<div>").addClass("dragCompHolder").attr("id", "dragCompHolder" + data.id).data("initial", data.order);
@@ -888,6 +1238,8 @@ $unit = $result->fetch_assoc();
         activeComp.addClass('compDragging');
         dragging = true;
       });
+
+      console.log("HUH");
     }
     var dragging = false;
     $(document).ready(function() {
@@ -943,7 +1295,6 @@ $unit = $result->fetch_assoc();
         };
         currentCompId--;
       }
-
       let contentHolder = $("<div>").attr("id", "editContent" + ele.id).addClass("edit-content-holder").data("initial", ele.order);
       let typeRow = $("<div>").addClass("edit-content-row-type");
       typeRow.append($("<div>").addClass("edit-content-label").html("Type:"));
@@ -1005,10 +1356,10 @@ $unit = $result->fetch_assoc();
       holder.append(toggleHolder);
 
       var componentsArray = JSON.parse(data.components);
+      holder.append($("<div id='compDragArea'>"));
       if (!componentsArray) {
         return;
       }
-      holder.append($("<div id='compDragArea'>"));
       componentsArray.forEach(function(ele) {
         createEditableComponent(holder, ele);
       });
@@ -1020,10 +1371,7 @@ $unit = $result->fetch_assoc();
         createEditableContent(ele);
       });
     }
-
-    <?php if ($userRole['role'] == 2) { // lecturer only functions:
-    ?>
-
+    <?php if ($userRole == 2) { // lecturer only functions: ?>
       function deleteComponent(compId) {
         if (!confirm("Are you sure you want to delete this component? All its associated content will be deleted with it.")) {
           return;
@@ -1043,7 +1391,6 @@ $unit = $result->fetch_assoc();
           alert("There was an error deleting this component, please try again later."); // !!! ^^^
         });
       }
-
       function deleteContent(contId) {
         if (!confirm("Are you sure you want to delete this content?")) {
           return;
@@ -1063,13 +1410,11 @@ $unit = $result->fetch_assoc();
           alert("There was an error deleting this content, please try again later.");
         });
       }
-
       function saveTile(tileId) {
         // get all elements required:
         let modal = $("#editModalCont" + tileId);
         let componentHolders = modal.find(".modal-component.edit-field");
         let contentHolders = modal.find(".edit-content-holder");
-
         // manage component changes:
         var componentArray = [];
         componentHolders.each(function() {
@@ -1078,7 +1423,6 @@ $unit = $result->fetch_assoc();
           let modified = false;
           component.tileId = tileId;
           component.compId = (ele.attr("id")).match(/-?\d+$/)[0]; // get component's id from the element's id string.
-
           // get other component attributes, but only if they've changed:
           let title = $(ele.find(".modal-component-title")[0]);
           if (title.val().trim() != ensureString(title.data("initial"))) {
@@ -1095,7 +1439,6 @@ $unit = $result->fetch_assoc();
             component.order = draggedComp.index();
             modified = true;
           }
-
           // append to data for insertion:
           if (modified) {
             componentArray.push(component);
@@ -1108,7 +1451,6 @@ $unit = $result->fetch_assoc();
           let content = {};
           let modified = false;
           content.contId = (ele.attr("id")).match(/-?\d+$/)[0]; // get component's id from the element's id string.
-
           // get other component attributes, but only if they've changed:
           let contentType = $(ele.find(".edit-content-field")[0]);
           if (contentType.val() != contentType.data("initial")) {
@@ -1136,13 +1478,11 @@ $unit = $result->fetch_assoc();
             modified = true;
           }
           content.componentId = (ele.parent().attr("id")).match(/-?\d+$/)[0];
-
           // append to data for insertion:
           if (modified) {
             contentArray.push(content);
           }
         });
-
         // convert to JSON and send for processing:
         if (componentArray.length > 0 || contentArray.length > 0) {
           if (!confirm("Are you sure you want to save these changes?")) {
@@ -1157,7 +1497,6 @@ $unit = $result->fetch_assoc();
           formData.append("tileUpdateJSON", JSON.stringify(jsonData));
           var promise = postAJAX("php/tiles/saveTile.php", formData);
           promise.then(function(data) {
-            alert("Tile successfully updated.");
             $("#modalContainerEdit" + tileId).remove(); // !!! reload tile too
           }).catch(function(error) {
             alert("There was an error saving this tile's components & content, please try again later.");
@@ -1167,115 +1506,11 @@ $unit = $result->fetch_assoc();
           document.querySelector('#modalContainer' + tileId).style.display = 'block';
         }
       }
-
       // converts any null values to empty strings:
       function ensureString(input) {
         return input === null ? "" : String(input);
       }
-
-      // Tile editing:
-      function toggleTileEdit(close = false, cancel = false) {
-        if (close) {
-          if (cancel) {
-            restoreTileOrder()
-          }
-          $("#tileEditBtn").show();
-          $("#tileSaveBtn").hide();
-          $("#tileCancelBtn").hide();
-          $(".unitTileHolder").show();
-          $(".unitTileEditCell").hide();
-        } else {
-          $("#tileEditBtn").hide();
-          $("#tileSaveBtn").show();
-          $("#tileCancelBtn").show();
-          $(".unitTileHolder").hide();
-          $(".unitTileEditCell").show();
-        }
-      }
-
-      // tile saving:
-      function saveTileArrangement() {
-        if (!confirm("Are you sure you want to save these changes?")) {
-          return;
-        }
-        $('.unitTileDiv').each(function() { // set data attributes to new defaults following save.
-          $(this).attr("data-initial", $(this).index());
-        });
-        toggleTileEdit(true);
-      }
-
-      // tile drag & dropping:
-      var tileDragging = false;
-      var activeTile;
-      var tileDragIndex;
-      var tileOffset;
-      $(function() {
-        $(".unitTileDiv").on("mouseenter", function(event) {
-          let tile = $(this);
-          if (tileDragging && tile.index() != tileDragIndex) {
-            if (tile.index() < tileDragIndex) {
-              tile.before(activeTile.parent());
-              tileDragIndex = activeTile.parent().index();
-            } else {
-              tile.after(activeTile.parent());
-              tileDragIndex = activeTile.parent().index();
-            }
-          }
-        });
-        $(".unitTileGrip").on('mousedown', function(event) {
-          activeTile = $(this).parent();
-          activeTile.width(activeTile.width());
-          tileDragIndex = activeTile.parent().index();
-          activeTile.parent().width(activeTile.parent().width());
-          activeTile.parent().height(activeTile.parent().height());
-          let startPos = activeTile.offset();
-          tileOffset = {
-            x: event.pageX - startPos.left,
-            y: event.pageY - startPos.top
-          };
-          activeTile.addClass('tileDragging');
-          tileDragging = true;
-        });
-      });
-      $(document).on('mouseup', function() {
-        if (tileDragging) {
-          activeTile.removeClass('tileDragging');
-          activeTile.css({
-            width: "",
-            left: "",
-            top: ""
-          });
-          activeTile.parent().css({
-            width: "",
-            height: ""
-          });
-          tileDragging = false;
-        }
-      });
-      $(document).on("mousemove", function(event) {
-        if (tileDragging) {
-          var mouseX = event.pageX - tileOffset.x;
-          var mouseY = event.pageY - tileOffset.y;
-          activeTile.css({
-            left: mouseX + "px",
-            top: mouseY + "px"
-          });
-        }
-      });
-
-      function restoreTileOrder() {
-        let parent = $(".weekly-content-container");
-        let items = $('.unitTileDiv').toArray();
-        items.sort(function(a, b) {
-          var indexA = $(a).attr('data-initial');
-          var indexB = $(b).attr('data-initial');
-          return indexA - indexB;
-        });
-        $.each(items, function(index, element) {
-          parent.append(element);
-        });
-      }
-    <?php } ?>
+      <?php } ?>
   </script>
 </body>
 

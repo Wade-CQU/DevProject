@@ -5,8 +5,6 @@ $tileId = intval($_POST['tileId']);
 $contentId = intval($_POST['contentId']);
 $state = intval(isset($_POST['taskState']));
 
-// time cache feature !!!
-
 // Determine task togglablitity & perform toggle:
 $sql = "INSERT INTO taskCompletion (contentId, userId, isComplete, tileId)
         VALUES ($contentId, $userId, $state, $tileId)

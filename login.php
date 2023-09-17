@@ -34,7 +34,7 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
     //Validation
     if(empty($username_err) && empty($password_err)){
         //SQL statement
-        $sql = "SELECT id, email, password FROM user WHERE email = ?";
+        $sql = "SELECT id, email, password, role FROM user WHERE email = ?";
         if($stmt = mysqli_prepare($dbh, $sql)){
             //Bind variables to the prepared statement
             mysqli_stmt_bind_param($stmt, "s", $username);
@@ -49,7 +49,7 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
                 //Check if username exists, if yes then verify password
                 if(mysqli_stmt_num_rows($stmt) == 1){
                     //BIND RESULT
-                    mysqli_stmt_bind_result($stmt, $id, $username, $hashed_password);
+                    mysqli_stmt_bind_result($stmt, $id, $username, $hashed_password, $role);
                     if(mysqli_stmt_fetch($stmt)){
                         if(password_verify($password, $hashed_password)){
                             //password is correct, so start a new session
@@ -57,6 +57,7 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
                             $_SESSION["loggedin"] = true;
                             $_SESSION["id"] = $id;
                             $_SESSION["username"] = $username;
+                            $_SESSION["role"] = $role;
 
                             //redirect user to welcome page
                             header("location: term.php");
@@ -64,7 +65,7 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
                             //Password is net valid, display a generic error message
                             $password_err = "Invalid Password";
                         }
-                    } 
+                    }
                 } else {
                     //Username doesn't exist, display a generic error message
                     $password_err = "Invalid username or password";
@@ -98,13 +99,13 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
 <body>
     <div class="backgroundComponents">
         <img src="assets/Pluto-svg.svg" class="pluto-svg floatInSpace">
-        <img src="assets/ShiningStar.svg" class="shining-star-svg">  
-        <div class="glow glowing"></div> 
+        <img src="assets/ShiningStar.svg" class="shining-star-svg">
+        <div class="glow glowing"></div>
     </div>
-    <?php 
+    <?php
         if(!empty($login_err)){
             echo '<div class="alert alert-danger">' . $login_err . '</div>';
-        }        
+        }
     ?>
 
     <form action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>" method="post">
@@ -117,7 +118,7 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
             <label>Username</label>
             <input type="text" name="username" class="form-control <?php echo (!empty($username_err)) ? 'is-invalid' : ''; ?>" value="<?php echo $username; ?>">
             <span class="invalid-feedback"><?php echo $username_err; ?></span>
-        </div>    
+        </div>
         <div class="form-group">
             <label>Password</label>
             <input type="password" name="password" class="form-control <?php echo (!empty($password_err)) ? 'is-invalid' : ''; ?>">

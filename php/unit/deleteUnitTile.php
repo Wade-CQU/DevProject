@@ -2,10 +2,10 @@
 require("../session.php");
 require("../dbConnect.php");
 
-$contentId = intval($_POST['contentId']);
+$tileId = intval($_POST['tileId']);
 
-// Delete the content:
-$sql = "DELETE FROM content WHERE ID = $contentId;";
+// Delete the tile:
+$sql = "DELETE FROM tile WHERE id = $tileId;";
 $stmt = $dbh->prepare($sql);
 $stmt->execute();
 $stmt->close();
