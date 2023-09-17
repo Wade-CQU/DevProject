@@ -978,19 +978,11 @@ $unit = $result->fetch_assoc();
       if (navTile.id == "assignments") {
         console.log("loadNavTile assignments");
         var assHolder = $("#modalContassignments");
-
-        //TESTING STUFF
-        assHolder.append($("#assContent").show());
-        //assHolder.append($("#assTeacherContent").show());
-
-        //PRODUCTION IF
-        /*
                 if (<?php echo $userRole; ?> == 2){
                   assHolder.append($("#assTeacherContent").show());
                 } else{
                   assHolder.append($("#assContent").show());
                 }
-        */
       }
       if (navTile.id == "classinfo") {
         var cInfoHolder = $("#modalContclassinfo");
