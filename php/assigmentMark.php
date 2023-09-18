@@ -10,9 +10,9 @@ $assignmentId = $_GET['assignmentId'];
 $count = 0;
 
 //Get data for Assignment
-$sql = "SELECT id, unitId, due, total, description, specification FROM assignments WHERE unitId = ?";
+$sql = "SELECT id, unitId, due, total, description, specification FROM assignments WHERE `order` = ?";
 $stmt = $dbh->prepare($sql);
-$stmt->bind_param("i", $unitId);
+$stmt->bind_param("i", $assignmentId);
 $stmt->execute();
 $result = $stmt->get_result();
 $stmt->close();
