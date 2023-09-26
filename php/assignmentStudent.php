@@ -78,6 +78,7 @@ $files1 = scandir($dir);
         </table>
     </div>
 
+    
     <div class="centre">
         <table class="centre-allign" style="color:white">
             <tr>
@@ -96,14 +97,8 @@ $files1 = scandir($dir);
                 </th>
             </tr>
             <tr>
-                <th>-</th>
-            </tr>
-            <tr>
                 <th>SubmissionDate: </th>
                 <th><?php echo $submission['submitDate'] ?></th>
-            </tr>
-            <tr>
-                <th>-</th>
             </tr>
             <tr>
                 <th>Student submission: </th>
@@ -120,9 +115,6 @@ $files1 = scandir($dir);
                 </th>
             </tr>
             <tr>
-                <th>-</th>
-            </tr>
-            <tr>
                 <th>Mark Assignment:</th>
                 <th>
                     <!-- <form action="assignmentGrade.php" method="post" id="gradeForm"> -->
@@ -134,18 +126,12 @@ $files1 = scandir($dir);
                 </th>
             </tr>
             <tr>
-                <th>-</th>
-            </tr>
-            <tr>
                 <th>Leave a comment:</th>
                 <th>
                     <label>Leave a comment for the Student:</label></br>
                     <textarea id="comment" name="comment" rows="6" cols="50"><?php echo $submission['comment'] ?></textarea>
                     <!-- </form> -->
                 </th>
-            </tr>
-            <tr>
-                <th>-</th>
             </tr>
             <tr>
                 <th>Upload Marking Sheet:</th>
@@ -172,6 +158,10 @@ $files1 = scandir($dir);
 
 </html>
 
+
+
+
+
 <script>
     submitForms = function() {
         //document.getElementById("gradeForm").submit();
@@ -183,29 +173,35 @@ $files1 = scandir($dir);
 <style>
     .centre {
         margin: auto;
-        width: 50%;
+        width: 70%;
         border: 3px solid orange;
         padding: 10px;
     }
 
+    .centre tr {
+        border-collapse: collapse;
+        border: 3px solid orange;
+    }
+
     .centre-allign {
-        margin: auto;
+        margin-right: auto;
+        margin-left: auto;
+        margin-top: 30px;
+        margin-bottom: 30px;
         width: 90%;
     }
 
-    .boarder {
-        padding: 10px;
-        border-bottom: 2px solid #8ebf42;
+    .centre-allign tr:nth-child(odd) {
+        background-color: rgba(255, 255, 255, 0.1);
     }
 
-    .th {
-        padding: 10px;
-        border-bottom: 2px solid #8ebf42;
-        text-align: center;
+    .centre-allign tr:nth-child(even) {
+        background-color: rgba(255, 255, 255, 0.2);
     }
 
-    .blank_row {
-        height: 100px !important;
-        /* overwrites any other rules */
-    }
+    .grade-button {
+        padding: 10px;
+        margin: 4px;
+    } 
+
 </style>
