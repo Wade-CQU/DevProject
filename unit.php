@@ -102,12 +102,12 @@ $unit = $result->fetch_assoc();
     while ($assignment = $assResult->fetch_assoc()) {
       $assCount++;
     ?>
-      <div>
-        <table class="assignment-table">
-          <tr>
-            <th>Assignment #</th>
-            <th><?php echo $assCount; ?></th>
-          </tr>
+      <div id="assignmentTableContainer">
+        <div class="assignment-label-container">
+          <div class="assignment-label">Assignment <?php echo $assCount; ?></div>
+          <div class="assignment-collapse-button" id="<?php echo $assCount; ?>">⇧</div>
+        </div>
+        <table class="assignment-table" id="student-assignment-table-<?php echo $assCount; ?>">
           <tr>
             <th>Description: </th>
             <th><?php echo $assignment['description']; ?></th>
@@ -204,11 +204,11 @@ $unit = $result->fetch_assoc();
       $assTCount++;
     ?>
       <div>
+      <div class="assignment-label-container">
+          <div class="assignment-label">Assignment <?php echo $assTCount; ?></div>
+          <div class="assignment-collapse-button">⇧</div>
+        </div>
         <table class="assignment-table">
-          <tr>
-            <th>Assignment #</th>
-            <th><?php echo $assTCount; ?></th>
-          </tr>
           <tr>
             <th>Description: </th>
             <th><?php echo $assignment['description']; ?></th>
@@ -737,6 +737,9 @@ $unit = $result->fetch_assoc();
             toggleTileEdit(true);
           }
         }
+
+
+        
         // tile drag & dropping:
         var tileDragging = false;
         var activeTile;
@@ -820,6 +823,19 @@ $unit = $result->fetch_assoc();
       </script>
   </div>
   <script>
+    //Assignment modal dropdowns
+    const assignmentTableCollapseButtons = document.querySelectorAll('.assignment-collapse-button');
+    assignmentTableCollapseButtons.forEach(function(collapseButton) {
+      collapseButton.addEventListener('click', function() {
+        const childAssignmentTable = document.getElementById(`student-assignment-table-${collapseButton.id}`);
+        childAssignmentTable.classList.toggle('collapedContainer');
+        if(collapseButton.textContent === '⇧'){
+          collapseButton.textContent = '⇩';
+        } else {
+          collapseButton.textContent = '⇧';
+        }
+      });
+    });
     //select all the tiles
     const tiles = document.querySelectorAll(".unitTileHolder");
     const navTiles = document.querySelectorAll(".nav-tile");

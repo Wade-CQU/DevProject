@@ -89,11 +89,11 @@ textarea {
 }
 
 .weekly-content-container {
-    display: flex;
-    flex-wrap: wrap;
-    column-gap: 20px;
-    justify-content: space-evenly;
-    align-items: center;
+  display: flex;
+  flex-wrap: wrap;
+  column-gap: 20px;
+  justify-content: space-evenly;
+align-items: center;
 }
 
 .flexbox {
@@ -175,7 +175,7 @@ textarea {
   width: 80px;
   min-width: 80px;
   vertical-align: middle;
-  justify-content: center;
+justify-content: center;
   align-items: center;
 }
 .unitTileIconHolder span {
@@ -589,7 +589,7 @@ table.studentsTable tr:hover td {
   user-select: none;
   letter-spacing: 2px;
   cursor: pointer;
-  background: transparent;
+background: transparent;
 }
 #tileSaveBtn:hover, #tileCancelBtn:hover, #tileEditBtn:hover, .addTileBtn:hover {
   background: #ff230061;
@@ -666,7 +666,6 @@ table.studentsTable tr:hover td {
   border: 4px dashed #181818;
   margin-bottom: 30px;
 }
-
 .unitTileContents input {
   background: #303339;
   color: #11d7f2;
@@ -680,7 +679,7 @@ table.studentsTable tr:hover td {
     padding: 0 4px;
     font-weight: bold;
     color: #ffee00;
-    z-index: 1;
+z-index: 1;
     margin: 16px 0;
     white-space: nowrap;
     display: flex;
@@ -693,24 +692,51 @@ table.studentsTable tr:hover td {
 }
 /* Assignment Modal */
 .assignment-table{
-  margin-right: auto;
-  margin-left: auto;
-  margin-top: 50px;
   margin-bottom: 80px;
 }
 .assignment-table tr th:nth-child(even) {
   padding-left: 20px;
   color: white;
+  width: 100%;
 }
 .assignment-table tr th:nth-child(odd) {
   padding-left: 20px;
   color: #FF7700;
+  width: 100px;
 }
 .assignment-table tr th {
   text-align: left;
-  padding: 7px;
-  border-bottom: 1px solid #ddd;
+  padding: 6px;
+  background-color: #363739;
 }
+.assignment-label-container{
+  margin-top: 50px;
+  padding: 10px;
+  background-color: rgba(255, 255, 255, 0.2);
+  display: flex;
+  justify-content: space-between;
+}
+.assignment-label{
+  font-size: 25px;  
+}
+.assignment-collapse-button{
+  padding: 4px;
+  margin-right: 3px;
+  color: #FF7700;
+  cursor: pointer;
+}
+.assignment-table-container{
+  margin-left: 30px;
+  margin-right: 30px;
+}
+.assignment-table-container{
+  background-color: rgb(129, 255, 129);
+}
+.collapedContainer{
+  display: none;
+  height: 0px;
+}
+
 
 /* */
 .modal-content-item:hover {
