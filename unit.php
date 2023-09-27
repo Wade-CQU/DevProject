@@ -107,7 +107,7 @@ $unit = $result->fetch_assoc();
           <div class="assignment-label">Assignment <?php echo $assCount; ?></div>
           <div class="assignment-collapse-button" id="<?php echo $assCount; ?>">⇧</div>
         </div>
-        <table class="assignment-table" id="student-assignment-table-<?php echo $assCount; ?>">
+        <table class="assignment-table" id="assignment-table-<?php echo $assCount; ?>">
           <tr>
             <th>Description: </th>
             <th><?php echo $assignment['description']; ?></th>
@@ -149,9 +149,9 @@ $unit = $result->fetch_assoc();
               </form>
             </th>
           </tr>
-          <tr>
+          <tr >
             <th>Status: </th>
-            <th>
+            <th id="submission-status-<?php echo $assCount; ?>">
               <?php
 
               $sql = "SELECT status, grade, comment FROM submission WHERE userId = ? AND assignmentsId = ?";
@@ -206,9 +206,9 @@ $unit = $result->fetch_assoc();
       <div>
       <div class="assignment-label-container">
           <div class="assignment-label">Assignment <?php echo $assTCount; ?></div>
-          <div class="assignment-collapse-button">⇧</div>
+          <div class="assignment-collapse-button" id="<?php echo $assTCount; ?>">⇧</div>
         </div>
-        <table class="assignment-table">
+        <table class="assignment-table" id="lecturer-assignment-table-<?php echo $assTCount; ?>">
           <tr>
             <th>Description: </th>
             <th><?php echo $assignment['description']; ?></th>
@@ -826,9 +826,18 @@ $unit = $result->fetch_assoc();
     //Assignment modal dropdowns
     const assignmentTableCollapseButtons = document.querySelectorAll('.assignment-collapse-button');
     assignmentTableCollapseButtons.forEach(function(collapseButton) {
+      const lecturerChildAssignmentTable = document.getElementById(`lecturer-assignment-table-${collapseButton.id}`);
+      const childAssignmentTable = document.getElementById(`assignment-table-${collapseButton.id}`);
+      const str = document.getElementById(`submission-status-${collapseButton.id}`).innerText.trim();
+      if(str !== 'Not submitted.'){
+        const parentDiv = childAssignmentTable.parentNode;
+        parentDiv.classList.add('assignment-table-submitted');
+        const assignmentLabel = childAssignmentTable.previousElementSibling.firstElementChild;
+        assignmentLabel.style.color = '#1E1F22';
+      } 
       collapseButton.addEventListener('click', function() {
-        const childAssignmentTable = document.getElementById(`student-assignment-table-${collapseButton.id}`);
         childAssignmentTable.classList.toggle('collapedContainer');
+        lecturerChildAssignmentTable.classList.toggle('collapedContainer');
         if(collapseButton.textContent === '⇧'){
           collapseButton.textContent = '⇩';
         } else {
@@ -836,6 +845,8 @@ $unit = $result->fetch_assoc();
         }
       });
     });
+
+
     //select all the tiles
     const tiles = document.querySelectorAll(".unitTileHolder");
     const navTiles = document.querySelectorAll(".nav-tile");
