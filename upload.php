@@ -75,7 +75,17 @@ include("php/dbConnect.php");
   }
 
   ?>
-  <button onclick="document.location='/devproject/unit.php?id=<?php echo $unitId; ?>'">Go back</button>
+  <button class="back-button" onclick="document.location='/devproject/unit.php?id=<?php echo $unitId; ?>'">
+  <img class="back-icon" src="assets/fontAwesomeIcons/back.svg" />Go back</button>
 </body>
-
 </html>
+<style>
+  .back-button{
+        padding: 5px;
+        font-size: 15px;
+        display: inline-flex;
+        gap: 10px;
+        margin-top:20px;
+        margin-left:20px;
+    }
+</style>

@@ -249,8 +249,7 @@ justify-content: center;
   background-color: #1E1F22;
   margin: 5% auto;
   padding: 20px;
-  border: 1px solid #888;
-  width: 80%;
+  width: 85%;
   min-height: 1000px;
 }
 
@@ -713,8 +712,8 @@ z-index: 1;
   padding: 5px;
 }
 .assignment-label-container{
-  margin-top: 50px;
   padding: 10px;
+  margin-top:10px;
   background-color: rgba(255, 255, 255, 0.2);
   display: flex;
   justify-content: space-between;
@@ -723,10 +722,20 @@ z-index: 1;
   font-size: 25px;  
   color: white;
 }
+.collapse-all-container{
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 70px;
+  gap: 20px;
+}
+.assignment-collapse-controller{
+  color: #f2e900;
+  cursor: pointer;
+}
 .assignment-collapse-button{
   padding: 4px;
   margin-right: 3px;
-  color: #FF7700;
+  color: #f2e900;
   cursor: pointer;
 }
 .assignment-table-container{
@@ -740,6 +749,7 @@ z-index: 1;
   display: none;
   height: 0px;
 }
+
 
 /* */
 .modal-content-item:hover {

@@ -11,6 +11,12 @@ html {
 .section-heading, .section-heading span, .modal-component-title, .modal-unit-heading, .centre p{
     color: #1E1F22;
 }
+.nav-tile-inner, .unitTile{
+    background-color: #45474d;
+}
+.nav-tile, .unitTileHolder{
+    background-color: #323235;
+}
 .modal-component-title, .modal-unit-heading{
     font-weight: bold;
 }
@@ -32,9 +38,13 @@ html {
 .modal-content-item * {
     color: #2c2c2c;
 }
-.assignment-table tr th:nth-child(even) {
-    color: #2c2c2c;
+.assignment-label-container{
+    background-color: rgba(0, 0, 0, 0.5);
 }
-.assignment-table tr th:nth-child(odd) {
-    color: #1E1F22;
+.assignment-collapse-controller, .assignment-collapse-button, .close{
+    color: #FF7700;
+}
+/* TERM PAGE */
+.unit-card{
+    background-color: #323235;
 }

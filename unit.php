@@ -98,6 +98,10 @@ $unit = $result->fetch_assoc();
   <!-- invis div for STUDENT Assignment tile ------ Links to assHolder.append($("#assContent").show()); on like line 420 -->
   <div id="assContent" style="display:none;">
     <div class="modal-unit-heading">Assignments for <?php echo $unit['name']; ?></div>
+    <div class="collapse-all-container">
+      <div class="assignment-collapse-controller" onClick="collapseAssignents(true)">Collapse All ▲</div>
+      <div class="assignment-collapse-controller" onClick="collapseAssignents()">Open all ▼</div>
+    </div>
     <?php
     while ($assignment = $assResult->fetch_assoc()) {
       $assCount++;
@@ -105,7 +109,7 @@ $unit = $result->fetch_assoc();
       <div id="assignmentTableContainer">
         <div class="assignment-label-container">
           <div class="assignment-label">Assignment <?php echo $assCount; ?></div>
-          <div class="assignment-collapse-button" id="<?php echo $assCount; ?>">⇧</div>
+          <div class="assignment-collapse-button" id="<?php echo $assCount; ?>">▲</div>
         </div>
         <table class="assignment-table" id="assignment-table-<?php echo $assCount; ?>">
           <tr>
@@ -199,6 +203,10 @@ $unit = $result->fetch_assoc();
   <!-- Invisible div for TEACHER assignment view -->
   <div id="assTeacherContent" style="display:none;">
     <div class="modal-unit-heading">Assignments for <?php echo $unit['name']; ?></div>
+    <div class="collapse-all-container">
+      <div class="assignment-collapse-controller" onClick="collapseAssignents(true)">Collapse All ▲</div>
+      <div class="assignment-collapse-controller" onClick="collapseAssignents()">Open all ▼</div>
+    </div>
     <?php
     while ($assignment = $assTResult->fetch_assoc()) {
       $assTCount++;
@@ -206,7 +214,7 @@ $unit = $result->fetch_assoc();
       <div>
       <div class="assignment-label-container">
           <div class="assignment-label">Assignment <?php echo $assTCount; ?></div>
-          <div class="assignment-collapse-button" id="<?php echo $assTCount; ?>">⇧</div>
+          <div class="assignment-collapse-button" id="<?php echo $assTCount; ?>">▲</div>
         </div>
         <table class="assignment-table" id="lecturer-assignment-table-<?php echo $assTCount; ?>">
           <tr>
@@ -838,13 +846,26 @@ $unit = $result->fetch_assoc();
       collapseButton.addEventListener('click', function() {
         childAssignmentTable.classList.toggle('collapedContainer');
         lecturerChildAssignmentTable.classList.toggle('collapedContainer');
-        if(collapseButton.textContent === '⇧'){
-          collapseButton.textContent = '⇩';
+        if(collapseButton.textContent === '▲'){
+          collapseButton.textContent = '▼';
         } else {
-          collapseButton.textContent = '⇧';
+          collapseButton.textContent = '▲';
         }
       });
     });
+
+    function collapseAssignents(collapse){
+      const assignmentTables = document.querySelectorAll('.assignment-table');
+      if(collapse){
+        assignmentTables.forEach(function(table){
+          table.classList.add('collapedContainer');
+        })
+      } else {
+        assignmentTables.forEach(function(table){
+          table.classList.remove('collapedContainer');
+        })
+      }
+    }
 
 
     //select all the tiles

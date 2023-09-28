@@ -145,7 +145,7 @@ $files1 = scandir($dir);
                 <td colspan="3"></td>
             </tr>
             <tr>
-                <th><button onclick="document.location='/devproject/php/assigmentMark.php?unitId=<?php echo $unitId; ?>&assignmentId=<?php echo $assignmentId ?>'">Go back</button> </th>
+                <th><button onclick="document.location='/devproject/php/assigmentMark.php?unitId=<?php echo $unitId; ?>&assignmentId=<?php echo $assignmentId ?>'">⬅ Go back</button> </th>
                 <th><button onclick="submitForms()">Submit</button></th>
             </tr>
 

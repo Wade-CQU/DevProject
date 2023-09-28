@@ -147,7 +147,8 @@ $skipped = array('0', '1');
             echo "<h1>NO SUBMISSIONS YET</h1>";
         } ?>
                 </table>
-                <button onclick="document.location='/devproject/unit.php?id=<?php echo $unitId; ?>'">Go back</button>
+                <button class="back-button" onclick="document.location='/devproject/unit.php?id=<?php echo $unitId; ?>'">
+                <img class="back-icon" src="../assets/fontAwesomeIcons/back.svg" /> Go back</button>
     </div>
 </body>
 
@@ -166,12 +167,10 @@ $skipped = array('0', '1');
         border: 3px solid orange;
         padding: 10px;
     }
-
     .centre tr {
         border-collapse: collapse;
         border: 3px solid orange;
     }
-
     .centre-allign {
         margin-right: auto;
         margin-left: auto;
@@ -179,18 +178,20 @@ $skipped = array('0', '1');
         margin-bottom: 30px;
         width: 90%;
     }
-
     .centre-allign tr:nth-child(odd) {
         background-color: rgba(255, 255, 255, 0.1);
     }
-
     .centre-allign tr:nth-child(even) {
         background-color: rgba(255, 255, 255, 0.2);
     }
-
     .grade-button {
         padding: 10px;
         margin: 4px;
     } 
-
+    .back-button{
+        padding: 5px;
+        font-size: 15px;
+        display: inline-flex;
+        gap: 10px;
+    }
 </style>
