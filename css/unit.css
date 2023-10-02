@@ -7,7 +7,6 @@
   display: block;
   padding: 20px 15%;
 }
-
 p1{
   display: block;
   margin-top: 20px;
@@ -18,13 +17,11 @@ p1{
   text-align: center;
   padding: 20px;
 }
-
 textarea {
   padding: 4px;
   font-size: 14px;
   resize: vertical;
 }
-
 .divider {
   position: absolute;
   margin-left: 2%;
@@ -33,29 +30,24 @@ textarea {
   background-color: #dfdff3;
   margin-top: 15px;
 }
-
 .unit-heading {
   background-color: #35393E;
   padding: 0px 15px;
   border-radius: 15px;
 }
-
 .unit-title {
   letter-spacing: -2px;
 }
-
 .class-xp-container {
   display: flex;
   gap: 10px;
 }
-
 .class-xp-label {
   font-family: 'Blender Pro';
   color: #f2e900;
   width: 100px;
   padding: 5px;
 }
-
 .class-xp-bar {
   width: 100%;
   height: fit-content;
@@ -66,12 +58,52 @@ textarea {
   overflow: hidden;
   border-radius: 5px;
 }
-
 .class-xp-progress {
   height: 10px;
   background-color: #54FF00;
 }
-
+.rank-display{
+  width: fit-content;
+  margin-right: auto;
+  margin-left: auto;
+  margin-top: 8px;
+  text-align: center;
+  font-family: 'Blender Pro';
+  color:#f2e900;
+}
+.rank-display-icon{
+  padding: 10px;
+  width: 150px;
+  margin-bottom: 10px;
+}
+.tooltip-icon{
+  width: 15px;
+}
+.tooltip{
+  position: relative;
+  display: inline-block;
+}
+.tooltip-text{
+  visibility: hidden;
+  width: 224px;
+  background-color: #555;
+  color: #fff;
+  text-align: center;
+  font-size: 13px;
+  padding: 5px 0;
+  border-radius: 6px;
+  position: absolute;
+  z-index: 1;
+  top: -5px;
+  left: 155%;
+  margin-left: -60px;
+  opacity: 0;
+  transition: opacity 0.3s;
+}
+.tooltip:hover .tooltip-text {
+  visibility: visible;
+  opacity: 1;
+}
 .section-heading, .section-heading span {
   font-size: 2rem;
   font-family: 'Blender Pro';
@@ -80,14 +112,12 @@ textarea {
   padding: 5px;
   letter-spacing: 6px;
 }
-
 .section-divider{
   width: 100%;
   height: 1px;
   background-color: #f2e900;
   margin-bottom: 40px;
 }
-
 .weekly-content-container {
   display: flex;
   flex-wrap: wrap;

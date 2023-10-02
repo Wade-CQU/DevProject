@@ -61,6 +61,20 @@ if ($unitTaskCount == 0) {
   $unitXpPercentage = floor($unitXpPercentage);
 }
 
+//assign a class rank variable which is used to display the rank icon
+$classRank = 1;
+switch (true) {
+  case $unitXpPercentage > 25 && $unitXpPercentage <= 50:
+      $classRank = 2;
+      break;
+  case $unitXpPercentage > 50 && $unitXpPercentage <= 75:
+      $classRank = 3;
+      break;
+  case $unitXpPercentage > 75:
+      $classRank = 4;
+      break;
+}
+
 
 // Get unit record:
 $sql = "SELECT id, code, name, description FROM unit WHERE EXISTS (SELECT 1 FROM unitUser WHERE unitId = ? AND userId = $userId) AND ID = ? LIMIT 1;";
@@ -507,6 +521,11 @@ $unit = $result->fetch_assoc();
         <div class="class-xp-bar">
           <div class="class-xp-progress" style="width: <?php echo $unitXpPercentage; ?>%;"></div>
         </div>
+      </div>
+      <div class="rank-display">
+        <div class="tooltip">Current rank: <img class="tooltip-icon" src="assets/fontAwesomeIcons/info.svg">
+          <div class="tooltip-text">As you complete learning material in this class your xp will increase and rank icon will improve</div></div>
+        <div><img class="rank-display-icon" src="assets/<?php echo $classRank; ?>.svg"></div>
       </div>
     </div>
     <div class="section-heading">RESOURCES</div>
