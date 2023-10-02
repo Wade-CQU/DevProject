@@ -38,7 +38,7 @@
     </div>
     <div class="split right">
         <div class="ranks">
-            <h1>Ranks:</h1>
+            <h1>Class Ranks:</h1>
             <div class="list-container">
                 <?php // Get unit's based on user:
                     $sql = "SELECT uId, name, termCode FROM unit u RIGHT JOIN (SELECT uu.unitId as uId FROM unitUser uu WHERE userId = $userId) uu ON uId = u.id ORDER BY termCode DESC";
@@ -57,7 +57,6 @@
                 <div class="list-unit-card" id="<?php echo $unit['uId']; ?>"<?php echo $unit['termCode'] != $termCode ? "style='display: none;'" : ""; ?>>
                     <div class="profile-title"><?php echo $unit['name']; ?></div>
                     <img class="rank-icon-container" src="assets/<?php echo $fakeRank; ?>.svg"/>
-                    <div class="rank-highlight rank-<?php echo $fakeRank; ?>"></div>
                 </div>
                   <?php }
                     $stmt->close();

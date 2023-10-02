@@ -1,8 +1,3 @@
-/*
-    Outline for debug
-        outline: 1px solid red;
-*/
-
 .body-content{
   display: block;
   padding: 20px 15%;
@@ -125,7 +120,6 @@ textarea {
   justify-content: space-evenly;
 align-items: center;
 }
-
 .flexbox {
   display: flex;
   justify-content: right;
@@ -140,7 +134,6 @@ align-items: center;
   display: flex;
   justify-content: space-between;
 }
-
 .nav-tile{
   background-color: #1e1f22;
   border-radius: 16px;
@@ -149,7 +142,6 @@ align-items: center;
   width: 300px;
   cursor: pointer;
 }
-
 .nav-tile-inner{
   width: 100%;
   height: 100%;
@@ -161,7 +153,6 @@ align-items: center;
   gap: 20px;
   overflow: hidden;
 }
-
 .nav-tile-icon{
   margin-left: 15px;
   width: 100px;
@@ -170,7 +161,6 @@ align-items: center;
   padding: 10px;
   border-radius: 10px;
 }
-
 .nav-tile-label{
   width: 100%;
   font-family: 'Blender Pro';
@@ -178,7 +168,6 @@ align-items: center;
   color: #02d7f2;
   text-align: center;
 }
-
 .unitTileHolder {
   background-color: #1e1f22;
   border-radius: 16px;
@@ -261,7 +250,7 @@ justify-content: center;
   display: none;
 }
 
-/* The Modal (background) */
+/* Modal Frame and background */
 .modal {
   display: none;
   position: fixed;
@@ -273,8 +262,6 @@ justify-content: center;
   overflow: auto;
   background-color: #0000008c;
 }
-
-/* Modal Content/Box */
 .modal-content {
   background-color: #1E1F22;
   margin: 5% auto;
@@ -282,19 +269,16 @@ justify-content: center;
   width: 85%;
   min-height: 1000px;
 }
-
 .modal-unit-heading{
   color: #02d7f2;
   font-size: 3em;
   text-align: center;
 }
-
 .modal-unit-description {
   color: white;
   margin: 20px 100px;
   text-align: center;
 }
-
 .modal-weekly-quest-container{
   background-color: #35393E;
   height: fit-content;
@@ -303,21 +287,14 @@ justify-content: center;
   margin-bottom: 30px;
   border-radius: 10px;
 }
-
 .modal-weekly-quest-title{
   font-size: 2em;
   letter-spacing: 8px;
 }
-
 .modal-weekly-quest, .modal-weekly-quest-title{
   color: #FF7700;
   padding: 10px 15px;
 }
-
-.weeklyQuestListItem{
-
-}
-
 .weeklyQuestCompleted{
   color: #54FF00;
   text-decoration: line-through;
@@ -403,7 +380,6 @@ textarea.modal-component-description {
   font-size: 28px;
   font-weight: bold;
 }
-
 .close:hover,
 .close:focus {
   color: black;
@@ -411,6 +387,7 @@ textarea.modal-component-description {
   cursor: pointer;
 }
 
+/* Modal Editting */
 .modal-edit-button{
   padding: 10px 15px;
   background-color: #FF7700;
@@ -421,11 +398,9 @@ textarea.modal-component-description {
   letter-spacing: 3px;
   margin-bottom: 25px;
 }
-
 .modal-edit-button:hover {
   background-color: #02d7f2;
 }
-
 .save-cancel-btn {
   display: inline-block;
   padding: 10px;
@@ -436,25 +411,20 @@ textarea.modal-component-description {
   margin: 5px 15px;
   cursor: pointer;
 }
-
 .save-cancel-btn:hover {
   background-color: #FF7700;
   color: #1E1F22;
 }
-
 .edit-field {
   margin-top: 15px;
   padding-bottom: 8px;
 }
-
 .component-head {
   width:100%
 }
-
 .modal-component-title, .edit-modal-delete-component {
   display: inline-block;
 }
-
 .edit-modal-delete-component {
   float: right;
   text-align: center;
@@ -466,7 +436,6 @@ textarea.modal-component-description {
   border-radius: 5px ;
   cursor: pointer;
 }
-
 .add-content-btn{
   background-color: white;
   padding: 2px 8px;
@@ -474,41 +443,33 @@ textarea.modal-component-description {
   border-radius: 5px;
   cursor: pointer;
 }
-
 .add-content-btn, .add-content-btn-label{
   display: inline-block;
   color: #FF7700;
 }
-
 .edit-content-holder{
   padding: 10px;
   border: dashed #dfdff3 1px;
   margin-top: 2px;
 }
-
 .edit-content-label{
   color: #FF7700;
 }
-
 .edit-content-row-type, .edit-content-row, .edit-content-row-url{
   display: grid;
   grid-auto-flow: column;
   gap: 10px;
   margin-top: 5px;
 }
-
 .edit-content-row-type{
   grid-template-columns: 120px 150px;
 }
-
 .edit-content-row{
   grid-template-columns: 120px auto;
 }
-
 .edit-content-row-url{
   grid-template-columns: 120px auto 1fr;
 }
-
 .edit-content-url{
   text-align: left;
   background-color: #ffffff;
@@ -518,14 +479,12 @@ textarea.modal-component-description {
   font-size: 14px;
   padding: 4px;
 }
-
 .edit-content-delete-icon{
   padding: 5px;
   width: 25px;
   margin-left: auto;
   cursor: pointer;
 }
-
 .edit-content-delete-icon:hover{
   background-color: #FF7700;
   border-radius: 5px;
@@ -606,7 +565,6 @@ table.studentsTable td {
 table.studentsTable tr:hover td {
   background: #3b3f49;
 }
-
 #tileSaveBtn, #tileCancelBtn, #tileEditBtn, .addTileBtn {
   float: right;
   border: 1px orange solid;
@@ -631,6 +589,7 @@ background: transparent;
   cursor: pointer;
   user-select: none;
 }
+
 /* DRAGGING SHENANAGINS */
 .dragComp {
   display: flex;
@@ -719,6 +678,7 @@ z-index: 1;
   cursor: grabbing;
   pointer-events: none;
 }
+
 /* Assignment Modal */
 .assignment-table{
   margin-bottom: 80px;
@@ -781,7 +741,7 @@ z-index: 1;
 }
 
 
-/* */
+/* Learning section editting */
 .modal-content-item:hover {
   background-color: #7dc3ff1f;
 }
