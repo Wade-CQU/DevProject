@@ -24,41 +24,44 @@ include("php/dbConnect.php");
   $date = date("Y-m-d H:i:s");
   $grade = 0;
   $status = 1;
-  //echo $date;
-  //echo "Assignment ID = " . $assignmentId . " ----- ";
-  //echo "Unit ID = " . $unitId . " ----- ";
 
   $target_dir = "Assignments/$unitId/$assignmentId/$userId/";
   $target_file = $target_dir . basename($_FILES["fileToUpload"]["name"]);
   $uploadOk = 1;
   $imageFileType = strtolower(pathinfo($target_file, PATHINFO_EXTENSION));
 
-  if (is_dir("Assignments/") == false) {
-    mkdir("Assignments/", 0777);
-    //echo "here 1 ";
+  //Checks if you selected a file to upload.
+  if(!isset($_FILES["fileToUpload"]["name"][0])){
+    $uploadOk = 3;
   }
-  if (is_dir("Assignments/$unitId/") == false) {
-    mkdir("Assignments/$unitId/", 0777);
-    //echo "here 2 ";
-  }
-  if (is_dir("Assignments/$unitId/$assignmentId/") == false) {
-    mkdir("Assignments/$unitId/$assignmentId/", 0777);
-    //echo "here 3 ";
-  }
-  if (is_dir("Assignments/$unitId/$assignmentId/$userId/") == false) {
-    mkdir("Assignments/$unitId/$assignmentId/$userId/", 0777);
-    //echo "here 4 ";
-  } else {
-    $uploadOk = 0;
-    //echo "Directory already exists";
 
+  if($uploadOk != 3){
+    if (is_dir("Assignments/") == false) {
+      mkdir("Assignments/", 0777);
+    }
+    if (is_dir("Assignments/$unitId/") == false) {
+      mkdir("Assignments/$unitId/", 0777);
+    }
+    if (is_dir("Assignments/$unitId/$assignmentId/") == false) {
+      mkdir("Assignments/$unitId/$assignmentId/", 0777);
+    }
+    if (is_dir("Assignments/$unitId/$assignmentId/$userId/") == false) {
+      mkdir("Assignments/$unitId/$assignmentId/$userId/", 0777);
+    } else {
+      $uploadOk = 0;
+      //echo "Directory already exists";
+    }
   }
 
   // Check if $uploadOk is set to 0 by an error
   if ($uploadOk == 0) {
     echo "<h1>Sorry, you have already submitted this assignment. Please contact NU support or your lecturer if this is a mistake.</h1>";
     // if everything is ok, try to upload file
-  } else {
+  }
+  if ($uploadOk == 3) {
+    echo "<h1>Sorry, you have not selected a file to upload, please go back and try again.</h1>";
+  } 
+  if($uploadOk == 1) {
     if (move_uploaded_file($_FILES["fileToUpload"]["tmp_name"], $target_file)) {
 
       //Creates sql to add a submission
