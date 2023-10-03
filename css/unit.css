@@ -1,3 +1,17 @@
+/* Animations */
+@keyframes fadeIn {
+  0%{
+    margin-bottom:-274px;
+    opacity: 0;
+  }
+  100%{
+    margin-bottom: 6px;
+    opacity: 1;
+  }
+}
+.fadesIn{
+  animation: fadeIn 1.5s ease-in-out;
+}
 .body-content{
   display: block;
   padding: 20px 15%;

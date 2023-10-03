@@ -525,7 +525,7 @@ $unit = $result->fetch_assoc();
       <div class="rank-display">
         <div class="tooltip">Current rank: <img class="tooltip-icon" src="assets/fontAwesomeIcons/info.svg">
           <div class="tooltip-text">As you complete learning material in this class your xp will increase and rank icon will improve</div></div>
-        <div><img class="rank-display-icon" src="assets/<?php echo $classRank; ?>.svg"></div>
+        <div><img class="rank-display-icon fadesIn" src="assets/<?php echo $classRank; ?>.svg"></div>
       </div>
     </div>
     <div class="section-heading">RESOURCES</div>
