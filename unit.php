@@ -40,6 +40,7 @@ $assTCount = 0;
 $sql = "SELECT id, unitId, due, total, description, specification FROM assignments WHERE unitId = ?";
 $stmt = $dbh->prepare($sql);
 $stmt->bind_param("i", $unitId);
+ensureIntegrity();
 $stmt->execute();
 $assTResult = $stmt->get_result();
 $stmt->close();
@@ -99,7 +100,6 @@ $unit = $result->fetch_assoc();
   <title><?php echo $unit['code'] . ": " . $unit['name']; ?></title>
   <link href="css/unit.css" rel="stylesheet" />
   <link href="css/default.css" rel="stylesheet" />
-  <script src="frameworks/jquery-3.7.0.min.js"></script>
   <script src="js/ajax.js"></script> <!-- !!! perhaps in header ^^? -->
   <?php if (isset($_COOKIE['lightTheme'])) { ?>
     <link rel="stylesheet" href="css/cringeTheme.css">
@@ -146,8 +146,6 @@ $unit = $result->fetch_assoc();
                 if ($days_remaining < 0) {
                   echo $assignment['due'] . " | Past Due Date.";
                 }
-
-
                 ?></th>
           </tr>
           <tr>
@@ -525,7 +523,7 @@ $unit = $result->fetch_assoc();
       <div class="rank-display">
         <div class="tooltip">Current rank: <img class="tooltip-icon" src="assets/fontAwesomeIcons/info.svg">
           <div class="tooltip-text">As you complete learning material in this class your xp will increase and rank icon will improve</div></div>
-        <div><img class="rank-display-icon fadesIn" src="assets/<?php echo $classRank; ?>.svg"></div>
+        <div><img class="rank-display-icon<?php if (isset($_SESSION['impressTheWomen'])) { echo " fadesIn"; unset($_SESSION['impressTheWomen']); } ?>" src="assets/<?php echo $classRank; ?>.svg"></div>
       </div>
     </div>
     <div class="section-heading">RESOURCES</div>
@@ -899,11 +897,11 @@ $unit = $result->fetch_assoc();
         //if modal has already been loaded -> change visiblity
         if (contentLoaded) {
           const thisModalContainer = document.querySelector("#modalContainer" + tile.dataset.tileId + ".modal");
-          thisModalContainer.style.display = "block";
+          $(thisModalContainer).stop().fadeIn(300);
 
           window.onclick = function(event) {
             if (event.target == thisModalContainer) {
-              thisModalContainer.style.display = "none";
+              $(thisModalContainer).stop().fadeOut(300);
             }
           }
           //if modal is not yet created -> create and make visible
@@ -919,7 +917,7 @@ $unit = $result->fetch_assoc();
             thisModalContent.appendChild(editButton);
 
             editButton.addEventListener("click", function() {
-              thisModalContainer.style.display = "none";
+              $(thisModalContainer).stop().fadeOut(1500);
               loadModalFrame(tile, true);
               getTileContents(tile.dataset.tileId, "#editModalCont" + tile.dataset.tileId, true);
             });
@@ -940,7 +938,7 @@ $unit = $result->fetch_assoc();
 
           window.onclick = function(event) {
             if (event.target == thisModalContainer) {
-              thisModalContainer.style.display = "none";
+              $(thisModalContainer).stop().fadeOut(300);
             }
           }
         } else {
@@ -955,6 +953,7 @@ $unit = $result->fetch_assoc();
       modalContainer.className = "modal";
       modalContainer.id = "modalContainer" + (isEdit ? "Edit" : "") + tile.dataset.tileId;
       var modalContent = document.createElement('div');
+      $(modalContent).hide();
       modalContent.id = (isEdit ? "editModalCont" : "modalCont") + tile.dataset.tileId;
       modalContent.className = "modal-content";
       var closeButton = document.createElement('span');
@@ -1000,14 +999,15 @@ $unit = $result->fetch_assoc();
         }
       } else {
         closeButton.onclick = function() {
-          modalContainer.style.display = "none";
+          $(modalContainer).stop().fadeOut(300);
         }
         window.onclick = function(event) {
           if (event.target == modalContainer) {
-            modalContainer.style.display = "none";
+            $(modalContainer).stop().fadeOut(300);
           }
         }
       }
+      $(modalContent).stop().fadeIn(300);
     }
     //load modal for each nav tile
     function loadNavTileModal(navTile) {
@@ -1025,47 +1025,33 @@ $unit = $result->fetch_assoc();
       document.body.appendChild(modalContainer);
       modalContainer.appendChild(modalContent);
       modalContent.appendChild(closeButton);
-      modalContainer.style.display = "block";
-
-      /*
-
-      JACK AND CONNOR
-      USE SECTION BELOW TO CREATE YOUR MODALS
-
-        ||
-        ||
-        ||
-      \ || /
-        \/
-
-      */
-
+      $(modalContainer).stop().fadeIn(400);
 
       //fill modal with content based on the nav tile id
       if (navTile.id == "assignments") {
         console.log("loadNavTile assignments");
         var assHolder = $("#modalContassignments");
-                if (<?php echo $userRole; ?> == 2){
-                  assHolder.append($("#assTeacherContent").show());
-                } else{
-                  assHolder.append($("#assContent").show());
-                }
+        if (<?php echo $userRole; ?> == 2){
+          assHolder.append($("#assTeacherContent").stop().fadeIn(300));
+        } else{
+          assHolder.append($("#assContent").stop().fadeIn(300));
+        }
       }
       if (navTile.id == "classinfo") {
         var cInfoHolder = $("#modalContclassinfo");
-        cInfoHolder.append($("#classInfoContent").show());
+        cInfoHolder.append($("#classInfoContent").stop().fadeIn(300));
       }
       if (navTile.id == "timetable") {
         var timetableHolder = $("#modalConttimetable");
-        timetableHolder.append($("#timetableContent").show());
+        timetableHolder.append($("#timetableContent").stop().fadeIn(300));
       }
       //make modal closeable
       closeButton.onclick = function() {
-        modalContainer.style.display = "none";
+        $(modalContainer).stop().fadeOut(300);
       }
       window.onclick = function(event) {
         if (event.target == modalContainer) {
-          modalContainer.style.display = "none";
+          $(modalContainer).stop().fadeOut(300); 
         }
       }
     }
@@ -1113,6 +1099,7 @@ $unit = $result->fetch_assoc();
           contentClass = "ordered";
         } else if (ele.type == 2) {
           contentType = "<a>";
+          contentClass = "internal";
         } else if (ele.type == 3) { // download server file or navigate to url:
           contentType = "<a>";
           contentClass = "external";
@@ -1195,16 +1182,13 @@ $unit = $result->fetch_assoc();
         alert("There was an error submitting this comment.")
       });
     }
-
+    // Create elements responsible for representing a tile comment, and append to the tile:
     function generateComment(tileId, data) {
-      let name = data.name;
+      let name = data.name + (data.role == 2 ? " (Lecturer)" : "");
       let message = data.comment;
       let date = data.postDate;
       var comment = $("<div id='comment" + data.cid + "'>").addClass("comment");
-      var iconElement = $("<div>").addClass("commentIcon");
-      if (data.role == 2) {
-        iconElement.addClass("lecturerIcon");
-      }
+      var iconElement = $("<img>").addClass("commentIcon").attr("src", "assets/pfps/"+(data.userId % 10)+".jpg");
       var nameElement = $("<div>").addClass("commentUserName").text(name);
       var dateElement = $("<div>").addClass("commentDate").text(date);
       var messageElement = $("<div>").addClass("commentMessage").text(message);
@@ -1225,7 +1209,7 @@ $unit = $result->fetch_assoc();
         return false;
       }
     }
-
+    // Updates the ticking of a task in the database via AJAX request:
     function requestTaskToggle(id, tileId) {
       let state = toggleTask(id);
       var formData = new FormData();
@@ -1319,8 +1303,6 @@ $unit = $result->fetch_assoc();
         activeComp.addClass('compDragging');
         dragging = true;
       });
-
-      console.log("HUH");
     }
     var dragging = false;
     $(document).ready(function() {
@@ -1427,7 +1409,7 @@ $unit = $result->fetch_assoc();
       var holder = $(parent);
       let buttonHolder = $("<div>").addClass("save-cancel-btn-container");
       buttonHolder.append($("<div>").addClass("save-cancel-btn").html("Save").attr("onclick", "saveTile(" + tileId + ");"));
-      buttonHolder.append($("<div>").addClass("save-cancel-btn").html("Cancel").attr("onclick", "$('#modalContainerEdit" + tileId + "').remove(); document.querySelector('#modalContainer" + tileId + "').style.display = 'block';"));
+      buttonHolder.append($("<div>").addClass("save-cancel-btn").html("Cancel").attr("onclick", "$('#modalContainerEdit" + tileId + "').stop().fadeOut(200, function() {this.remove();}); $('#modalContainer" + tileId + "').stop().fadeIn(0);"));
       buttonHolder.append($("<div>").addClass("save-cancel-btn").html("Add Component").attr("onclick", "createEditableComponent($('#editModalCont" + tileId + "'));").css("float", "right"));
       holder.append(buttonHolder);
 
@@ -1582,13 +1564,13 @@ $unit = $result->fetch_assoc();
           formData.append("tileUpdateJSON", JSON.stringify(jsonData));
           var promise = postAJAX("php/tiles/saveTile.php", formData);
           promise.then(function(data) {
-            $("#modalContainerEdit" + tileId).remove(); // !!! reload tile too
+            $("#modalContainerEdit" + tileId).fadeOut(300, function(){this.remove();});
           }).catch(function(error) {
             alert("There was an error saving this tile's components & content, please try again later.");
           });
         } else { // if no changes, just go back:
-          $("#modalContainerEdit" + tileId).remove();
-          document.querySelector('#modalContainer' + tileId).style.display = 'block';
+          $("#modalContainerEdit" + tileId).fadeOut(300, function(){this.remove();});
+          $('#modalContainer' + tileId).stop().fadeIn(0);
         }
       }
       // converts any null values to empty strings:

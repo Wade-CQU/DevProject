@@ -11,7 +11,7 @@
     <link href="css/profilePage.css?d=<?php echo time(); ?>" rel="stylesheet" />
     <title>View Profile</title>
     <?php if (isset($_COOKIE['lightTheme'])) { ?>
-      <link rel="stylesheet" href="css/cringeTheme.css">
+        <link rel="stylesheet" href="css/cringeTheme.css">
     <?php } ?>
 </head>
 <body>
@@ -24,13 +24,13 @@
                 $stmt->execute();
                 $result = $stmt->get_result();
                 if (!$result) { // if query or database connection fails:
-                    echo "404 Unit Not Found"; // !!! review?
+                    echo "404 Unit Not Found";
                     $stmt->close();
                     $dbh->close();
                     exit;
                 }
                 while($user = $result->fetch_assoc()) { ?>
-                  <img src="https://cdn-icons-png.flaticon.com/512/64/64572.png" alt="Profile Icon">
+                  <img src="<?php echo $pfp; ?>" alt="Profile Icon">
                   <h1><?php echo  $user["firstName"]. "   " . $user["lastName"]; ?></h1>
                   <h2><?php echo  $user["email"]; ?></h2>
           <?php } ?>
@@ -41,23 +41,22 @@
             <h1>Class Ranks:</h1>
             <div class="list-container">
                 <?php // Get unit's based on user:
-                    $sql = "SELECT uId, name, termCode FROM unit u RIGHT JOIN (SELECT uu.unitId as uId FROM unitUser uu WHERE userId = $userId) uu ON uId = u.id ORDER BY termCode DESC";
+                    $sql = "SELECT uId, `name`, termCode FROM unit u RIGHT JOIN (SELECT uu.unitId as uId FROM unitUser uu WHERE userId = $userId) uu ON uId = u.id ORDER BY termCode DESC";
                     $stmt = $dbh->prepare($sql);
                     $stmt->execute();
                     $result = $stmt->get_result();
-
                     if (!$result) { // if query or database connection fails:
-                        echo "404 Unit Not Found"; // !!! review?
+                        echo "404 Unit Not Found"; 
                         $stmt->close();
                         $dbh->close();
                         exit;
                     }
                     while ($unit = $result->fetch_assoc()) {
-                        $fakeRank = rand(1, 4); ?>
-                <div class="list-unit-card" id="<?php echo $unit['uId']; ?>"<?php echo $unit['termCode'] != $termCode ? "style='display: none;'" : ""; ?>>
-                    <div class="profile-title"><?php echo $unit['name']; ?></div>
-                    <img class="rank-icon-container" src="assets/<?php echo $fakeRank; ?>.svg"/>
-                </div>
+                        $realRank = rand(1, 4); ?>
+                    <div class="list-unit-card" id="<?php echo $unit['uId']; ?>"<?php echo $unit['termCode'] != $termCode ? "style='display: none;'" : ""; ?>>
+                        <div class="profile-title"><?php echo substr($unit['name'], 0, 32); ?></div>
+                        <img class="rank-icon-container" src="assets/<?php echo $realRank; ?>.svg"/>
+                    </div>
                   <?php }
                     $stmt->close();
                     $dbh->close();

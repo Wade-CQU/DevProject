@@ -12,6 +12,7 @@
 .fadesIn{
   animation: fadeIn 1.5s ease-in-out;
 }
+/* Unit page background */
 .body-content{
   display: block;
   padding: 20px 15%;
@@ -282,6 +283,7 @@ justify-content: center;
   padding: 20px;
   width: 85%;
   min-height: 1000px;
+  border-radius: 24px;
 }
 .modal-unit-heading{
   color: #02d7f2;
@@ -357,14 +359,14 @@ textarea.modal-component-description {
 .modal-content-item.ordered * {
   margin-left: 12px;
 }
-.modal-content-item.external {
-  padding-left: 9px;
-}
-.modal-content-item.external * {
+.modal-content-item.external *, .modal-content-item.internal * {
   margin-left: 12px;
 }
 .modal-content-item.external::marker {
   content: "🌏︎";
+}
+.modal-content-item.internal::marker {
+  content: "🖿";
 }
 .modal-content-item * {
   color: white;
@@ -420,14 +422,13 @@ textarea.modal-component-description {
   padding: 10px;
   border-radius: 5px;
   border: solid #FF7700  2px;
-  background-color: white;
-  color: #FF7700;
+  background-color: transparent;
+  color: #fff700;
   margin: 5px 15px;
   cursor: pointer;
 }
 .save-cancel-btn:hover {
-  background-color: #FF7700;
-  color: #1E1F22;
+  background-color: #ff770063;
 }
 .edit-field {
   margin-top: 15px;

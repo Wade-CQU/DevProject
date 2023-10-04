@@ -34,11 +34,13 @@ header{
   cursor: pointer;
   padding: 12px 0px;
 }
-.profile-icon{
+.profile-icon {
   width: 30px;
   height: 30px;
+  border-radius: 100px;
   float: right;
   margin-right: 20px;
+  border: 2px #ffffff12 solid;
 }
 .term-xp-label{
   color: #F2E900;

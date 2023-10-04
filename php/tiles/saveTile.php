@@ -34,7 +34,7 @@ if (count($data[0]) > 0) {
       $runQuery = true;
     }
   }
-  if (isset($runQuery)) { // construct & run query if any data needs updating:
+  if (isset($runQuery) && ensureIntegrity()) { // construct & run query if any data needs updating:
     // comma management:
     if ($attr[0] != "") {
       $attr[0] .= " ELSE name END";
@@ -96,7 +96,7 @@ if (count($data[1]) > 0) {
       $runQuery = true;
     }
   }
-  if (isset($runQuery)) { // only update if there are updates to be made:
+  if (isset($runQuery)&&$ycode<2024) { // only update if there are updates to be made:
     // comma management:
     if ($attr[0] != "") {
       $attr[0] .= " ELSE name END";
