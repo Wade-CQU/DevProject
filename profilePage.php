@@ -52,13 +52,49 @@
                         exit;
                     }
                     while ($unit = $result->fetch_assoc()) {
-                        $realRank = rand(1, 4); ?>
+                        //Get total nbr of tasks in unit
+                        $sql = "SELECT SUM(totalTasks) FROM tile where unitId=?;";
+                        $stmt = $dbh->prepare($sql);
+                        $stmt->bind_param("i", $unit['uId']);
+                        $stmt->execute();
+                        $stmt->bind_result($unitTaskCount);
+                        $stmt->fetch();
+                        $stmt->close();
+                        //get number of tasks this user has completed
+                        $sql = "SELECT COUNT(tc.id) FROM taskcompletion tc
+                        RIGHT JOIN tile t ON tc.tileId = t.id
+                        RIGHT JOIN unit u ON t.unitId = u.id
+                        where u.id = ? AND tc.userId = ? AND tc.isComplete = 1;";
+                        $stmt = $dbh->prepare($sql);
+                        $stmt->bind_param("ii", $unit['uId'], $userId);
+                        $stmt->execute();
+                        $stmt->bind_result($unitTaskCompleted);
+                        $stmt->fetch();
+                        $stmt->close();
+                        //calculate total unit xp percentage for current user
+                        if ($unitTaskCount == 0) {
+                          $unitXpPercentage = 0;
+                        } else {
+                          $unitXpPercentage = ($unitTaskCompleted / $unitTaskCount) * 100;
+                          $unitXpPercentage = floor($unitXpPercentage);
+                        }
+                        //assign rank
+                        if($unitXpPercentage < 25){
+                          $rank = 1;
+                        } else if($unitXpPercentage < 50){
+                          $rank = 2;
+                        } else if($unitXpPercentage < 75){
+                          $rank = 3;
+                        } else {
+                          $rank = 4;
+                        }
+                        ?>
                     <div class="list-unit-card" id="<?php echo $unit['uId']; ?>"<?php echo $unit['termCode'] != $termCode ? "style='display: none;'" : ""; ?>>
                         <div class="profile-title"><?php echo substr($unit['name'], 0, 32); ?></div>
-                        <img class="rank-icon-container" src="assets/<?php echo $realRank; ?>.svg"/>
+                        <img class="rank-icon-container" src="assets/<?php echo $rank; ?>.svg"/>
                     </div>
                   <?php }
-                    $stmt->close();
+
                     $dbh->close();
                   ?>
             </div>
