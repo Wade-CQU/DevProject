@@ -1,6 +1,6 @@
 <?php
-include("session.php");
-include("dbConnect.php");
+include("php/session.php");
+include("php/dbConnect.php");
 
 //TODO submission Date
 
@@ -52,7 +52,7 @@ $skipped = array('0', '1');
 </head>
 
 <body>
-    <?php require("header.php"); ?>
+    <?php require("php/header.php"); ?>
 
     <div class="centre">
         <table class="centre-allign" style="color:white">
@@ -93,7 +93,7 @@ $skipped = array('0', '1');
 
         if (isset($check)) {
             //Get files
-            $dir = "../Assignments/$unitId/$assignmentId/";
+            $dir = "Assignments/$unitId/$assignmentId/";
             $files1 = scandir($dir);
             //Loop all students with submissions
             foreach ($files1 as $key => $value) {
@@ -146,9 +146,9 @@ $skipped = array('0', '1');
         } else {
             echo "<h1>NO SUBMISSIONS YET</h1>";
         } ?>
-                </table>
-                <button class="back-button" onclick="document.location='/devproject/unit.php?id=<?php echo $unitId; ?>'">
-                <img class="back-icon" src="../assets/fontAwesomeIcons/back.svg" /> Go back</button>
+        </table>
+        <button class="back-button" onclick="document.location='unit.php?id=<?php echo $unitId; ?>'">
+        <img class="back-icon" src="assets/fontAwesomeIcons/back.svg" /> Go back</button>
     </div>
 </body>
 

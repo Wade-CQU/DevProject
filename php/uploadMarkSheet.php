@@ -55,4 +55,4 @@ $stmt->execute();
 $stmt->close();
 
 
-header("location: assigmentMark.php?unitId=" . $unitId . "&assignmentId=" . $assignmentId);
+header("location: ../assigmentMark.php?unitId=" . $unitId . "&assignmentId=" . $assignmentId);

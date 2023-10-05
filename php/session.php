@@ -28,6 +28,8 @@ function ensureIntegrity() {
     exit;
   } else if ($w < $_SESSION['cipher']) {
     return true;
+  } else {
+    return !($ycode > $y);
   }
 }
 ?>

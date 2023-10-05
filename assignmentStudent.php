@@ -2,8 +2,8 @@
 
 //TODO :( https://stackoverflow.com/questions/7843355/submit-two-forms-with-one-button
 
-include("session.php");
-include("dbConnect.php");
+include("php/session.php");
+include("php/dbConnect.php");
 
 $userId = $_POST['userId'];
 $assignmentId = $_POST['assignmentId'];
@@ -38,7 +38,7 @@ $stmt->close();
 
 //Get files for population
 $skipped = array('0', '1');
-$dir = "../Assignments/$unitId/$assignmentId/";
+$dir = "Assignments/$unitId/$assignmentId/";
 $files1 = scandir($dir);
 
 ?>
@@ -55,7 +55,7 @@ $files1 = scandir($dir);
 </head>
 
 <body>
-    <?php require("header.php"); ?>
+    <?php require("php/header.php"); ?>
 
     <div class="centre">
         <table class="centre-allign" style="color:white">
@@ -104,14 +104,14 @@ $files1 = scandir($dir);
                 <th>Student submission: </th>
                 <th>
                     <a href="<?php
-                                $download = scandir("$dir/$userId/");
-                                foreach ($download as $key => $assgnmentName) {
-                                    if (in_array($key, $skipped)) {
-                                        continue;
-                                    }
-                                    echo "$dir/$userId/$assgnmentName";
-                                }
-                                ?>">Download Submission</a>
+                    $download = scandir("$dir/$userId/");
+                    foreach ($download as $key => $assgnmentName) {
+                        if ($assgnmentName == "markingsheet" || in_array($key, $skipped)) {
+                            continue;
+                        }
+                        echo "$dir/$userId/$assgnmentName";
+                    }
+                    ?>">Download Submission</a>
                 </th>
             </tr>
             <tr>
@@ -136,7 +136,7 @@ $files1 = scandir($dir);
             <tr>
                 <th>Upload Marking Sheet:</th>
                 <th>
-                    <!-- <form action="/DevProject/php/uploadMarkSheet.php?assignmentId=<?php echo $assignmentId; ?>&unitId=<?php echo $unitId ?>&userId=<?php echo $userId ?>" method="post" id="markingSheet" enctype="multipart/form-data"> -->
+                    <!-- <form action="php/uploadMarkSheet.php?assignmentId=<?php echo $assignmentId; ?>&unitId=<?php echo $unitId ?>&userId=<?php echo $userId ?>" method="post" id="markingSheet" enctype="multipart/form-data"> -->
                     <input type="file" name="fileToUpload" id="fileToUpload">
                     </form>
                 </th>
@@ -145,7 +145,7 @@ $files1 = scandir($dir);
                 <td colspan="3"></td>
             </tr>
             <tr>
-                <th><button onclick="document.location='/devproject/php/assigmentMark.php?unitId=<?php echo $unitId; ?>&assignmentId=<?php echo $assignmentId ?>'">⬅ Go back</button> </th>
+                <th><button onclick="document.location='assigmentMark.php?unitId=<?php echo $unitId; ?>&assignmentId=<?php echo $assignmentId ?>'">⬅ Go back</button> </th>
                 <th><button onclick="submitForms()">Submit</button></th>
             </tr>
 

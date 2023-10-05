@@ -247,7 +247,7 @@ $unit = $result->fetch_assoc();
           </tr>
           <tr>
             <th>Mark Assignment: </th>
-            <th><a href="/devproject/php/assigmentMark.php?unitId=<?php echo $unitId; ?>&assignmentId=<?php echo $assTCount; ?>">Mark Assignment</a></th>
+            <th><a href="assigmentMark.php?unitId=<?php echo $unitId; ?>&assignmentId=<?php echo $assTCount; ?>">Mark Assignment</a></th>
           </tr>
         </table>
       </div>
